@@ -17,7 +17,7 @@ Le joueur incarne le nouveau gardien du phare. Le départ du précédent gardien
 
 L'expérience recherchée est calme, immersive, mélancolique et satisfaisante. Le plaisir vient autant de la transformation visible des espaces que de la découverte de leur histoire.
 
-- Plateformes visées : PC et mobile.
+- Plateforme visée : PC uniquement.
 - Priorité absolue : une expérience solo de qualité.
 - Référence de sensation pour le nettoyage et les déplacements : *PowerWash Simulator*.
 
@@ -37,7 +37,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 - Vue à la première personne et déplacement libre en 3D.
 - Possibilité de marcher plus lentement.
 - La caméra peut être verrouillée pendant certaines manipulations pour faciliter le placement.
-- Les sensations de déplacement et de nettoyage doivent rester confortables sur PC comme sur mobile.
+- Les sensations de déplacement et de nettoyage doivent rester confortables sur PC.
 - Les commandes exactes et leur personnalisation seront définies lors du prototype d'interaction.
 
 ## 4. Nettoyage et réparation ✅
@@ -127,7 +127,6 @@ Elles peuvent inclure :
 - L'ouverture du journal met automatiquement le jeu en pause.
 - Le journal est inaccessible pendant les cinématiques.
 - Sur PC : navigation par défilement et boutons précédent/suivant ; une touche dédiée est personnalisable.
-- Sur mobile : icône tactile dédiée.
 - Pas de recherche textuelle dans le journal.
 
 ### Deux voix narratives distinctes
@@ -209,7 +208,7 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 ### Périmètre de la première version ✅
 
 - Expérience solo de qualité prioritaire.
-- PC et mobile.
+- PC uniquement ; mobile hors périmètre (décision du 2026-11-09).
 - Campagne de restauration du phare et exploration libre après la campagne.
 
 ### Pistes non engagées 💡
