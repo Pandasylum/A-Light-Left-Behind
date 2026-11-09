@@ -1,8 +1,8 @@
-# THE LAST KEEPER — RÈGLES ET DIRECTIVES DU PROJET
+# A LIGHT LEFT BEHIND — RÈGLES ET DIRECTIVES DU PROJET
 
 ## 1. Présentation et vision du jeu
 
-**The Last Keeper** est un jeu contemplatif à la première personne dans lequel le joueur incarne le gardien d'un ancien phare.
+**A Light Left Behind** est un jeu contemplatif à la première personne dans lequel le joueur incarne le gardien d'un ancien phare.
 
 Le jeu repose sur la restauration, le nettoyage, l'organisation et la découverte progressive d'un lieu chargé d'histoire.
 

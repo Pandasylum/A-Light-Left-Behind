@@ -1,8 +1,8 @@
-# THE LAST KEEPER — ORGANISATION DES PROJETS CLAUDE
+# A LIGHT LEFT BEHIND — ORGANISATION DES PROJETS CLAUDE
 
 ## Objectif général
 
-Organiser le développement de The Last Keeper à travers six projets Claude spécialisés.
+Organiser le développement de A Light Left Behind à travers six projets Claude spécialisés.
 
 Chaque projet possède un domaine de responsabilité précis.
 
@@ -25,7 +25,7 @@ Claude Code est utilisé pour intervenir directement sur les fichiers du projet 
 
 **Important :** ne pas considérer les six projets Claude comme six projets de jeu indépendants. Ils travaillent tous sur le même jeu.
 
-## 1. THE LAST KEEPER — Direction & Game Design
+## 1. A LIGHT LEFT BEHIND — Direction & Game Design
 
 **Rôle : cerveau central du projet et source de référence.**
 
@@ -67,7 +67,7 @@ Les autres projets doivent respecter ces décisions.
 
 Lorsqu'une proposition provenant d'un autre projet implique une modification du game design, elle doit être examinée ici avant d'être considérée comme validée.
 
-## 2. THE LAST KEEPER — Godot Engineering
+## 2. A LIGHT LEFT BEHIND — Godot Engineering
 
 **Rôle : développement technique et architecture du jeu.**
 
@@ -118,7 +118,7 @@ Ne pas sur-ingénier les systèmes.
 
 La priorité est de disposer d'une architecture fiable, compréhensible et suffisamment souple pour accueillir les futures pièces du phare.
 
-## 3. THE LAST KEEPER — Art Direction & Assets
+## 3. A LIGHT LEFT BEHIND — Art Direction & Assets
 
 **Rôle : direction artistique et production des ressources visuelles.**
 
@@ -172,7 +172,7 @@ Ne pas générer des pièces entières sous forme d'un seul modèle 3D.
 
 La cohérence visuelle de l'ensemble est plus importante que la complexité individuelle de chaque ressource.
 
-## 4. THE LAST KEEPER — Sound Design
+## 4. A LIGHT LEFT BEHIND — Sound Design
 
 **Rôle : conception et production sonore.**
 
@@ -226,7 +226,7 @@ Les ambiances doivent rester discrètes et ne pas devenir envahissantes.
 
 Éviter les effets sonores excessifs.
 
-## 5. THE LAST KEEPER — World & Content
+## 5. A LIGHT LEFT BEHIND — World & Content
 
 **Rôle : conception du monde, des pièces et du contenu.**
 
@@ -272,7 +272,7 @@ Privilégier les détails environnementaux et les découvertes progressives plut
 
 Les pièces doivent s'intégrer à la progression globale du joueur.
 
-## 6. THE LAST KEEPER — QA & Production
+## 6. A LIGHT LEFT BEHIND — QA & Production
 
 **Rôle : assurance qualité et suivi du développement.**
 
