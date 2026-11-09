@@ -1,3 +1,4 @@
+> ⚠️ Document obsolète (ancien titre « The Last Keeper »). Remplacé par ROADMAP.md et PLAN_DE_PRODUCTION.md. Conservé pour mémoire.
 # THE LAST KEEPER — FEUILLE DE ROUTE DE PRODUCTION
 
 ## Objectif général
