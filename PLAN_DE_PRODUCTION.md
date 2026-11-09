@@ -13,7 +13,7 @@ Le plan est organisé par dépendances et livrables. Les durées ne sont pas est
 
 ### Indispensable pour la première version
 
-- Jeu solo à la première personne, PC et mobile.
+- Jeu solo à la première personne, PC uniquement.
 - Déplacement, interaction, nettoyage, réparation, manipulation et rangement.
 - Progression guidée avec embranchements, validation de restauration à 100 % et découvertes facultatives séparées.
 - Outils de base disponibles dans la première pièce ; améliorations progressives via un atelier dédié, probablement la deuxième pièce.
@@ -57,12 +57,12 @@ Tâches :
 - Prise en main d'un objet et caméra éventuellement verrouillée.
 - Placement sur surface avec orientations prédéfinies.
 - Déplacement d'un meuble libre et distinction avec les installations fixes.
-- Commandes PC et contrôles tactiles mobiles.
+- Commandes PC (clavier/souris).
 - Première version de l'inventaire et changement rapide de l'objet tenu.
 
 **Livrable / sortie :** scène grise de test où le joueur peut se déplacer, interagir, prendre, transporter, orienter et placer quelques objets sans blocage.
 
-**Critères de validation :** les interactions sont compréhensibles sans explication constante ; le placement est prévisible ; les contrôles sont utilisables à la souris/clavier et au tactile.
+**Critères de validation :** les interactions sont compréhensibles sans explication constante ; le placement est prévisible ; les contrôles sont utilisables à la souris/clavier.
 
 ### Phase 2 — Prototype du nettoyage et de la réparation
 
@@ -74,7 +74,7 @@ Tâches :
 - Définir les retours visuels et sonores de contact, progression et achèvement.
 - Implémenter les étapes de réparation et les variantes selon le matériau.
 - Définir la mesure de progression par surface et par objet.
-- Tester les performances sur PC et mobile, notamment sur les surfaces de grande taille.
+- Tester les performances sur PC, notamment sur les surfaces de grande taille.
 
 **Livrable / sortie :** petit espace de test où plusieurs types de surfaces peuvent être nettoyés et quelques objets réparés de bout en bout.
 
@@ -202,7 +202,7 @@ Tâches :
 - Vérifier qu'aucun objet facultatif n'est requis pour progresser.
 - Tester les embranchements, retours aux pièces précédentes et modifications après validation.
 - Tester les sauvegardes, imports invalides, exports, nouvelles parties et réinitialisations.
-- Tester PC (clavier/souris) et mobile (tactile), différentes résolutions et performances.
+- Tester PC (clavier/souris), différentes résolutions et performances.
 - Vérifier les sous-titres, volumes, lisibilité des indications et options.
 - Faire tester par des joueurs novices et recueillir les retours sur le rythme, la clarté et la fatigue liée au rangement.
 - Corriger les bugs bloquants et les problèmes de progression avant les défauts mineurs.
@@ -242,7 +242,7 @@ Certaines tâches peuvent avancer en parallèle une fois leurs dépendances stab
 ## 5. Ordre de priorité en cas de manque de temps
 
 1. Fiabilité de la boucle centrale : nettoyer, réparer, ranger et valider.
-2. Confort des déplacements et interactions sur PC et mobile.
+2. Confort des déplacements et interactions sur PC.
 3. Progression sans blocage et sauvegarde fiable.
 4. Campagne complète et conclusion compréhensible.
 5. Journal et narration essentielle.
@@ -257,7 +257,6 @@ Ne pas sacrifier la lisibilité de la restauration ou la stabilité des sauvegar
 |---|---|
 | Le 100 % devient une chasse au pixel | Comptabiliser des unités de surface/objets explicites ; fournir un indicateur clair des éléments restants ; tester les cas limites. |
 | Le rangement devient une corvée ou limite trop la créativité | Valider un emplacement logique plutôt qu'une position décorative exacte ; garder un placement libre dans les contraintes prévues. |
-| La manipulation devient trop complexe sur mobile | Limiter les degrés de liberté, utiliser des rotations prédéfinies et une caméra verrouillable. |
 | Trop de contenu est produit avant validation du gameplay | Exiger une vertical slice satisfaisante avant la production en série des pièces. |
 | Les systèmes deviennent difficiles à réutiliser | Séparer les systèmes communs des données propres à chaque pièce. |
 | Les découvertes facultatives bloquent la campagne | Séparer leurs flags et compteurs des critères de restauration. |
@@ -285,7 +284,7 @@ Chaque tâche devrait préciser :
 - son résultat attendu ;
 - ses dépendances ;
 - un critère de validation observable ;
-- les plateformes concernées (PC, mobile ou les deux).
+- les plateformes concernées.
 
 ### Prochaine étape concrète
 
