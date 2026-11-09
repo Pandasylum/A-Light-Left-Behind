@@ -284,7 +284,6 @@ Chaque tâche devrait préciser :
 - son résultat attendu ;
 - ses dépendances ;
 - un critère de validation observable ;
-- les plateformes concernées.
 
 ### Prochaine étape concrète
 

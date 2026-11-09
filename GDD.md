@@ -127,7 +127,6 @@ Elles peuvent inclure :
 - L'ouverture du journal met automatiquement le jeu en pause.
 - Le journal est inaccessible pendant les cinématiques.
 - Sur PC : navigation par défilement et boutons précédent/suivant ; une touche dédiée est personnalisable.
-- Sur mobile : icône tactile dédiée.
 - Pas de recherche textuelle dans le journal.
 
 ### Deux voix narratives distinctes
