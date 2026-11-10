@@ -41,6 +41,7 @@ Vérification automatique : `tools/check_project.sh` (Godot headless Linux, vers
 - Piles : un meuble ne peut pas être déplacé tant qu'il porte au moins un objet (message d'indice pour le joueur).
 - Ceinture : 5 emplacements de ceinture plus la main ; 6 objets portés au maximum.
 - Métal très corrodé : intégré au geste de réparation, aucun état distinct.
+- Caméra : Pendant la manipulation d’un objet, la caméra reste toujours libre. Pendant le nettoyage, le joueur peut verrouiller la caméra avec une touche à bascule. Le verrouillage n’est jamais imposé, et la caméra est libre par défaut.
 
 ## Hypothèses 🟡
 - Le sol de la pièce n'est jamais une zone ; un support déclaré (palette, étagère basse) n'est pas du sol même posé au niveau du sol. À confirmer par Direction.
