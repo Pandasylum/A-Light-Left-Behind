@@ -30,3 +30,47 @@ Dossier : `docs/art/references/` (images à déposer par le développeur).
 
 ## À décider 🟡
 Outil 3D principal, format d'export, budget de polygones, résolution des textures, palette finale.
+
+## Palette et matériaux
+
+Statut : seul le principe général est validé. Le reste est une proposition 🟡, à valider après le test de style.
+
+### Principe ✅ (2026-11-10)
+- Palette commune à tout le phare, variations par pièce.
+- Lumière froide et bleutée au début, plus chaude avec la restauration.
+
+### Palette commune 🟡
+- Bois : brun vieilli, délavé, sombre.
+- Métal : fer noirci, cuivre terni, acier rouillé.
+- Murs : pierre grise, enduit jauni, peinture écaillée.
+- Textiles désaturés : beige, brun, vert passé.
+- Valeurs hexadécimales à fixer après le test de style. En attendant, référence : PROJECT_RULES §4.3.
+
+### Variantes par espace 🟡
+La liste et les noms des pièces relèvent du GDD (§6, graphe non figé). Ici, seulement des familles de matériaux.
+- Hall central : pierre, bois, métal, ambiance froide.
+- Cuisine : carrelage, surfaces lavables, faïence.
+- Salle de vie : bois, textiles, mobilier ancien.
+- Atelier : bois brut, métal, outils, étagères.
+- Chambre : bois sombre, tissus, effets personnels.
+- Archives : bois, papier jauni, étagères, poussière.
+- Lanterne : métal, verre, mécanismes, lumière.
+- Vestibule d'entrée (tutoriel) : à définir.
+
+### États selon la progression 🟡
+- Avant : couleurs ternes, poussière, humidité, éclairage froid, faible contraste.
+- Après : bois retrouvé, surfaces propres, textiles restaurés, lumière plus chaude.
+
+### Règles de production 🟡
+- Mêmes matériaux sur plusieurs pièces.
+- Varier meubles et décorations plutôt que les modèles.
+- Textures et variations de couleur plutôt que modèles différents.
+- Éclairage et état des matériaux évoluent avec la progression.
+- Cohérence architecturale dans tout le phare.
+
+### Matériaux de base à produire en premier 🟡
+1. Bois vieilli (sombre ; variante brute pour l'atelier). 2. Pierre grise. 3. Enduit / peinture écaillée. 4. Fer noirci / acier rouillé (masque de rouille). 5. Cuivre / laiton terni. 6. Textile désaturé (teinte paramétrable).
+Deuxième vague : carrelage / faïence, papier jauni, verre.
+
+### Points ouverts
+Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
