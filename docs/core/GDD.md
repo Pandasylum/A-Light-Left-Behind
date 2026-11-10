@@ -79,7 +79,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 
 - La progression principale suit un ordre défini, avec quelques embranchements.
 - Les pièces se débloquent progressivement ; la campagne reste guidée.
-- Une pièce doit atteindre **100 % de nettoyage, 100 % de réparation et 100 % de rangement** pour valider sa restauration et débloquer la suite prévue.
+- Une pièce doit atteindre **100 %** pour valider sa restauration et débloquer la suite prévue. Le 100 % couvre tout ce que la pièce permet de faire avec les mécaniques disponibles à ce stade : la pièce 1 ne compte que le nettoyage et le rangement, sans la réparation ; les pièces suivantes comptent la réparation lorsqu'elle est disponible. La définition technique exacte reste ouverte (§15).
 - Les clés, objets d'histoire et autres découvertes narratives ne sont pas obligatoires pour valider une pièce. Leur suivi est séparé de l'objectif de restauration.
 - Les pièces déjà restaurées restent accessibles. Le joueur peut y revenir pour modifier leur organisation ou poursuivre l'entretien.
 - Les pièces sont initialement très sales et encombrées.

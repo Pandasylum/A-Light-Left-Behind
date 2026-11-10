@@ -51,6 +51,7 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - États visuels : cassé puis réparé, sauf cas particuliers (par exemple la lampe du phare). Une réparation a un effet fonctionnel dans le jeu.
 - Quatre outils de réparation : marteau (bois), tournevis (petites pièces mécaniques), clé à molette (installations métalliques et plomberie), kit de réparation (surfaces abîmées).
 - La réparation compte dans le 100 %.
+- Le 100 % d'une pièce couvre tout ce que la pièce permet de faire avec les mécaniques disponibles à ce stade : la pièce 1 ne compte que le nettoyage et le rangement, sans la réparation ; les pièces suivantes comptent la réparation lorsqu'elle est disponible. La définition technique exacte reste ouverte (GDD §15).
 - Plan de production : la phase 4 (pièce 1) contient la boucle « nettoyer, ranger » ; la réparation est introduite en phase 5 avec l'atelier. La phase 2 (prototype de réparation) reste inchangée.
 - Non décidé (GDD §15) : liste exacte des outils de nettoyage, mécanique détaillée de la réparation, origine des pièces de remplacement, consommabilité du kit de réparation, liste et nombre des réparations spécifiques.
 

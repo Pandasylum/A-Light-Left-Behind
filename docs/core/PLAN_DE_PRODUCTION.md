@@ -270,9 +270,9 @@ Ne pas sacrifier la lisibilité de la restauration ou la stabilité des sauvegar
 Une pièce est prête à être considérée comme terminée lorsque :
 
 - toutes les surfaces et tous les objets obligatoires atteignent leur état de nettoyage requis ;
-- toutes les réparations obligatoires sont terminées ;
+- toutes les réparations obligatoires sont terminées, lorsque la pièce permet de réparer (la pièce 1 ne compte pas la réparation) ;
 - tous les objets concernés sont rangés dans un emplacement logique valide ;
-- le calcul affiche 100 % pour les trois axes : nettoyage, réparation, rangement ;
+- le calcul affiche 100 % pour les axes disponibles dans la pièce : nettoyage et rangement, et réparation lorsqu'elle est disponible ;
 - les découvertes facultatives peuvent rester non trouvées ;
 - la pièce peut être quittée puis revisitée sans perdre son état ni casser la progression.
 
