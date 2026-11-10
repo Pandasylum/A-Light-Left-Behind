@@ -62,7 +62,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 - Les meubles libres peuvent être déplacés après avoir été nettoyés et réparés ; leur positionnement reste libre.
 - Les installations fixes et gros équipements ne sont pas déplaçables.
 - Les réparations de meubles dépendent de leur matériau.
-- La ceinture de transport peut être améliorée : chaque amélioration augmente de 1 le nombre de petits objets transportables, jusqu'à une capacité maximale envisagée de 5.
+- La ceinture de transport n'est pas possédée au départ : le joueur la trouve dans la pièce tutoriel. Sa capacité de départ est de 1 petit objet, en plus de l'objet tenu en main. Chaque amélioration (à l'atelier) augmente cette capacité de 1, jusqu'à un plafond de 5 petits objets (soit 4 améliorations).
 - L'inventaire sert à gérer les objets transportés. Le joueur peut changer rapidement d'objet tenu avec une commande dédiée.
 - L'ouverture de l'inventaire ne met pas le jeu en pause.
 
