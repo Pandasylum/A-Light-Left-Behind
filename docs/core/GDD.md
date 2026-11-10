@@ -101,7 +101,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
   - Éponge : nettoyage courant.
   - Raclette : vitres et surfaces lisses.
   - Serpillière : sols.
-  - Seau : rincer les outils et renouveler leur eau.
+  - Seau : rincer les outils de nettoyage. Sans rinçage, leur efficacité baisse fortement ; un outil sale perd jusqu'à 90 % d'efficacité au maximum, jamais 100 %. Le rinçage est un geste court : le joueur tient l'outil sale et interagit avec le seau. Le seau est améliorable à l'atelier comme les autres outils, ce qui permet de rincer moins souvent.
 - Ils sont tous accessibles dès l'arrivée dans cette pièce ; les améliorations, elles, se débloquent au fil de la progression.
 - Une pièce dédiée, l'atelier, est la deuxième pièce restaurée. Elle introduit la réparation et ses outils, puis permet d'améliorer les outils, ceinture comprise.
 - L'atelier ne fabrique jamais d'objets.
@@ -233,6 +233,7 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 - Nouveaux espaces après la campagne (sous-sol, cabanon extérieur, autres extensions).
 - Passage sous le phare pouvant éventuellement conduire jusqu'à la côte : idée d'extension future, pas une fonctionnalité requise pour la sortie initiale.
 - Support manette en bonus, si facile. Non engagé : le clavier/souris reste la référence.
+- Renouvellement de l'eau du seau : retiré du périmètre actuel, à reconsidérer plus tard.
 
 ## 15. Points à préciser pendant le prototypage 🟡
 
@@ -252,7 +253,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 12. Quand et où le joueur obtient la trousse à outils.
 13. Contenu exact de la trousse à outils.
 14. La trousse à outils est-elle améliorable ?
-15. Comportement du seau (rinçage, eau).
+15. Rythme de salissure des outils, signal visuel d'outil sale, effet exact des améliorations du seau sur la fréquence de rinçage.
 16. Comportement de l'outil multifonction selon la cible.
 
 ---
