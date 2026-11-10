@@ -383,7 +383,7 @@ La première étape consiste à créer :
 - Un système de rangement.
 - Une sauvegarde.
 
-Une fois ce prototype validé, l'environnement pourra être étendu vers un atelier comprenant environ trente objets, quatre outils, dix surfaces nettoyables et deux objets restaurables.
+Une fois ce prototype validé, l'environnement pourra être étendu vers un atelier comprenant environ trente objets, six outils, dix surfaces nettoyables et deux objets restaurables.
 
 Chaque système doit être validé avant de devenir une dépendance pour les étapes suivantes.
 
