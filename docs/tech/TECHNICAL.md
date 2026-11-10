@@ -19,7 +19,7 @@ Légende : ✅ décision validée · 🟡 à décider en Phase 0
 3. ✅ 2026-11-10 — Dossiers : projet Godot dans `game/` (`core`, `systems`, `data`, `rooms/test`, `props`, `ui`, `assets`, `tests`) ; docs et CLAUDE.md hors du moteur. Nommage : fichiers en snake_case, classes en PascalCase.
 4. 🟡 Représentation de la saleté (masque ou zones), à tester en Phase 2.
 5. ✅ 2026-11-10 — Architecture : trois autoloads maximum (sauvegarde, progression, réglages) ; physique par requêtes uniquement (raycast, shape query), aucun RigidBody persistant. Sauvegarde : JSON versionné dans `user://`, écriture atomique, jamais de .tres/ResourceSaver.
-6. 🟡 Représentation des objets et de leurs emplacements de rangement.
+6. ✅ 2026-11-10 — Objets = ressource `ItemData` ; emplacements de rangement = volumes (Area3D) dans les scènes de pièce + ressource `ZoneData` pour les règles.
 
 ## Input Map (provisoire) 🟡
 Actions définies dans `game/project.godot` (clavier/souris, touches provisoires, codes physiques ; aucune manette). Le regard à la souris est lu directement, hors Input Map. Les actions `ui_*` par défaut sont conservées.
@@ -34,3 +34,14 @@ Vérification automatique : `tools/check_project.sh` (Godot headless Linux, vers
 - Le JSON de Godot relit tous les nombres en flottants (un entier revient en 1.0) : les consommateurs convertissent en entier à la lecture.
 - Les vecteurs sont stockés sous forme de tableaux ; aucun objet sérialisé, le fichier est traité comme non fiable.
 - Une version de format plus récente que celle supportée est refusée ; point d'extension `_migrate` vide.
+
+## Décisions de Direction ✅ (source : Direction 2026-11-10)
+- Verrou du 100 % : booléen « restaurée » par pièce, posé au premier passage à 100 %, sauvegardé, jamais retiré. Le pourcentage affiché reflète l'état réel ; un axe ajouté plus tard ne retire pas le statut.
+- Rangement : zones souples par catégorie. Un objet est rangé s'il est posé (ni tenu, ni au sol) dans une zone qui accepte sa catégorie.
+- Piles : un meuble ne peut pas être déplacé tant qu'il porte au moins un objet (message d'indice pour le joueur).
+- Ceinture : 5 emplacements de ceinture plus la main ; 6 objets portés au maximum.
+- Métal très corrodé : intégré au geste de réparation, aucun état distinct.
+
+## Hypothèses 🟡
+- Le sol de la pièce n'est jamais une zone ; un support déclaré (palette, étagère basse) n'est pas du sol même posé au niveau du sol. À confirmer par Direction.
+- Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
