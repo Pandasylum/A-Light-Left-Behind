@@ -44,6 +44,23 @@ func _run() -> void:
 	p.look_by(Vector2(100, 0))
 	_check(not is_equal_approx(p.rotation.y, yaw_before), "yaw sur Player")
 
+	# Marche lente à bascule.
+	var ev := InputEventAction.new()
+	ev.action = &"walk_slow"
+	ev.pressed = true
+	_check(p.slow_walk_toggle and not p.is_slow_walking(), "bascule par défaut, marche lente off")
+	p._unhandled_input(ev)
+	_check(p.is_slow_walking(), "1re pression : marche lente on")
+	v = p.compute_horizontal_velocity(Vector2(0, -1), p.is_slow_walking())
+	_check(is_equal_approx(v.length(), 1.2), "vitesse lente suit l'état (obtenu %s)" % v.length())
+	p._unhandled_input(ev)
+	_check(not p.is_slow_walking(), "2e pression : marche lente off")
+	v = p.compute_horizontal_velocity(Vector2(0, -1), p.is_slow_walking())
+	_check(is_equal_approx(v.length(), 2.5), "vitesse normale après bascule off")
+	p.slow_walk_toggle = false
+	p._unhandled_input(ev)
+	_check(not p.is_slow_walking(), "mode maintenu : pas de bascule")
+
 	print("test_player : ", "OK" if _failures == 0 else "%d échec(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
 

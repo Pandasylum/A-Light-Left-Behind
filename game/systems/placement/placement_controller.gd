@@ -19,7 +19,7 @@ enum Verdict { NO_SURFACE, UNSTABLE, BLOCKED, CANNOT_STACK, OK }
 ## Nœud de la pièce qui reçoit les objets posés (chemin relatif à ce nœud).
 @export var placed_objects_path: NodePath = ^"../../PlacedObjects"
 
-var rules: PlacementRules = PlacementRules.new() ## valeurs provisoires
+@export var rules: PlacementRules = PlacementRules.new() ## valeurs provisoires
 
 var _player: Player
 var _camera: Camera3D
