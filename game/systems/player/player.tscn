@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://systems/carry/carry_controller.gd" id="4_carry"]
 [ext_resource type="Script" path="res://systems/placement/placement_controller.gd" id="5_placement"]
 [ext_resource type="PackedScene" path="res://ui/hud/interaction_prompt.tscn" id="3_prompt"]
+[ext_resource type="PackedScene" path="res://ui/inventory/inventory_panel.tscn" id="6_inventory"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.3
@@ -38,3 +39,5 @@ script = ExtResource("4_carry")
 script = ExtResource("5_placement")
 
 [node name="InteractionPrompt" parent="." instance=ExtResource("3_prompt")]
+
+[node name="InventoryPanel" parent="." instance=ExtResource("6_inventory")]
