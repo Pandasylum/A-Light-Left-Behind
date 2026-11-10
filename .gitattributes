@@ -1,0 +1,14 @@
+# Fins de ligne LF pour les fichiers texte
+*.gd text eol=lf
+*.tscn text eol=lf
+*.tres text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.cfg text eol=lf
+*.godot text eol=lf
+
+# Binaires (pas de Git LFS)
+*.glb binary
+*.png binary
+*.ogg binary
+*.wav binary

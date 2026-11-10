@@ -1,6 +1,6 @@
 # CLAUDE.md — règles permanentes pour Claude Code
 
-Jeu : A Light Left Behind (Godot 4.6, PC uniquement, développeur solo). Règles fondamentales : `PROJECT_RULES.md`. Décisions de conception : `GDD.md` (fait foi). Avancement : `ROADMAP.md`. Carte du code : `SYSTEMS.md`.
+Jeu : A Light Left Behind (Godot 4.7.2, PC uniquement, développeur solo). Règles fondamentales : `PROJECT_RULES.md`. Décisions de conception : `GDD.md` (fait foi). Avancement : `ROADMAP.md`. Carte du code : `SYSTEMS.md`.
 
 Documents rangés dans `docs/` : `core/` (GDD, PROJECT_RULES, PLAN_DE_PRODUCTION), `direction/` (ROADMAP, CLAUDE_PROJECTS, archive), `tech/` (TECHNICAL, SYSTEMS), `art/` (ART_BIBLE, references).
 

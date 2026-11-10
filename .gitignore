@@ -1,0 +1,24 @@
+# Godot 4
+.godot/
+.import/
+*.translation
+
+# Exports
+export/
+exports/
+build/
+*.exe
+*.pck
+*.zip
+export_presets.cfg
+export_credentials.cfg
+
+# Fichiers locaux
+.mono/
+*.tmp
+*.log
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+override.cfg
