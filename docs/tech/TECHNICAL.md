@@ -35,6 +35,8 @@ Vérification automatique : `tools/check_project.sh` (Godot headless Linux, vers
 - Les vecteurs sont stockés sous forme de tableaux ; aucun objet sérialisé, le fichier est traité comme non fiable.
 - Une version de format plus récente que celle supportée est refusée ; point d'extension `_migrate` vide.
 
+Couches de collision (2026-11-10). Couche 1 : monde (sol, murs, meubles). Couche 2 : joueur (masque 1). Les couches suivantes seront ajoutées ici au fur et à mesure.
+
 ## Décisions de Direction ✅ (source : Direction 2026-11-10)
 - Verrou du 100 % : booléen « restaurée » par pièce, posé au premier passage à 100 %, sauvegardé, jamais retiré. Le pourcentage affiché reflète l'état réel ; un axe ajouté plus tard ne retire pas le statut.
 - Rangement : zones souples par catégorie. Un objet est rangé s'il est posé (ni tenu, ni au sol) dans une zone qui accepte sa catégorie.
