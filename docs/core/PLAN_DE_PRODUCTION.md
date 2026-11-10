@@ -16,7 +16,7 @@ Le plan est organisé par dépendances et livrables. Les durées ne sont pas est
 - Jeu solo à la première personne, PC uniquement.
 - Déplacement, interaction, nettoyage, réparation, manipulation et rangement.
 - Progression guidée avec embranchements, validation de restauration à 100 % et découvertes facultatives séparées.
-- Outils de base disponibles dans la première pièce ; améliorations progressives via un atelier dédié, probablement la deuxième pièce.
+- Outils de nettoyage et de rangement de base disponibles dans la première pièce ; réparation et ses outils introduits, puis améliorations progressives, via un atelier dédié, probablement la deuxième pièce.
 - Journal, documents, notes et pensées orales du nouveau gardien.
 - Sauvegarde locale, menus, cinématiques, audio, sous-titres français et retours joueur.
 - Campagne complète, conclusion et exploration libre après la campagne.
@@ -103,7 +103,7 @@ Tâches :
 
 Tâches :
 - Construire la première pièce avec son état abandonné, ses surfaces, ses meubles et ses objets.
-- Y placer les outils de base à découvrir ; tous les outils de base prévus sont accessibles dès cette première pièce.
+- Y placer les outils de nettoyage et de rangement de base à découvrir ; ils sont tous accessibles dès cette première pièce.
 - Y placer la ceinture de transport : le joueur ne la possède pas au départ et la trouve dans cette pièce.
 - Introduire les commandes et interactions progressivement, sans transformer le tutoriel en long texte.
 - Ajouter quelques objets narratifs facultatifs et les premières entrées du journal.
@@ -112,7 +112,7 @@ Tâches :
 - Faire tester la pièce par des personnes qui ne connaissent pas le projet.
 - Corriger les incompréhensions, les gestes pénibles, les bugs et le rythme.
 
-**Livrable / sortie :** première pièce complète, jouable du début à sa validation, avec nettoyage, réparation, rangement, découverte et sauvegarde de progression.
+**Livrable / sortie :** première pièce complète, jouable du début à sa validation, avec nettoyage, rangement, découverte et sauvegarde de progression.
 
 **Jalon majeur :** ne pas passer à la production en série des autres pièces tant que cette vertical slice n'est pas satisfaisante.
 
@@ -125,6 +125,7 @@ Tâches :
 - Implémenter la ceinture : capacité de départ de 1 petit objet (en plus de l'objet tenu en main), +1 par amélioration à l'atelier, plafond de 5 petits objets (soit 4 améliorations).
 - Implémenter le déblocage des améliorations selon les pièces restaurées et les matériaux récupérés naturellement.
 - Construire la pièce dédiée à l'atelier, probablement la deuxième pièce restaurée.
+- Introduire la réparation à l'atelier avec ses quatre outils (marteau, tournevis, clé à molette, kit de réparation).
 - Créer l'interface d'amélioration des outils ; aucune fabrication d'objets.
 - Implémenter les améliorations modestes et leurs effets.
 - Créer le graphe de progression des pièces : ordre principal et embranchements.
