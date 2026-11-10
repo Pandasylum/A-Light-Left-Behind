@@ -41,6 +41,11 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Plateforme : PC uniquement, mobile abandonné.
 - Entrées : clavier/souris de référence. Toutes les entrées passent par des actions de l'Input Map.
 - L'ancienne feuille de route (PRODUCTION_ROADMAP) est archivée dans `docs/direction/archive/`.
+- Cœur du jeu : nettoyer, ranger et réparer.
+- Pièce 1 (zone tutoriel) : nettoyage et rangement. Elle contient les outils de base de nettoyage et de rangement.
+- Pièce 2 (atelier) : introduit la réparation et ses outils, puis permet d'améliorer les outils, ceinture comprise. L'atelier ne fabrique jamais d'objets.
+- La ceinture reste trouvée dans la pièce 1.
+- Non décidé (GDD §15) : liste exacte des outils de nettoyage, liste des outils de réparation, mécanique de réparation.
 
 ## Décisions en attente (GDD §15)
 
