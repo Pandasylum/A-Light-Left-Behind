@@ -104,6 +104,18 @@ Types de saleté et outils :
 - Les pièces déjà restaurées restent accessibles. Le joueur peut y revenir pour modifier leur organisation ou poursuivre l'entretien.
 - Les pièces sont initialement très sales et encombrées.
 - La restauration transforme visiblement et progressivement chaque espace.
+- Graphe des pièces (décisions validées le 2026-11-10) :
+  - Le jeu compte 7 pièces principales, sans compter les deux zones tutoriel (pièce 1 et atelier). Durée visée : 45 minutes à 1 heure par pièce principale, environ 7 heures de jeu au total. Le contenu est produit par étapes, pas tout d'un coup.
+  - Structure : noyau de départ (pièce 1 et atelier) → hub central (rez-de-chaussée) → branches de restauration → étages supérieurs → sommet du phare.
+  - Le hub est le point central de circulation. Plusieurs portes donnent accès aux pièces ; certaines sont verrouillées et se débloquent progressivement. Le hub doit lui-même être restauré. L'escalier central s'y trouve ; il est débloqué quand toutes les zones autour du hub sont à 100 %.
+  - L'atelier est collé au hub, ouvert et facilement accessible. Il sert de tutoriel.
+  - Une pièce se débloque quand la précédente (dans sa branche) est à 100 %. À partir du hub, plusieurs branches peuvent être explorées en parallèle et l'ordre de certaines pièces est libre. Seul le dernier étage (la lampe) reste bloqué tant que le reste n'est pas terminé.
+  - Les étages supérieurs deviennent accessibles progressivement. Le phare monte vers la lanterne, au sommet, dernière grande étape : rallumer la lampe est l'aboutissement du jeu.
+  - Chaque pièce principale doit être nettoyée, rangée et réparée à 100 % (selon ce que la pièce permet) pour être validée. Le 100 % acquis reste acquis, même si le joueur modifie ensuite le rangement. Les objets narratifs, clés et découvertes restent facultatifs (exception : la clé du tutoriel).
+  - Après la campagne : exploration libre et restauration complémentaire. L'extérieur n'est pas jouable pour l'instant (visible par les fenêtres seulement).
+  - L'atmosphère (éclairage, ambiance) évolue avec la progression, du froid vers le chaleureux.
+  - Aucune nouveauté de mécanique n'est imposée pièce par pièce : tous les outils et mécaniques sont utilisables ; à revoir avec une extension.
+  - Principes d'architecture : éviter une progression entièrement linéaire, donner une sensation de liberté sans monde ouvert, réutiliser les mêmes systèmes et des espaces indépendants, limiter les coûts grâce à une architecture simple.
 
 ### Pièce 1 — tutoriel
 
@@ -274,6 +286,8 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 
 - Coopération à deux joueurs, uniquement si elle devient techniquement réaliste sans compromettre l'expérience solo. Aucune contrainte d'architecture ne doit être imposée à la première version pour cette possibilité.
 - Nouveaux espaces après la campagne (sous-sol, cabanon extérieur, autres extensions).
+- Extension : trappe vers un sous-sol menant à un tunnel.
+- Extension : cabanon extérieur.
 - Passage sous le phare pouvant éventuellement conduire jusqu'à la côte : idée d'extension future, pas une fonctionnalité requise pour la sortie initiale.
 - Support manette en bonus, si facile. Non engagé : le clavier/souris reste la référence.
 - Renouvellement de l'eau du seau : retiré du périmètre actuel, à reconsidérer plus tard.
@@ -286,7 +300,16 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 Ces points ne remettent pas en cause les décisions de conception ci-dessus ; ils demandent des choix concrets de production ou des essais :
 
 1. Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.
-2. Liste des pièces et graphe exact des embranchements.
+2. Graphe des pièces :
+   - liste, noms, rôles et branches des 7 pièces principales ;
+   - le hub compte-t-il parmi les 7 pièces ;
+   - connexion physique entre la pièce 1, l'atelier et le hub, et condition d'ouverture de la première branche ;
+   - nombre d'étages ;
+   - définition exacte de « le reste » pour débloquer le dernier étage (la lampe) ;
+   - l'atelier compte-t-il parmi les zones autour du hub pour débloquer l'escalier ;
+   - relation entre le déblocage de l'escalier et celui du dernier étage (lampe) ;
+   - mécanisme de l'évolution de l'atmosphère (globale ou par pièce) ;
+   - rôle, contenu et fonctionnement du journal (mentionné comme découverte du noyau de départ).
 3. Liste des orientations autorisées par objet.
 4. ~~Liste, ordre et coûts des améliorations d'outils.~~ Fusionné au point 5.
 5. Catalogue des améliorations d'outils (arbres, contenu de chacun) et ordre de déblocage. Les améliorations n'ont pas de coût en matériaux : elles se débloquent par la récupération d'items d'amélioration. L'éponge abrasive en est le premier exemple.
