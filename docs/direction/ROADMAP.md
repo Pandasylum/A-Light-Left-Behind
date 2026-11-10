@@ -13,15 +13,15 @@ Statuts : À faire · En cours · À tester · Bloqué · Terminé
 | 1 | Prototype des interactions fondamentales | À faire | 0 |
 | 2 | Prototype du nettoyage et de la réparation | À faire | 1 |
 | 3 | Prototype du rangement et de la validation à 100 % | À faire | 2 |
-| 4 | Vertical slice : première pièce tutorielle (jalon majeur) | À faire | 3 |
-| 5 | Systèmes de progression, inventaire et atelier | À faire | 4 |
+| 4 | Première pièce : vestibule (tutoriel nettoyage et rangement) | À faire | 3 |
+| 5 | Systèmes de progression, inventaire et atelier ; fin de la vertical slice (vestibule + atelier + hub, jalon majeur) | À faire | 4 |
 | 6 | Journal, narration et découvertes | À faire | 5 |
 | 7 | Production des pièces et du contenu de campagne | À faire | 5, 6 |
 | 8 | Menus, sauvegarde et expérience complète | À faire | 7 |
 | 9 | Cinématiques, audio et finition artistique | À faire | 8 |
 | 10 | QA, équilibrage et sortie | À faire | 9 |
 
-Règle : pas de production en série des pièces (phase 7) tant que la vertical slice (phase 4) n'est pas jugée satisfaisante.
+Règle : pas de production en série des pièces (phase 7) tant que la vertical slice (fin de la phase 5) n'est pas jugée satisfaisante.
 
 ## En cours — Phase 0
 
