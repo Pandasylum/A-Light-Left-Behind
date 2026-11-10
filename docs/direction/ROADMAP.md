@@ -1,6 +1,6 @@
 # A LIGHT LEFT BEHIND — ROADMAP
 
-Dernière mise à jour : 2026-11-09
+Dernière mise à jour : 2026-11-10
 Suivi de production. Le détail des phases est dans `PLAN_DE_PRODUCTION.md`. Les décisions de conception sont dans `GDD.md`, qui prévaut en cas de contradiction.
 
 Statuts : À faire · En cours · À tester · Bloqué · Terminé
@@ -25,7 +25,7 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 
 ## En cours — Phase 0
 
-- [En cours] Assainissement documentaire : renommage, ROADMAP.md, README.md.
+- [Terminé] Assainissement documentaire : renommage, ROADMAP.md, README.md.
 - [À faire] Audit ou initialisation du dépôt Godot 4.6 : structure de dossiers, conventions de nommage, suivi des bugs.
 - [À faire] Backlog priorisé et liste des risques techniques.
 
@@ -35,6 +35,12 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Titre du jeu : A Light Left Behind.
 - La première pièce est une zone de tutoriel où se trouvent tous les outils de base (contenu à définir).
 - L'atelier est la deuxième pièce. Il sert uniquement à améliorer les outils, ceinture à outils comprise, que le joueur possède déjà. Aucune fabrication d'objets.
+
+## Décisions validées (2026-11-10)
+
+- Plateforme : PC uniquement, mobile abandonné.
+- Entrées : clavier/souris de référence. Toutes les entrées passent par des actions de l'Input Map.
+- L'ancienne feuille de route (PRODUCTION_ROADMAP) est archivée dans `docs/direction/archive/`.
 
 ## Décisions en attente (GDD §15)
 
