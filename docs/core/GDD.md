@@ -44,7 +44,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 
 - Le joueur nettoie directement les surfaces et les objets avec les outils adaptés.
 - Les outils de nettoyage et de rangement de base sont trouvés dans la première pièce servant de tutoriel.
-- Les outils de nettoyage et de rangement sont accessibles dès l'arrivée dans la pièce tutoriel ; la réparation et ses outils sont introduits à l'atelier, et les améliorations se débloquent progressivement.
+- Outils de nettoyage trouvés progressivement dans la pièce 1 ; outils de réparation trouvés progressivement à l'atelier. La réparation est introduite à l'atelier, et les améliorations se débloquent progressivement.
 - Le nettoyage précède la réparation : une surface ou un objet doit être nettoyé avant d'être réparé.
 - Réparer consiste en une étape simple et satisfaisante. Dans certains cas, la réparation passe par un remplacement (par exemple un fusible).
 - Réparer ne demande aucune collecte de pièces ni de matériaux. Les pièces de remplacement sont fournies par la trousse à outils du joueur.
@@ -76,9 +76,9 @@ Types de saleté et outils :
 - Le placement est libre, avec une aimantation douce sur les surfaces. Les objets sont figés une fois posés (pas de simulation physique persistante).
 - La rotation se fait par paliers, avec une touche ou la molette (valeur proposée : 15°, à confirmer). Chaque objet a des orientations autorisées (par exemple un livre debout ou à plat).
 - Rangement : zones souples par catégorie d'objets, sans position imposée. Un objet compte comme rangé s'il est hors du sol et hors du désordre.
-- Empilement : un petit objet peut être posé sur un grand objet (par exemple une lampe de table sur un gros carton) ; les petits objets sont empilables entre eux (livres).
+- Empilement : un petit objet peut être posé sur un objet plus gros (exemple : une lampe de table sur un gros carton) ; les petits objets sont empilables entre eux (livres).
 - Murs : objets décoratifs et cadres. Pas de plafond (exception possible : la réparation d'un lustre).
-- Gros objets : portés, un seul à la fois.
+- Gros objets : portés à deux mains, un seul à la fois.
 - Catégories d'objets :
   - Petits objets (livres, outils, boîtes, vaisselle) : portés à la main, un à la fois. La ceinture ajoute des emplacements supplémentaires pour petits objets (1 au départ, jusqu'à 5 avec les améliorations).
   - Objets moyens (chaises, caisses, tabourets) : portés à la main.
@@ -100,7 +100,7 @@ Types de saleté et outils :
 - La progression principale suit un ordre défini, avec quelques embranchements.
 - Les pièces se débloquent progressivement ; la campagne reste guidée.
 - Une pièce doit atteindre **100 %** pour valider sa restauration et débloquer la suite prévue. Le 100 % couvre tout ce que la pièce permet de faire avec les mécaniques disponibles à ce stade : la pièce 1 ne compte que le nettoyage et le rangement, sans la réparation ; les pièces suivantes comptent la réparation lorsqu'elle est disponible. La définition technique exacte reste ouverte (§15).
-- Les clés, objets d'histoire et autres découvertes narratives ne sont pas obligatoires pour valider une pièce. Leur suivi est séparé de l'objectif de restauration.
+- Les clés, objets d'histoire et autres découvertes narratives ne sont pas obligatoires pour valider une pièce. Leur suivi est séparé de l'objectif de restauration. Exception : la clé du tutoriel est obligatoire, car la ceinture qu'elle ouvre est requise pour sortir de la pièce 1.
 - Les pièces déjà restaurées restent accessibles. Le joueur peut y revenir pour modifier leur organisation ou poursuivre l'entretien.
 - Les pièces sont initialement très sales et encombrées.
 - La restauration transforme visiblement et progressivement chaque espace.
@@ -116,6 +116,17 @@ Types de saleté et outils :
 - Sortie de la pièce 1 : 100 % de la pièce requis ET possession de la ceinture.
 - Narration : le nouveau Gardien n'a pas envie d'être là, mais il le faut pour sa fille malade.
 - La trousse à outils est obtenue à l'atelier.
+
+### Pièce 2 — atelier
+
+- Durée visée : 20 minutes.
+- Le joueur peut revenir à l'atelier à tout moment. L'atelier compte dans le 100 % : il se nettoie, se range et se répare.
+- Les outils de réparation (marteau, outil multifonction) sont trouvés progressivement dans l'atelier.
+- Réparations d'apprentissage : remettre le courant ; réparer le meuble de l'atelier lui-même pour pouvoir l'utiliser. Réparer une chaise est une proposition À CONFIRMER.
+- Améliorer un outil : le joueur trouve des items d'amélioration dans les pièces suivantes. À l'atelier, il clique sur le meuble de l'atelier, ce qui ouvre un menu d'amélioration. Tout l'arbre est visible d'avance et le menu indique ce qui est faisable. Il suffit de cliquer sur l'amélioration avec l'item pour la valider. L'item ne compte pas dans la ceinture.
+- Les améliorations se débloquent par la récupération d'items d'amélioration. Elles sont organisées en arbres par type d'objet (outil), de 3 ou 4 améliorations chacun. L'éponge abrasive est la première amélioration de l'éponge (début d'arbre), pour qu'elle ne bloque pas la progression.
+- Les améliorations sont simples : de simples réglages de paramètres (par exemple plus rapide, surface plus large, outil qui se salit moins vite donc moins de rinçages), sans nouvelle mécanique.
+- Narration : outils de l'ancien gardien, notes et plan du phare ; l'ancien gardien a tout laissé en plan.
 
 ### Après la campagne ✅
 
@@ -134,7 +145,7 @@ Types de saleté et outils :
   - Raclette : vitres et surfaces lisses.
   - Serpillière : sols.
   - Seau : rincer les outils de nettoyage. Sans rinçage, leur efficacité baisse fortement ; un outil sale perd jusqu'à 90 % d'efficacité au maximum, jamais 100 %. Le rinçage est un geste court : le joueur tient l'outil sale et interagit avec le seau. Le seau est améliorable à l'atelier comme les autres outils, ce qui permet de rincer moins souvent.
-- Ils sont tous accessibles dès l'arrivée dans cette pièce ; les améliorations, elles, se débloquent au fil de la progression.
+- Outils de nettoyage trouvés progressivement dans la pièce 1 ; outils de réparation trouvés progressivement à l'atelier. Les améliorations se débloquent au fil de la progression.
 - Une pièce dédiée, l'atelier, est la deuxième pièce restaurée. Elle introduit la réparation et ses outils, puis permet d'améliorer les outils, ceinture comprise.
 - L'atelier ne fabrique jamais d'objets.
 - Les deux outils de réparation :
@@ -278,7 +289,13 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 2. Liste des pièces et graphe exact des embranchements.
 3. Liste des orientations autorisées par objet.
 4. Liste, ordre et coûts des améliorations d'outils.
-5. Contenu précis de la deuxième pièce, qui est l'atelier, et du reste de la première pièce tutorielle (voir « Pièce 1 — tutoriel », §6).
+5. Contenu précis restant de l'atelier (voir « Pièce 2 — atelier », §6) et du reste de la première pièce tutorielle (voir « Pièce 1 — tutoriel », §6). Points ouverts de l'atelier :
+   - forme de l'item d'amélioration (porté ou stocké) et combien, où, dans quelles pièces ;
+   - liste des arbres d'amélioration (quels outils) et contenu de chacun ;
+   - condition de sortie de l'atelier ;
+   - ce que fait « remettre le courant » (portée et effets) ;
+   - confirmation de la chaise comme réparation d'apprentissage ;
+   - contenu exact des notes et du plan du phare.
 6. Langues de sous-titrage supplémentaires éventuelles.
 7. Détails techniques des sauvegardes, contrôles et compatibilité selon la plateforme.
 8. Mécanique de réparation : déroulé exact des étapes et variantes selon le matériau.
