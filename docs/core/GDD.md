@@ -43,8 +43,8 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 ## 4. Nettoyage et réparation ✅
 
 - Le joueur nettoie directement les surfaces et les objets avec les outils adaptés.
-- Les outils de base sont trouvés dans la première pièce servant de tutoriel.
-- Tous les outils de base sont accessibles dès le départ ; les améliorations se débloquent progressivement.
+- Les outils de nettoyage et de rangement de base sont trouvés dans la première pièce servant de tutoriel.
+- Les outils de nettoyage et de rangement sont accessibles dès le départ ; les outils de réparation sont introduits à l'atelier, et les améliorations se débloquent progressivement.
 - Les réparations se font par étapes et tiennent compte du matériau de l'objet ou de l'élément concerné.
 - Les installations lourdes et fixes (par exemple radiateurs et équipements intégrés) restent en place.
 - Le nettoyage et la réparation doivent produire un retour visuel et sonore satisfaisant.
@@ -89,10 +89,10 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 
 ## 7. Outils, améliorations et atelier ✅
 
-- Les outils de base sont trouvés dans la première pièce du tutoriel.
+- Les outils de nettoyage et de rangement de base sont trouvés dans la première pièce du tutoriel.
 - Ils sont tous disponibles dès le départ ; les améliorations, elles, se débloquent au fil de la progression.
-- Une pièce dédiée sert d'atelier d'amélioration ; elle sera probablement la deuxième pièce restaurée.
-- L'atelier sert uniquement à améliorer les outils, pas à fabriquer des objets.
+- Une pièce dédiée, l'atelier, est la deuxième pièce restaurée. Elle introduit la réparation et ses outils, puis permet d'améliorer les outils, ceinture comprise.
+- L'atelier ne fabrique jamais d'objets.
 - Les déblocages sont liés à la restauration de certaines pièces et à la récupération naturelle de matériaux.
 - Pas de grind artificiel, pas de niveaux ni de système d'XP.
 - Les améliorations restent modestes et ne doivent pas accélérer excessivement le nettoyage.
@@ -222,7 +222,7 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 
 Ces points ne remettent pas en cause les décisions de conception ci-dessus ; ils demandent des choix concrets de production ou des essais :
 
-1. Liste exacte des outils de base trouvés dans la première pièce.
+1. Liste exacte des outils de nettoyage et de rangement trouvés dans la première pièce.
 2. Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.
 3. Liste des pièces et graphe exact des embranchements.
 4. Nombre d'orientations prédéfinies par objet ou famille d'objets.
@@ -230,6 +230,8 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 6. Contenu précis de la première pièce tutorielle et de la deuxième pièce, qui est l'atelier.
 7. Langues de sous-titrage supplémentaires éventuelles.
 8. Détails techniques des sauvegardes, contrôles et compatibilité selon la plateforme.
+9. Liste exacte des outils de réparation introduits à l'atelier.
+10. Mécanique de réparation : déroulé exact des étapes et variantes selon le matériau.
 
 ---
 
