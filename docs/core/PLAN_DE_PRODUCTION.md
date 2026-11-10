@@ -1,11 +1,11 @@
 # A LIGHT LEFT BEHIND — Plan de production
 
-Dernière mise à jour : 2026-11-09  
-Statut : plan de réalisation proposé à partir du GDD validé. L'ordre est une recommandation de production, pas une nouvelle décision de contenu.
+Dernière mise à jour : 2026-11-10  
+Statut : plan de réalisation réaligné sur le GDD validé (vertical slice = vestibule + atelier + hub, 8 zones jouables). L'ordre est une recommandation de production, pas une nouvelle décision de contenu.
 
 ## 1. Principe directeur
 
-Construire d'abord une **vertical slice** : une première pièce jouable qui contient la boucle centrale complète (explorer, nettoyer, déplacer/ranger, découvrir, valider). Ne pas produire toutes les pièces avant d'avoir vérifié que cette boucle est agréable, compréhensible et techniquement fiable.
+Construire d'abord une **vertical slice** : le vestibule (pièce 1, tutoriel nettoyage/rangement), l'atelier (tutoriel réparation et améliorations) et le hub central, qui contiennent la boucle centrale complète (explorer, nettoyer, déplacer/ranger, réparer, découvrir, valider). Ne pas produire toutes les pièces avant d'avoir vérifié que cette boucle est agréable, compréhensible et techniquement fiable.
 
 Le plan est organisé par dépendances et livrables. Les durées ne sont pas estimées : elles dépendront du moteur, de l'état actuel du projet, des outils déjà en place et du temps disponible.
 
@@ -16,7 +16,8 @@ Le plan est organisé par dépendances et livrables. Les durées ne sont pas est
 - Jeu solo à la première personne, PC uniquement.
 - Déplacement, interaction, nettoyage, réparation, manipulation et rangement.
 - Progression guidée avec embranchements, validation de restauration à 100 % et découvertes facultatives séparées.
-- Outils de nettoyage et de rangement de base disponibles dans la première pièce ; réparation et ses outils introduits, puis améliorations progressives, via un atelier dédié, probablement la deuxième pièce.
+- Jeu de 8 zones jouables : vestibule + 7 pièces principales (hub, cuisine, salle de vie, atelier, chambre, archives, lanterne), produites par étapes.
+- Quatre outils de nettoyage (éponge, raclette, serpillière, seau) au vestibule ; réparation (marteau, outil multifonction) et trousse à outils à l'atelier, collé au hub et ouvert, qui fait partie du noyau de départ avec le vestibule ; améliorations = items trouvés dans les pièces suivantes et utilisés à l'atelier.
 - Journal, documents, notes et pensées orales du nouveau gardien.
 - Sauvegarde locale, menus, cinématiques, audio, sous-titres français et retours joueur.
 - Campagne complète, conclusion et exploration libre après la campagne.
@@ -97,12 +98,12 @@ Tâches :
 
 **Critères de validation :** chaque pourcentage est explicable et reproductible ; aucun pixel invisible ne bloque la fin ; le joueur conserve une vraie liberté de placement.
 
-### Phase 4 — Vertical slice : première pièce tutorielle
+### Phase 4 — Vertical slice, première partie : le vestibule
 
-**Objectif :** assembler la boucle complète dans une vraie pièce représentative.
+**Objectif :** assembler la boucle nettoyer/ranger dans une vraie pièce représentative. La phase 4 ne produit que le vestibule ; la vertical slice se termine à la fin de la phase 5.
 
 Tâches :
-- Construire la première pièce avec son état abandonné, ses surfaces, ses meubles et ses objets.
+- Construire le vestibule (pièce 1) avec son état abandonné, ses surfaces, ses meubles et ses objets.
 - Y placer les outils de nettoyage et de rangement de base à découvrir ; ils sont tous accessibles dès cette première pièce.
 - Y placer la ceinture de transport : le joueur ne la possède pas au départ et la trouve dans cette pièce.
 - Introduire les commandes et interactions progressivement, sans transformer le tutoriel en long texte.
@@ -112,26 +113,27 @@ Tâches :
 - Faire tester la pièce par des personnes qui ne connaissent pas le projet.
 - Corriger les incompréhensions, les gestes pénibles, les bugs et le rythme.
 
-**Livrable / sortie :** première pièce complète, jouable du début à sa validation, avec nettoyage, rangement, découverte et sauvegarde de progression.
+**Livrable / sortie :** vestibule complet, jouable du début à sa validation, avec nettoyage, rangement, découverte et sauvegarde de progression.
 
-**Jalon majeur :** ne pas passer à la production en série des autres pièces tant que cette vertical slice n'est pas satisfaisante.
+### Phase 5 — Systèmes de progression, inventaire, atelier et hub (fin de la vertical slice)
 
-### Phase 5 — Systèmes de progression, inventaire et atelier
-
-**Objectif :** rendre la boucle extensible à toute la campagne.
+**Objectif :** rendre la boucle extensible à toute la campagne et compléter la vertical slice (vestibule + atelier + hub).
 
 Tâches :
 - Finaliser l'inventaire et le transport des petits objets.
 - Implémenter la ceinture : capacité de départ de 1 petit objet (en plus de l'objet tenu en main), +1 par amélioration à l'atelier, plafond de 5 petits objets (soit 4 améliorations).
-- Implémenter le déblocage des améliorations selon les pièces restaurées et les matériaux récupérés naturellement.
-- Construire la pièce dédiée à l'atelier, probablement la deuxième pièce restaurée.
-- Introduire la réparation à l'atelier avec ses deux outils (marteau, outil multifonction).
+- Implémenter le déblocage des améliorations selon les pièces restaurées et les items d'amélioration trouvés dans les pièces suivantes.
+- Construire l'atelier (collé au hub, ouvert, noyau de départ avec le vestibule) et le hub central.
+- Introduire la réparation à l'atelier avec ses deux outils (marteau, outil multifonction) et la trousse à outils ; la réparation est incluse dans le 100 % des pièces concernées.
+- Atelier : générateur de secours en attendant l'installation électrique du hub (tableau électrique = réparation signature du hub).
 - Créer l'interface d'amélioration des outils ; aucune fabrication d'objets.
 - Implémenter les améliorations modestes et leurs effets.
 - Créer le graphe de progression des pièces : ordre principal et embranchements.
 - Implémenter la validation de pièce et le déblocage de la suite.
 
-**Livrable / sortie :** progression jouable entre les premières pièces, avec atelier et première amélioration fonctionnelle.
+**Livrable / sortie :** vertical slice jouable (vestibule, atelier, hub), avec première amélioration fonctionnelle.
+
+**Jalon majeur :** ne pas passer à la production en série des autres pièces (phase 7) tant que la vertical slice n'est pas satisfaisante.
 
 ### Phase 6 — Journal, narration et découvertes
 
@@ -154,8 +156,8 @@ Tâches :
 **Objectif :** produire les pièces restantes à partir des systèmes validés.
 
 Tâches :
-- Définir la liste finale des pièces, leurs dépendances et les embranchements.
-- Pour chaque pièce, établir une fiche de contenu : état initial, surfaces, matériaux, objets à nettoyer/réparer/ranger, meubles déplaçables, outils utiles, matériaux récupérables, découvertes facultatives, ambiance et critères de validation.
+- Appliquer la liste validée des pièces (vestibule + 7 pièces principales), leurs dépendances et les embranchements.
+- Pour chaque pièce, établir une fiche de contenu : état initial, surfaces, matériaux, objets à nettoyer/réparer/ranger, meubles déplaçables, outils utiles, items d'amélioration à trouver, découvertes facultatives, ambiance et critères de validation.
 - Produire les pièces et leur progression de restauration.
 - Créer les transitions et chargements propres à chaque destination.
 - Ajuster le niveau d'encombrement et la quantité de tâches pour conserver un rythme agréable.
@@ -223,9 +225,10 @@ Nettoyage
       ↓
 Rangement + critères de validation à 100 %
       ↓
-Première pièce complète (vertical slice)
+Vestibule (phase 4)
       ↓
-Progression + atelier (réparation) + inventaire
+Progression + hub + atelier (réparation) + inventaire
+= fin de la vertical slice (phase 5)
       ↓
 Journal et narration ─────────┐
       ↓                       │
@@ -259,7 +262,7 @@ Ne pas sacrifier la lisibilité de la restauration ou la stabilité des sauvegar
 |---|---|
 | Le 100 % devient une chasse au pixel | Comptabiliser des unités de surface/objets explicites ; fournir un indicateur clair des éléments restants ; tester les cas limites. |
 | Le rangement devient une corvée ou limite trop la créativité | Valider un emplacement logique plutôt qu'une position décorative exacte ; garder un placement libre dans les contraintes prévues. |
-| Trop de contenu est produit avant validation du gameplay | Exiger une vertical slice satisfaisante avant la production en série des pièces. |
+| Trop de contenu est produit avant validation du gameplay | Exiger une vertical slice (vestibule + atelier + hub) satisfaisante avant la production en série des pièces. |
 | Les systèmes deviennent difficiles à réutiliser | Séparer les systèmes communs des données propres à chaque pièce. |
 | Les découvertes facultatives bloquent la campagne | Séparer leurs flags et compteurs des critères de restauration. |
 | Les sauvegardes importées corrompent la progression | Valider intégrité et compatibilité avant toute écriture ; conserver la sauvegarde actuelle en cas d'échec. |
@@ -289,7 +292,7 @@ Chaque tâche devrait préciser :
 
 ### Prochaine étape concrète
 
-Commencer par la **Phase 0 — Audit et fondations** : relever ce qui existe déjà dans le projet, ce qui fonctionne réellement et ce qui doit être repris. Ensuite, attaquer la Phase 1 sans ajouter de contenu de campagne tant que les interactions fondamentales ne sont pas validées.
+Commencer par la **Phase 0 — Audit et fondations** : relever ce qui existe déjà dans le projet, ce qui fonctionne réellement et ce qui doit être repris. Ensuite, attaquer la Phase 1 puis la suite dans l'ordre, sans ajouter de contenu de campagne tant que les interactions fondamentales ne sont pas validées.
 
 ---
 
