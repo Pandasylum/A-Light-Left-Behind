@@ -6,6 +6,7 @@ Format d'une entrée : `chemin` — rôle en une ligne — dépendances principa
 
 ## Systèmes
 `game/project.godot` [input] — actions Input Map provisoires (liste dans docs/tech/TECHNICAL.md) — aucune
+`tools/` — godot.sh (télécharge/lance Godot 4.7.2 épinglé), check_project.sh (import + chargement headless) — aucune
 
 ## Scènes
 `game/core/main.tscn` — scène principale (Node3D), instancie la scène grise — greybox.tscn

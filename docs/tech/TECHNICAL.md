@@ -26,3 +26,5 @@ Actions définies dans `game/project.godot` (clavier/souris, touches provisoires
 - Déplacement : `move_forward`, `move_back`, `move_left`, `move_right`, `walk_slow`
 - Interaction : `interact`, `use_primary`, `use_secondary`, `drop_object`, `rotate_left`, `rotate_right`, `cycle_item`
 - Interface : `inventory_open`, `journal_open`, `pause_menu`
+
+Vérification automatique : `tools/check_project.sh` (Godot headless Linux, version épinglée à 4.7.2).
