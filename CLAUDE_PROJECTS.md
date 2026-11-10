@@ -387,3 +387,16 @@ Après l'implémentation, il doit :
 - Mettre à jour la documentation lorsque cela est nécessaire.
 
 L'objectif est de construire un seul jeu cohérent, maintenable et évolutif, et non six projets indépendants.
+## 11. Activation progressive des projets (décision du 2026-11-10)
+
+Trois projets sont actifs au départ : Direction & Game Design, Godot Engineering, Art Direction & Assets.
+Sound Design, World & Content et QA & Production sont créés quand leur phase approche (audio : phases 6 à 9 ; contenu : phase 7 ; QA : avant la phase 10). D'ici là, Direction suit l'avancement dans `ROADMAP.md` et Claude Code lance ses tests ciblés.
+
+## 12. Circulation de l'information (décision du 2026-11-10)
+
+- Le dépôt est la seule source de vérité. Les chats pensent et décident, Claude Code exécute.
+- Chaque décision vit dans un seul document : `GDD.md` (conception), `TECHNICAL.md` (technique), `ART_BIBLE.md` (art). Pas de copie.
+- Chaque projet Claude ne synchronise que ses documents depuis GitHub (filtre par projet).
+- Entre projets : fiche de transmission de 10 lignes maximum (décision, pourquoi, demande, contraintes, livrable).
+- Prompts Claude Code : techniques écrits par Godot Engineering, documentation et game design par Direction. Règles permanentes dans `CLAUDE.md`, carte du code dans `SYSTEMS.md`.
+- Claude Code ne prend aucune décision : doute de conception → Direction ; doute technique → Godot Engineering.
