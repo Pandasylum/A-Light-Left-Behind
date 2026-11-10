@@ -1,8 +1,7 @@
 class_name CarryController
 extends Node
 ## Enfant de Player. Relie CarryInventory au monde : prise (Interactable PICK_UP ciblé), changement
-## d'objet (cycle_item), dépôt (drop_object). Dépôt PROVISOIRE : retour à l'origine mémorisée
-## à la prise ; sera remplacé par le placement (P1-D).
+## d'objet (cycle_item), dépôt (drop_object) délégué au PlacementController.
 
 const HAND_OFFSET: Vector3 = Vector3(0.3, -0.25, -0.6)
 const LARGE_EXTRA_OFFSET: Vector3 = Vector3(-0.3, 0.05, -0.3) ## LARGE : plus centré
@@ -12,8 +11,8 @@ var inventory: CarryInventory = CarryInventory.new() ## recréé dans _ready sel
 var _sensor: InteractionSensor
 var _prompt: InteractionPrompt
 var _anchor: Node3D
+var _placement: PlacementController
 var _target: Interactable = null
-var _origins: Dictionary = {} ## Node3D -> {parent, transform, layer}
 var _debug_label: Label
 
 
@@ -23,6 +22,7 @@ func _ready() -> void:
 	_sensor = player.get_node("Head/InteractionSensor")
 	_prompt = player.get_node("InteractionPrompt")
 	_anchor = player.get_node("Head/HandAnchor")
+	_placement = player.get_node("PlacementController")
 	_sensor.target_changed.connect(_on_target_changed)
 	inventory.held_changed.connect(func(_i: ItemData) -> void: _update_label())
 	inventory.belt_changed.connect(func(_s: int, _i: ItemData) -> void: _update_label())
@@ -47,13 +47,11 @@ func pick_up(interactable: Interactable) -> void:
 	var data: ItemData = body.get("item_data") as ItemData if body != null else null
 	if data == null:
 		return
-	var origin: Dictionary = {"parent": body.get_parent(), "transform": body.global_transform,
-			"layer": (body as CollisionObject3D).collision_layer}
 	var result: CarryInventory.Result = inventory.pick_up(data, body)
 	if result != CarryInventory.Result.OK:
 		_show_refusal(result)
 		return
-	_origins[body] = origin
+	body.set(&"support_surface", null) ## objet repris : plus de surface porteuse
 	_refresh_visuals()
 
 
@@ -67,19 +65,28 @@ func cycle() -> void:
 	_refresh_visuals()
 
 
-## Dépôt provisoire : l'objet retrouve sa position et son orientation d'origine.
+## Dépôt : délégué au PlacementController (pose sur la surface visée, ou message de refus).
 func drop() -> void:
-	var body: Node3D = inventory.held_ref() as Node3D
-	if inventory.drop_object() == null or body == null:
-		return
-	var origin: Dictionary = _origins.get(body, {})
-	_origins.erase(body)
-	if origin.is_empty():
-		return
-	body.reparent(origin["parent"], false)
-	body.global_transform = origin["transform"]
-	(body as CollisionObject3D).collision_layer = origin["layer"]
-	body.visible = true
+	if inventory.held() != null:
+		_placement.place_held()
+
+
+## ItemData de l'objet en main (null si la main est vide).
+func held_data() -> ItemData:
+	return inventory.held()
+
+
+## Nœud de l'objet en main (null si la main est vide).
+func held_body() -> Node3D:
+	return inventory.held_ref() as Node3D
+
+
+## Retire l'objet de la main (pose acceptée) et le renvoie ; l'appelant le replace.
+func release_held() -> Node3D:
+	var body: Node3D = held_body()
+	if body == null or inventory.drop_object() == null:
+		return null
+	return body
 
 
 func _on_target_changed(target: Interactable) -> void:

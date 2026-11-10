@@ -12,6 +12,8 @@ enum Category { SMALL, MEDIUM, LARGE, FIXED }
 @export var category: Category = Category.SMALL
 ## Emprise au sol rectangulaire : largeur (x) et profondeur (y), en mètres.
 @export var footprint: Vector2 = Vector2(0.3, 0.3)
+## Hauteur de l'objet, en mètres (> 0).
+@export var height: float = 0.3
 ## Orientations autorisées (identifiants). Vide = orientation unique.
 @export var allowed_orientations: Array[StringName] = []
 ## Axes de progression suivis pour cet objet.
@@ -27,6 +29,8 @@ func validate() -> PackedStringArray:
 		errors.append("id vide")
 	if footprint.x <= 0.0 or footprint.y <= 0.0:
 		errors.append("emprise non strictement positive")
+	if height <= 0.0:
+		errors.append("hauteur non strictement positive")
 	if category == Category.FIXED and tracks_storing:
 		errors.append("un objet FIXED ne suit pas l'axe rangement")
 	return errors

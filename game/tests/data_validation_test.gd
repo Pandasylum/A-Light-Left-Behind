@@ -37,10 +37,11 @@ func _valid_item() -> String:
 func _invalid_item() -> String:
 	var i: ItemData = ItemData.new()
 	i.footprint = Vector2(0.0, 0.5)
+	i.height = 0.0
 	i.category = ItemData.Category.FIXED
 	i.tracks_storing = true
 	return _expect(i.validate(), [
-		"id vide", "emprise non strictement positive",
+		"id vide", "emprise non strictement positive", "hauteur non strictement positive",
 		"un objet FIXED ne suit pas l'axe rangement",
 	])
 
