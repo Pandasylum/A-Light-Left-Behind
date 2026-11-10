@@ -226,7 +226,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 3. Liste des pièces et graphe exact des embranchements.
 4. Nombre d'orientations prédéfinies par objet ou famille d'objets.
 5. Liste, ordre et coûts des améliorations d'outils.
-6. Contenu précis de la première pièce tutorielle et de la deuxième pièce qui accueillera probablement l'atelier.
+6. Contenu précis de la première pièce tutorielle et de la deuxième pièce, qui est l'atelier.
 7. Langues de sous-titrage supplémentaires éventuelles.
 8. Détails techniques des sauvegardes, contrôles et compatibilité selon la plateforme.
 

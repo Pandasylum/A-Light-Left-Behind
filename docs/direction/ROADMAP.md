@@ -49,7 +49,6 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 
 ## Propositions non validées
 
-- Tester la performance du nettoyage sur un vrai appareil mobile dès la phase 2.
 - Préparer en parallèle, dès la phase 1, des références visuelles et un comparatif de génération 3D par IA (2 outils, 3 objets), sans abonnement.
 
 ## Bloqué
