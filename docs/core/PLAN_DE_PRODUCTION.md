@@ -104,6 +104,7 @@ Tâches :
 Tâches :
 - Construire la première pièce avec son état abandonné, ses surfaces, ses meubles et ses objets.
 - Y placer les outils de base à découvrir ; tous les outils de base prévus sont accessibles dès cette première pièce.
+- Y placer la ceinture de transport : le joueur ne la possède pas au départ et la trouve dans cette pièce.
 - Introduire les commandes et interactions progressivement, sans transformer le tutoriel en long texte.
 - Ajouter quelques objets narratifs facultatifs et les premières entrées du journal.
 - Ajouter une première pensée orale du nouveau gardien si le rythme narratif le justifie.
@@ -121,7 +122,7 @@ Tâches :
 
 Tâches :
 - Finaliser l'inventaire et le transport des petits objets.
-- Implémenter la ceinture : +1 capacité par amélioration, jusqu'à 5 petits objets transportés.
+- Implémenter la ceinture : capacité de départ de 1 petit objet (en plus de l'objet tenu en main), +1 par amélioration à l'atelier, plafond de 5 petits objets (soit 4 améliorations).
 - Implémenter le déblocage des améliorations selon les pièces restaurées et les matériaux récupérés naturellement.
 - Construire la pièce dédiée à l'atelier, probablement la deuxième pièce restaurée.
 - Créer l'interface d'amélioration des outils ; aucune fabrication d'objets.
