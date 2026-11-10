@@ -58,22 +58,24 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Rangement (2026-11-10) : zones souples par catégorie d'objets, sans position imposée ; un objet est rangé s'il est hors du sol et hors du désordre.
 - Placement libre avec aimantation douce sur les surfaces ; objets figés une fois posés (pas de simulation physique persistante).
 - Rotation par paliers (touche ou molette), valeur proposée 15° À CONFIRMER ; chaque objet a des orientations autorisées.
-- Empilement : un petit objet sur un grand objet (lampe de table sur un gros carton) ; petits objets empilables entre eux (livres).
+- Empilement : un petit objet posé sur un objet plus gros (exemple : une lampe de table sur un gros carton) ; petits objets empilables entre eux (livres).
 - Murs : objets décoratifs et cadres ; pas de plafond (exception possible : réparation d'un lustre). Gros objets portés, un seul à la fois.
 - Collisions : placement qui chevauche refusé, sauf empilement de petits objets.
 - Un objet tombe au sol s'il est lâché ou posé trop près du bord de son support. Un objet tombé fait baisser le 100 %. Une fois le 100 % atteint, il reste acquis définitivement.
 - Pièce 1 (tutoriel), 2026-11-10 : apprentissage libre avec indices (le personnage commente à voix haute, sans forcer) ; outils de nettoyage trouvés progressivement ; ceinture = récompense (clé trouvée pendant le rangement, vieux coffre en bois fermé à clé près de la porte de sortie) ; le coffre est le gros objet d'apprentissage (saisie, port à deux mains, dépôt précis, rotation par orientations prédéfinies) ; rinçage du seau découvert seul ; durée visée 15 minutes ; sortie = 100 % ET ceinture ; narration : le nouveau Gardien n'a pas envie d'être là mais le fait pour sa fille malade ; trousse à outils obtenue à l'atelier.
+- Outils : outils de nettoyage trouvés progressivement dans la pièce 1 ; outils de réparation trouvés progressivement à l'atelier. La clé du tutoriel est obligatoire (la ceinture qu'elle ouvre est requise pour sortir de la pièce 1).
+- Atelier (pièce 2), 2026-11-10 : durée visée 20 minutes ; retour possible à tout moment ; compte dans le 100 % (nettoyage, rangement, réparation) ; outils de réparation (marteau, outil multifonction) trouvés progressivement ; réparations d'apprentissage : remettre le courant, réparer le meuble de l'atelier pour pouvoir l'utiliser (chaise = proposition À CONFIRMER) ; amélioration : items d'amélioration trouvés dans les pièces suivantes, clic sur le meuble de l'atelier = menu d'amélioration, arbre entier visible d'avance avec indication de ce qui est faisable, clic sur l'amélioration avec l'item pour valider, l'item ne compte pas dans la ceinture ; arbres par type d'objet (outil) de 3 ou 4 améliorations ; éponge abrasive en début d'arbre de l'éponge ; améliorations = simples réglages de paramètres (plus rapide, surface plus large, outil qui se salit moins vite), sans nouvelle mécanique ; narration : outils de l'ancien gardien, notes et plan du phare, tout laissé en plan.
 - Saleté et outils (2026-11-10) : poussière et traces = éponge ; vitres = éponge puis raclette ; sols = serpillière ; rouille superficielle = éponge abrasive (amélioration, après l'atelier) ; métal profondément corrodé = réparation après un traitement (non défini).
 - Catégories d'objets (2026-11-10) : petits (à la main, un à la fois ; ceinture = 1 emplacement au départ, jusqu'à 5), moyens (à la main), gros (deux mains), fixes (non déplaçables).
 
 ## Décisions en attente (GDD §15)
 
-1. Liste exacte des outils de nettoyage et de rangement trouvés dans la pièce 1 (les outils de réparation de l'atelier sont listés au GDD §15).
+1. Liste exacte des outils de nettoyage et de rangement trouvés dans la pièce 1.
 2. Définition technique du 100 % (nettoyage, réparation, rangement).
 3. Liste des pièces et graphe des embranchements.
 4. Nombre d'orientations prédéfinies par objet ou famille.
 5. Liste, ordre et coûts des améliorations d'outils.
-6. Contenu de la première pièce tutorielle et de l'atelier.
+6. Contenu restant de la pièce 1 et de l'atelier (points ouverts au GDD §15).
 7. Langues de sous-titrage supplémentaires.
 8. Détails des sauvegardes, contrôles et compatibilité par plateforme.
 
