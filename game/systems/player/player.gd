@@ -6,6 +6,7 @@ const PITCH_LIMIT: float = deg_to_rad(89.0)
 
 @export var walk_speed: float = 2.5 ## m/s
 @export var slow_walk_speed: float = 1.2 ## m/s
+@export var slow_walk_toggle: bool = true ## true : walk_slow bascule la marche lente ; false : maintenu
 @export var mouse_sensitivity: float = 0.002 ## rad/pixel
 @export var gravity: float = 9.8 ## m/s²
 
@@ -18,6 +19,7 @@ const PITCH_LIMIT: float = deg_to_rad(89.0)
 @onready var prompt: InteractionPrompt = $InteractionPrompt
 
 var _start_position: Vector3
+var _slow_walk_on: bool = false ## état de bascule de la marche lente (jamais remis à zéro automatiquement)
 
 
 func _ready() -> void:
@@ -29,6 +31,8 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		look_by((event as InputEventMouseMotion).relative)
+	elif slow_walk_toggle and event.is_action_pressed(&"walk_slow", false):
+		_slow_walk_on = not _slow_walk_on
 	elif event.is_action_pressed(&"pause_menu"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	elif event is InputEventMouseButton:
@@ -40,12 +44,17 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	var input_dir: Vector2 = Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
-	var horizontal: Vector3 = compute_horizontal_velocity(input_dir, Input.is_action_pressed(&"walk_slow"))
+	var horizontal: Vector3 = compute_horizontal_velocity(input_dir, is_slow_walking())
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
 	velocity.y = 0.0 if is_on_floor() else velocity.y - gravity * delta
 	move_and_slide()
 	check_fall()
+
+
+## Marche lente active : état de bascule, ou touche maintenue si slow_walk_toggle = false.
+func is_slow_walking() -> bool:
+	return _slow_walk_on if slow_walk_toggle else Input.is_action_pressed(&"walk_slow")
 
 
 ## Remet le joueur au départ (vitesse nulle) s'il est tombé sous fall_limit_y.
