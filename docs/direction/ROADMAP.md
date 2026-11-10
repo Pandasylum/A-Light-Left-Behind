@@ -33,8 +33,8 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 
 - Le GDD prévaut sur toute ancienne feuille de route.
 - Titre du jeu : A Light Left Behind.
-- La première pièce est une zone de tutoriel où se trouvent tous les outils de base (contenu à définir).
-- L'atelier est la deuxième pièce. Il sert uniquement à améliorer les outils, ceinture à outils comprise, que le joueur possède déjà. Aucune fabrication d'objets.
+- La première pièce est une zone de tutoriel où se trouvent les outils de nettoyage et de rangement de base (contenu à définir).
+- L'atelier est la deuxième pièce. Il introduit la réparation et ses outils, puis sert à améliorer les outils, ceinture à outils comprise. Aucune fabrication d'objets.
 
 ## Décisions validées (2026-11-10)
 
@@ -45,11 +45,18 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Pièce 1 (zone tutoriel) : nettoyage et rangement. Elle contient les outils de base de nettoyage et de rangement.
 - Pièce 2 (atelier) : introduit la réparation et ses outils, puis permet d'améliorer les outils, ceinture comprise. L'atelier ne fabrique jamais d'objets.
 - La ceinture reste trouvée dans la pièce 1.
-- Non décidé (GDD §15) : liste exacte des outils de nettoyage, liste des outils de réparation, mécanique de réparation.
+- Les objets et meubles cassés, ainsi que des mécanismes spécifiques (lampe du phare, chaufferie, électricité, etc.) pouvant avoir un impact sur le lore, se réparent.
+- Le nettoyage précède la réparation.
+- Déroulé de réparation : une étape simple et satisfaisante ; dans certains cas, un remplacement (par exemple un fusible). Aucune collecte de pièces ou de matériaux : les pièces de remplacement sont fournies par la trousse à outils du joueur.
+- États visuels : cassé puis réparé, sauf cas particuliers (par exemple la lampe du phare). Une réparation a un effet fonctionnel dans le jeu.
+- Quatre outils de réparation : marteau (bois), tournevis (petites pièces mécaniques), clé à molette (installations métalliques et plomberie), kit de réparation (surfaces abîmées).
+- La réparation compte dans le 100 %.
+- Plan de production : la phase 4 (pièce 1) contient la boucle « nettoyer, ranger » ; la réparation est introduite en phase 5 avec l'atelier. La phase 2 (prototype de réparation) reste inchangée.
+- Non décidé (GDD §15) : liste exacte des outils de nettoyage, mécanique détaillée de la réparation, origine des pièces de remplacement, consommabilité du kit de réparation, liste et nombre des réparations spécifiques.
 
 ## Décisions en attente (GDD §15)
 
-1. Liste exacte des outils de base.
+1. Liste exacte des outils de nettoyage et de rangement trouvés dans la pièce 1 (les outils de réparation de l'atelier sont listés au GDD §15).
 2. Définition technique du 100 % (nettoyage, réparation, rangement).
 3. Liste des pièces et graphe des embranchements.
 4. Nombre d'orientations prédéfinies par objet ou famille.
