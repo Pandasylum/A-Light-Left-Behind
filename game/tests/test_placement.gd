@@ -13,6 +13,7 @@ func _run() -> void:
 	_test_can_stack()
 	_test_top_face()
 	_test_surface_transform()
+	_test_push_out()
 	await _test_shape_query()
 	await _test_item_surface()
 	await _test_landing()
@@ -224,16 +225,18 @@ func _test_landing() -> void:
 	# Chute vers le sol.
 	var l: PlacementLanding.Landing = _land(data, edge, shelf)
 	_check(l.ok and l.surface == floor_surface and l.iterations == 1, "chute vers le sol : atterrit sur le sol en 1 itération")
-	_check(l.ok and is_equal_approx(l.center.y, 0.0) and is_equal_approx(l.center.x, 0.5), "chute : verticale exacte, y = dessus du sol")
-	# Enfoncement dans le meuble (attendu avec la règle provisoire) : l'étagère est ignorée pendant la chute.
-	_check(not PlacementLanding.is_blocked(space, data, 0.0, l.center, [shelf.get_rid()]), "chute : sans l'étagère, pose libre")
+	# Dégagement horizontal : bord de l'étagère (x = 0,5) + demi-emprise (0,15) + marge (0,02) = 0,67 ; z inchangé.
+	_check(l.ok and is_equal_approx(l.center.y, 0.0) and absf(l.center.x - 0.67) < 1e-4 and absf(l.center.z) < 1e-4,
+			"chute : dégagée de l'étagère par le plus petit décalage (x = %.3f)" % l.center.x)
+	_check(l.ok and not PlacementLanding.is_blocked(space, data, 0.0, l.center), "chute : pose libre, étagère comprise")
 	await physics_frame
 
 	# Chute vers un support plus bas (palette large).
 	var pallet: StaticBody3D = _support(Vector3(0, 0.15, 0), Vector3(2.0, 0.15, 2.0))
 	await physics_frame
 	l = _land(data, edge, shelf)
-	_check(l.ok and l.surface == PlacementSurface.of_body(pallet) and is_equal_approx(l.center.y, 0.15), "chute vers un support plus bas : palette")
+	_check(l.ok and l.surface == PlacementSurface.of_body(pallet) and is_equal_approx(l.center.y, 0.15)
+			and not PlacementLanding.is_blocked(space, data, 0.0, l.center), "chute vers un support plus bas : palette, dégagée")
 	pallet.free()
 
 	# Cascade : plaque étroite sous l'étagère, puis le sol.
@@ -261,12 +264,13 @@ func _test_landing() -> void:
 	_check(not l.ok and l.iterations == 1, "aucune surface dessous : refus")
 	shelf.free()
 
-	# Itérations : origine + n plaques étroites espacées de 0,15 m, puis le sol.
+	# Itérations : escalier de plaques étroites (0,1 m) sous une origine de même largeur. Chaque atterrissage est
+	# instable ; une plaque sur deux recouvre la précédente (dégagement de 0,22 m), puis le sol.
 	floor_body = _support(Vector3(0, 0, 0), Vector3(8, 0.2, 8), 1, true)
 	var plates: Array[StaticBody3D] = []
-	var origin: StaticBody3D = _support(Vector3(0, 1.6, 0), Vector3(1.0, 0.02, 1.0))
+	var origin: StaticBody3D = _support(Vector3(0.5, 1.6, 0), Vector3(0.1, 0.02, 0.1))
 	for j: int in range(1, 10):
-		plates.append(_support(Vector3(0.5, 1.6 - 0.15 * j, 0.0), Vector3(0.1, 0.02, 0.1)))
+		plates.append(_support(Vector3(0.5 + 0.22 * floori(j / 2.0), 1.6 - 0.15 * j, 0.0), Vector3(0.1, 0.02, 0.1)))
 	var start: Vector3 = Vector3(0.5, 1.6, 0.0)
 	await physics_frame
 	await physics_frame
@@ -280,6 +284,127 @@ func _test_landing() -> void:
 	for b: Node in plates + [origin, floor_body]:
 		b.free()
 	await process_frame
+
+	await _test_landing_clearance()
+
+
+## Chutes réelles depuis une table, un objet empilé : l'objet finit à côté, sans recouvrir aucun corps.
+func _test_landing_clearance() -> void:
+	var data: ItemData = ItemData.new() # SMALL 0,3 x 0,3 x 0,1
+	data.footprint = Vector2(0.3, 0.3)
+	data.height = 0.1
+	var floor_body: StaticBody3D = _support(Vector3(0, 0, 0), Vector3(8, 0.2, 8), 1, true)
+	var table: StaticBody3D = _support(Vector3(0, 0.75, 0), Vector3(1.2, 0.75, 0.8))
+	await physics_frame
+	await physics_frame
+	var space: PhysicsDirectSpaceState3D = (root as Node).get_viewport().world_3d.direct_space_state
+	var floor_surface: PlacementSurface = PlacementSurface.of_body(floor_body)
+	# Du bord de la table : atterrit à côté (x = 0,6 + 0,15 + 0,02), sur le sol.
+	var l: PlacementLanding.Landing = _land(data, Vector3(0.6, 0.75, 0.0), table)
+	_check(l.ok and l.surface == floor_surface and absf(l.center.x - 0.77) < 1e-4 and is_equal_approx(l.center.y, 0.0),
+			"bord de table : atterrit à côté (x = %.3f)" % l.center.x)
+	_check(l.ok and not _overlaps_world(space, data, 0.0, l.center), "bord de table : aucun corps recouvert")
+	# Table tournée de 90° (étendue 0,8 en x, 1,2 en z) : objet au bord +z.
+	var turned: StaticBody3D = _support(Vector3(3, 0.75, 0), Vector3(1.2, 0.75, 0.8))
+	turned.rotation.y = PI / 2.0
+	await physics_frame
+	l = _land(data, Vector3(3.0, 0.75, 0.6), turned)
+	_check(l.ok and l.surface == floor_surface and is_equal_approx(l.center.y, 0.0), "table tournée : atterrit au sol")
+	_check(l.ok and not _overlaps_world(space, data, 0.0, l.center), "table tournée : aucun corps recouvert")
+	turned.free()
+
+	# Depuis un objet empilé : un MEDIUM posé sur la table, un SMALL au bord de son dessus tombe sur la table, à côté.
+	var medium: TestItem = _item("test_medium_1", Vector3(0.0, 0.75 + 0.2, 0.0)) # 0,45 x 0,45 x 0,4 sur la table
+	await physics_frame
+	await physics_frame
+	var small: ItemData = _item_data("test_small_1") # 0,12 x 0,12 x 0,1
+	var medium_top: float = 0.75 + 0.4
+	l = _land(small, Vector3(0.2, medium_top, 0.0), medium)
+	_check(l.ok and l.surface == PlacementSurface.of_body(table) and is_equal_approx(l.center.y, 0.75),
+			"depuis un objet empilé : atterrit sur la table")
+	_check(l.ok and absf(l.center.x - (0.225 + 0.06 + 0.02)) < 1e-4, "depuis un objet empilé : dégagé de l'objet (x = %.3f)" % l.center.x)
+	_check(l.ok and not _overlaps_world(space, small, 0.0, l.center), "depuis un objet empilé : aucun corps recouvert")
+	medium.free()
+	table.free()
+	floor_body.free()
+	await process_frame
+
+
+## Vrai si la boîte de l'objet (couches 1 et 3) recouvre un corps, requête de forme réelle.
+func _overlaps_world(space: PhysicsDirectSpaceState3D, data: ItemData, yaw: float, center: Vector3, exclude: Array[RID] = []) -> bool:
+	var query: PhysicsShapeQueryParameters3D = PlacementLanding._box_query(data, yaw, center, PlacementLanding.FALL_MASK, exclude)
+	return not space.intersect_shape(query, 1).is_empty()
+
+
+func _test_push_out() -> void:
+	var margin: float = 0.02
+	var support: PlacementLanding.OrientedRect = PlacementLanding.OrientedRect.make(Vector2.ZERO, Vector2(1.0, 0.6), 0.0)
+	# Axe choisi : objet 0,3 x 0,3 sur le bord +x -> dégagement en +x (0,5 + 0,15 + 0,02 - 0,5).
+	var body: PlacementLanding.OrientedRect = PlacementLanding.OrientedRect.make(Vector2(0.5, 0.0), Vector2(0.3, 0.3), 0.0)
+	var o: Array[Vector2] = PlacementLanding.push_out(body, support, margin)
+	_check(not o.is_empty() and o[0].distance_to(Vector2(0.17, 0.0)) < 1e-5, "push_out : axe X, +x (%s)" % [o[0] if not o.is_empty() else "vide"])
+	# Axe Z plus court : objet près du bord +z.
+	body = PlacementLanding.OrientedRect.make(Vector2(0.0, 0.3), Vector2(0.3, 0.3), 0.0)
+	o = PlacementLanding.push_out(body, support, margin)
+	_check(not o.is_empty() and o[0].distance_to(Vector2(0.0, 0.17)) < 1e-5, "push_out : axe Z, +z (%s)" % [o[0] if not o.is_empty() else "vide"])
+	# Côté opposé : -x.
+	body = PlacementLanding.OrientedRect.make(Vector2(-0.5, 0.0), Vector2(0.3, 0.3), 0.0)
+	o = PlacementLanding.push_out(body, support, margin)
+	_check(not o.is_empty() and o[0].distance_to(Vector2(-0.17, 0.0)) < 1e-5, "push_out : côté -x")
+	# Tri par distance croissante, jamais de décalage qui laisse un recouvrement.
+	body = PlacementLanding.OrientedRect.make(Vector2(0.4, 0.1), Vector2(0.3, 0.3), 0.0)
+	o = PlacementLanding.push_out(body, support, margin)
+	var sorted: bool = o.size() >= 2
+	for i: int in range(1, o.size()):
+		sorted = sorted and o[i].length() >= o[i - 1].length() - PlacementLanding.TIE_EPSILON
+	_check(sorted, "push_out : triés par distance croissante (%d candidats)" % o.size())
+	var cleared: bool = true
+	for c: Vector2 in o:
+		var moved: PlacementLanding.OrientedRect = PlacementLanding.OrientedRect.make(body.center + c, body.size, body.yaw)
+		cleared = cleared and PlacementLanding.push_out(moved, support, 0.0).is_empty()
+	_check(cleared, "push_out : chaque décalage sépare les rectangles")
+	# Marge : la distance croît d'autant ; marge nulle = contact exact.
+	body = PlacementLanding.OrientedRect.make(Vector2(0.5, 0.0), Vector2(0.3, 0.3), 0.0)
+	o = PlacementLanding.push_out(body, support, 0.0)
+	_check(not o.is_empty() and o[0].distance_to(Vector2(0.15, 0.0)) < 1e-5, "push_out : sans marge, contact exact")
+	o = PlacementLanding.push_out(body, support, 0.1)
+	_check(not o.is_empty() and o[0].distance_to(Vector2(0.25, 0.0)) < 1e-5, "push_out : marge 0,1 -> +0,1")
+	# Rectangles tournés : objet tourné de 45° et support tourné de 90° (équivalent à 0,6 x 1,0).
+	var turned_support: PlacementLanding.OrientedRect = PlacementLanding.OrientedRect.make(Vector2.ZERO, Vector2(1.0, 0.6), PI / 2.0)
+	body = PlacementLanding.OrientedRect.make(Vector2(0.0, 0.5), Vector2(0.3, 0.3), 0.0)
+	o = PlacementLanding.push_out(body, turned_support, margin)
+	_check(not o.is_empty() and o[0].distance_to(Vector2(0.0, 0.17)) < 1e-4, "push_out : support tourné de 90° -> étendue en z (%s)" % [o[0] if not o.is_empty() else "vide"])
+	var diamond: PlacementLanding.OrientedRect = PlacementLanding.OrientedRect.make(Vector2(0.6, 0.0), Vector2(0.3, 0.3), PI / 4.0)
+	o = PlacementLanding.push_out(diamond, support, margin)
+	var half_diag: float = 0.3 * sqrt(2.0) * 0.5
+	_check(not o.is_empty() and o[0].distance_to(Vector2(0.5 + half_diag + margin - 0.6, 0.0)) < 1e-4,
+			"push_out : objet tourné de 45° (demi-diagonale) (%s)" % [o[0] if not o.is_empty() else "vide"])
+	# Axe de l'objet tourné qui gagne : support 1,0 x 1,0, objet 0,2 x 1,0 tourné de 30° (axes obliques).
+	var wide: PlacementLanding.OrientedRect = PlacementLanding.OrientedRect.make(Vector2(0.0, 0.0), Vector2(0.4, 0.4), 0.0)
+	var slanted: PlacementLanding.OrientedRect = PlacementLanding.OrientedRect.make(Vector2(0.45, 0.0), Vector2(0.4, 0.4), deg_to_rad(30.0))
+	o = PlacementLanding.push_out(slanted, wide, margin)
+	var slanted_ok: bool = not o.is_empty()
+	for c: Vector2 in o:
+		slanted_ok = slanted_ok and PlacementLanding.push_out(PlacementLanding.OrientedRect.make(slanted.center + c, slanted.size, slanted.yaw), wide, 0.0).is_empty()
+	_check(slanted_ok, "push_out : lacet 30°, tous les candidats séparent")
+	# Égalité : objet centré sur le support carré -> quatre décalages de même longueur, ordre fixe, stable.
+	var square: PlacementLanding.OrientedRect = PlacementLanding.OrientedRect.make(Vector2.ZERO, Vector2(0.4, 0.4), 0.0)
+	body = PlacementLanding.OrientedRect.make(Vector2.ZERO, Vector2(0.2, 0.2), 0.0)
+	var first: Array[Vector2] = PlacementLanding.push_out(body, square, margin)
+	var second: Array[Vector2] = PlacementLanding.push_out(body, square, margin)
+	var expected: Array[Vector2] = [Vector2(0.32, 0.0), Vector2(-0.32, 0.0), Vector2(0.0, 0.32), Vector2(0.0, -0.32)]
+	var same: bool = first.size() == expected.size() and first == second
+	for i: int in mini(first.size(), expected.size()):
+		same = same and first[i].distance_to(expected[i]) < 1e-5
+	_check(same, "push_out : égalité, ordre fixe +x, -x, +z, -z (%d candidats)" % first.size())
+	# Aucun recouvrement : séparés, ou simplement au contact.
+	_check(PlacementLanding.push_out(PlacementLanding.OrientedRect.make(Vector2(2.0, 0.0), Vector2(0.3, 0.3), 0.0), support, margin).is_empty(),
+			"push_out : éloignés -> aucun décalage")
+	_check(PlacementLanding.push_out(PlacementLanding.OrientedRect.make(Vector2(0.65, 0.0), Vector2(0.3, 0.3), 0.0), support, margin).is_empty(),
+			"push_out : au contact -> aucun décalage")
+	# Séparés sur la diagonale seulement (axes de l'objet tourné).
+	_check(PlacementLanding.push_out(PlacementLanding.OrientedRect.make(Vector2(0.78, 0.48), Vector2(0.3, 0.3), PI / 4.0), support, margin).is_empty(),
+			"push_out : séparés par un axe de l'objet tourné -> aucun décalage")
 
 
 func _aim(player: Player, pos: Vector3, yaw: float, pitch_deg: float) -> void:
@@ -451,21 +576,25 @@ func _test_greybox_flow() -> void:
 	_check(placement._surface == plot_surface and placement._verdict == PlacementController.Verdict.UNSTABLE,
 			"plot trop petit : instable (verdict %d)" % placement._verdict)
 	_check(placement._material.albedo_color == PlacementController.COLOR_FALL, "instable : aperçu orange")
-	var placement_x: float = placement._center.x
-	var placement_z: float = placement._center.z
 	placement.place_held()
 	_check(carry.held_body() == null and large.get_parent() == placed_root, "instable : l'objet est posé (chute)")
 	_check(msg.text == "place.fell", "instable : message place.fell (%s)" % msg.text)
 	_check(large.support_surface == floor_surface and is_equal_approx(large.global_position.y, floor_surface.top_y() + large.item_data.height * 0.5),
 			"chute : atterri sur le sol (y = %.3f)" % large.global_position.y)
-	_check(absf(large.global_position.x - placement_x) < 0.001 and absf(large.global_position.z - placement_z) < 0.001,
-			"chute : verticale (x, z inchangés par rapport à la visée)")
 	_check(large.collision_layer == 4 and large.visible, "chute : collision couche 3 réactivée, visible")
-	# Enfoncement dans le meuble : le plot est ignoré pendant la chute, le LARGE le recouvre (règle provisoire).
+	# Dégagement horizontal : le LARGE ne recouvre plus le plot ni aucun corps des couches 1 et 3.
 	await physics_frame
-	_check(PlacementController.is_blocked((root as Node).get_viewport().world_3d.direct_space_state, large.item_data, 0.0,
-			large.global_position - Vector3.UP * large.item_data.height * 0.5, [large.get_rid()]),
-			"chute : le LARGE tombé s'enfonce dans le plot (signalé, attendu)")
+	var space: PhysicsDirectSpaceState3D = (root as Node).get_viewport().world_3d.direct_space_state
+	var final_center: Vector3 = large.global_position - Vector3.UP * large.item_data.height * 0.5
+	_check(not _overlaps_world(space, large.item_data, large.global_rotation.y, final_center, [large.get_rid()]),
+			"chute : le LARGE ne recouvre aucun corps (couches 1 et 3)")
+	_check(Vector2(large.global_position.x - plot_surface.global_position.x, large.global_position.z - plot_surface.global_position.z).length() > 0.4 + 0.15,
+			"chute : décalé horizontalement hors du plot")
+	# Ciblable : un rayon de la caméra vers le dessus de l'objet l'atteint avant tout autre corps.
+	var top: Vector3 = large.global_position + Vector3.UP * large.item_data.height * 0.5
+	var view_from: Vector3 = Vector3(large.global_position.x, 1.5, large.global_position.z + 1.8)
+	var ray: Dictionary = space.intersect_ray(PhysicsRayQueryParameters3D.create(view_from, top, PlacementController.AIM_MASK))
+	_check(not ray.is_empty() and ray.get("collider") == large, "chute : l'objet est ciblable (rien ne le masque)")
 	room.queue_free()
 
 
