@@ -8,7 +8,7 @@ Légende : ✅ validé · 🟡 à décider
 - Stylisé peint à la main avec éclairage réaliste.
 - Critère de réussite : l'ambiance des références est respectée (jugement du développeur).
 - Simplifié : formes épaisses, bords adoucis, textures peintes, peu de détail fin, palette limitée.
-- Reste réaliste : lumière chaude à l'intérieur, lumière froide aux fenêtres, ombres douces, poussière, brume, pluie.
+- Reste réaliste : intérieur froid à l'état abandonné, lumière plus chaude avec la restauration, lumière froide aux fenêtres, ombres douces, poussière, brume, pluie.
 - Palette indicative : bois chaud, bleu patiné, rouille, pierre froide (valeurs à fixer).
 - Le contraste sale / propre doit rester lisible (boucle de nettoyage).
 
@@ -22,6 +22,7 @@ Dossier : `docs/art/references/` (images à déposer par le développeur).
 - Objets : une chaise, une caisse, un outil.
 - Deux générateurs 3D comparés (candidats : Tripo, Meshy, Rodin), sans abonnement avant le choix.
 - Intégration dans Godot sous une lampe chaude et une fenêtre froide, comparaison aux références.
+- 🟡 Rendre les mêmes objets sous lumière froide seule (état de départ), puis sous lumière réchauffée (après restauration).
 
 ## Principes de production
 - Ressources existantes et bibliothèques d'abord (vérifier les licences commerciales).
@@ -63,7 +64,7 @@ La liste et les noms des pièces relèvent du GDD (§6, graphe non figé). Ici, 
 - Vestibule d'entrée (tutoriel) : à définir.
 
 ### États selon la progression 🟡
-- Avant : couleurs ternes, poussière, humidité, éclairage froid, faible contraste.
+- Avant : couleurs ternes, poussière, humidité, éclairage froid, contraste de teinte faible.
 - Après : bois retrouvé, surfaces propres, textiles restaurés, lumière plus chaude.
 
 ### Règles de production 🟡
