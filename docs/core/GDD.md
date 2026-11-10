@@ -65,7 +65,14 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 - Les objets possèdent des emplacements logiques (étagère, table, crochet, etc.).
 - Le joueur choisit librement leur position précise dans l'espace autorisé par l'emplacement logique.
 - La manipulation est volontairement simplifiée et se concentre principalement sur les surfaces ; elle ne vise pas une simulation physique complexe.
-- La rotation est possible selon un ensemble d'orientations prédéfinies, et non de manière totalement libre.
+- Le placement est libre, avec une aimantation douce sur les surfaces. Les objets sont figés une fois posés (pas de simulation physique persistante).
+- La rotation se fait par paliers, avec une touche ou la molette (valeur proposée : 15°, à confirmer). Chaque objet a des orientations autorisées (par exemple un livre debout ou à plat).
+- Rangement : zones souples par catégorie d'objets, sans position imposée. Un objet compte comme rangé s'il est hors du sol et hors du désordre.
+- Empilement : un petit objet peut être posé sur un grand objet (par exemple une lampe de table sur un gros carton) ; les petits objets sont empilables entre eux (livres).
+- Murs : objets décoratifs et cadres. Pas de plafond (exception possible : la réparation d'un lustre).
+- Gros objets : portés, un seul à la fois.
+- Collisions : un placement qui chevauche est refusé, sauf l'empilement de petits objets.
+- Un objet qui tombe au sol fait baisser le 100 %. Une fois le 100 % atteint, il reste acquis définitivement.
 - Les meubles libres peuvent être déplacés après avoir été nettoyés et réparés ; leur positionnement reste libre.
 - Les installations fixes et gros équipements ne sont pas déplaçables.
 - Les réparations de meubles dépendent de leur matériau.
@@ -241,7 +248,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 
 1. Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.
 2. Liste des pièces et graphe exact des embranchements.
-3. Nombre d'orientations prédéfinies par objet ou famille d'objets.
+3. Liste des orientations autorisées par objet.
 4. Liste, ordre et coûts des améliorations d'outils.
 5. Contenu précis de la première pièce tutorielle et de la deuxième pièce, qui est l'atelier.
 6. Langues de sous-titrage supplémentaires éventuelles.
@@ -255,6 +262,13 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 14. La trousse à outils est-elle améliorable ?
 15. Rythme de salissure des outils, signal visuel d'outil sale, effet exact des améliorations du seau sur la fréquence de rinçage.
 16. Comportement de l'outil multifonction selon la cible.
+17. Définition de « désordre ».
+18. Catégories de taille (petit, grand, gros) et règles d'empilement.
+19. Liste des zones de rangement par catégorie.
+20. Valeur des paliers de rotation (15° à confirmer).
+21. Articulation entre orientations autorisées et paliers de rotation.
+22. Portée du 100 % acquis (par pièce ou global).
+23. Cause exacte de la chute d'un objet.
 
 ---
 

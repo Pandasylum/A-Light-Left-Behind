@@ -49,12 +49,19 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Le nettoyage précède la réparation.
 - Déroulé de réparation : une étape simple et satisfaisante ; dans certains cas, un remplacement (par exemple un fusible). Aucune collecte de pièces ou de matériaux : les pièces de remplacement sont fournies par la trousse à outils du joueur.
 - États visuels : cassé puis réparé, sauf cas particuliers (par exemple la lampe du phare). Une réparation a un effet fonctionnel dans le jeu.
-- Six outils au total. Pièce 1 : éponge (nettoyage courant), raclette (vitres et surfaces lisses), serpillière (sols), seau (rincer les outils et renouveler leur eau). Atelier : marteau (réparations du bois et éléments à redresser), outil multifonction (visserie, plomberie, petites réparations ; reprend le rôle de reboucher, colmater et restaurer les surfaces abîmées). Les pièces de remplacement restent fournies par la trousse à outils, distincte de la ceinture.
+- Six outils au total. Pièce 1 : éponge (nettoyage courant), raclette (vitres et surfaces lisses), serpillière (sols), seau (rincer les outils). Atelier : marteau (réparations du bois et éléments à redresser), outil multifonction (visserie, plomberie, petites réparations ; reprend le rôle de reboucher, colmater et restaurer les surfaces abîmées). Les pièces de remplacement restent fournies par la trousse à outils, distincte de la ceinture.
 - La réparation compte dans le 100 %.
 - Le 100 % d'une pièce couvre tout ce que la pièce permet de faire avec les mécaniques disponibles à ce stade : la pièce 1 ne compte que le nettoyage et le rangement, sans la réparation ; les pièces suivantes comptent la réparation lorsqu'elle est disponible. La définition technique exacte reste ouverte (GDD §15).
 - Plan de production : la phase 4 (pièce 1) contient la boucle « nettoyer, ranger » ; la réparation est introduite en phase 5 avec l'atelier. La phase 2 (prototype de réparation) reste inchangée.
 - Non décidé (GDD §15) : liste exacte des outils de nettoyage, mécanique détaillée de la réparation, origine des pièces de remplacement, consommabilité du kit de réparation, liste et nombre des réparations spécifiques.
 - Seau : sert à rincer les outils de nettoyage ; sans rinçage, leur efficacité baisse fortement (un outil sale perd jusqu'à 90 % d'efficacité au maximum, jamais 100 %). Le rinçage est un geste court : le joueur tient l'outil sale et interagit avec le seau. Les améliorations du seau permettent de rincer moins souvent ; il est amélioré à l'atelier comme les autres outils. Renouvellement de l'eau retiré du périmètre actuel (piste 💡, GDD §14).
+- Rangement (2026-11-10) : zones souples par catégorie d'objets, sans position imposée ; un objet est rangé s'il est hors du sol et hors du désordre.
+- Placement libre avec aimantation douce sur les surfaces ; objets figés une fois posés (pas de simulation physique persistante).
+- Rotation par paliers (touche ou molette), valeur proposée 15° À CONFIRMER ; chaque objet a des orientations autorisées.
+- Empilement : un petit objet sur un grand objet (lampe de table sur un gros carton) ; petits objets empilables entre eux (livres).
+- Murs : objets décoratifs et cadres ; pas de plafond (exception possible : réparation d'un lustre). Gros objets portés, un seul à la fois.
+- Collisions : placement qui chevauche refusé, sauf empilement de petits objets.
+- Un objet qui tombe au sol fait baisser le 100 % ; une fois atteint, le 100 % reste acquis définitivement.
 
 ## Décisions en attente (GDD §15)
 
