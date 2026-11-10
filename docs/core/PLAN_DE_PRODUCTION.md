@@ -292,7 +292,7 @@ Chaque tâche devrait préciser :
 
 ### Prochaine étape concrète
 
-Commencer par la **Phase 0 — Audit et fondations** : relever ce qui existe déjà dans le projet, ce qui fonctionne réellement et ce qui doit être repris. Ensuite, attaquer la Phase 1 puis la suite dans l'ordre, sans ajouter de contenu de campagne tant que les interactions fondamentales ne sont pas validées.
+Commencer par la **Phase 0 — Audit et fondations** : relever ce qui existe déjà dans le projet, ce qui fonctionne réellement et ce qui doit être repris. Ensuite, attaquer la Phase 1 sans ajouter de contenu de campagne tant que les interactions fondamentales ne sont pas validées.
 
 ---
 
