@@ -14,7 +14,10 @@ Test : `tools/godot.sh --headless --path game --script res://tests/save_roundtri
 
 ## Scènes
 `game/core/main.tscn` — scène principale (Node3D), instancie la scène grise — greybox.tscn
-`game/rooms/test/greybox.tscn` — pièce grise de test : sol 10x10, lumière, environnement, caméra fixe — aucune
+`game/rooms/test/greybox.tscn` — pièce grise de test : sol 10x10, lumière, environnement, caméra fixe (current=false), instancie Player — player.tscn
+`game/systems/player/player.gd` + `player.tscn` — Player (CharacterBody3D, classe Player) : marche/marche lente, regard souris (yaw Player, pitch Head), Échap libère la souris, clic gauche la recapture ; couche 2, masque 1 — Input Map
+`game/tests/test_player.gd` — structure de player.tscn, valeurs par défaut, logique de déplacement/regard — player.gd
+Test : `tools/godot.sh --headless --path game --script res://tests/test_player.gd`
 
 ## Données et ressources
 `game/data/item_data.gd` — ItemData (Resource) : id, nom, catégorie, emprise, orientations, axes suivis ; validate() — aucune
