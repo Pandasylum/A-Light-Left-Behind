@@ -9,10 +9,18 @@ const PITCH_LIMIT: float = deg_to_rad(89.0)
 @export var mouse_sensitivity: float = 0.002 ## rad/pixel
 @export var gravity: float = 9.8 ## m/s²
 
+@export var fall_limit_y: float = -10.0 ## m ; sous cette hauteur, retour au départ
+
 @onready var head: Node3D = $Head
+@onready var sensor: InteractionSensor = $Head/InteractionSensor
+@onready var prompt: InteractionPrompt = $InteractionPrompt
+
+var _start_position: Vector3
 
 
 func _ready() -> void:
+	_start_position = global_position
+	sensor.target_changed.connect(prompt.set_target)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
@@ -35,6 +43,14 @@ func _physics_process(delta: float) -> void:
 	velocity.z = horizontal.z
 	velocity.y = 0.0 if is_on_floor() else velocity.y - gravity * delta
 	move_and_slide()
+	check_fall()
+
+
+## Remet le joueur au départ (vitesse nulle) s'il est tombé sous fall_limit_y.
+func check_fall() -> void:
+	if global_position.y < fall_limit_y:
+		global_position = _start_position
+		velocity = Vector3.ZERO
 
 
 ## Applique une rotation souris (en pixels) : yaw sur Player, pitch sur Head.

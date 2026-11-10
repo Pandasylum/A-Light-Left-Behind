@@ -1,6 +1,8 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://systems/player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://systems/interaction/interaction_sensor.gd" id="2_sensor"]
+[ext_resource type="PackedScene" path="res://ui/hud/interaction_prompt.tscn" id="3_prompt"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.3
@@ -20,3 +22,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head"]
 current = true
+
+[node name="InteractionSensor" type="Node" parent="Head"]
+script = ExtResource("2_sensor")
+
+[node name="InteractionPrompt" parent="." instance=ExtResource("3_prompt")]
