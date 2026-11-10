@@ -13,7 +13,6 @@ var _prompt: InteractionPrompt
 var _anchor: Node3D
 var _placement: PlacementController
 var _target: Interactable = null
-var _debug_label: Label
 
 
 func _ready() -> void:
@@ -24,10 +23,6 @@ func _ready() -> void:
 	_anchor = player.get_node("Head/HandAnchor")
 	_placement = player.get_node("PlacementController")
 	_sensor.target_changed.connect(_on_target_changed)
-	inventory.held_changed.connect(func(_i: ItemData) -> void: _update_label())
-	inventory.belt_changed.connect(func(_s: int, _i: ItemData) -> void: _update_label())
-	_build_debug_label()
-	_update_label()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -144,19 +139,3 @@ func _show_refusal(result: CarryInventory.Result) -> void:
 
 func _is_active() -> bool:
 	return Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
-
-
-func _build_debug_label() -> void:
-	var layer: CanvasLayer = CanvasLayer.new()
-	_debug_label = Label.new()
-	_debug_label.position = Vector2(12, 8)
-	_debug_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layer.add_child(_debug_label)
-	add_child(layer)
-
-
-## Provisoire (remplacé en P1-E).
-func _update_label() -> void:
-	var held: ItemData = inventory.held()
-	var held_name: String = tr(held.name_key) if held != null else "-"
-	_debug_label.text = "Main : %s / Ceinture : %d/%d" % [held_name, inventory.belt_count(), inventory.capacity()]

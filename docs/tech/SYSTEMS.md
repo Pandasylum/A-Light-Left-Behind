@@ -26,7 +26,7 @@ Couches de collision : 1 monde, 2 joueur, 3 interactifs (nouvelle ; valeur de ma
 Test : `tools/godot.sh --headless --path game --script res://tests/test_player.gd`
 
 `game/systems/carry/carry_inventory.gd` — CarryInventory (RefCounted) : logique pure main + ceinture de SMALL (capacité 1 à 5, paramètre du constructeur), rangement automatique du SMALL en main avant un MEDIUM/LARGE, pick_up/add_to_belt/cycle_item (CYCLE_BLOCKED, NOTHING_TO_DO)/drop_object, énum Result, signaux held_changed/belt_changed — ItemData
-`game/systems/carry/carry_controller.gd` — CarryController (enfant de Player ; capacité = Player.belt_capacity) : prise via Interactable PICK_UP (refusée si l'objet porte une charge : carry.supports_object), cycle_item/drop_object, HandAnchor, masquage ceinture, dépôt délégué au PlacementController (held_data/held_body/release_held), label de debug (provisoire, P1-E) — CarryInventory, InteractionSensor, InteractionPrompt
+`game/systems/carry/carry_controller.gd` — CarryController (enfant de Player ; capacité = Player.belt_capacity) : prise via Interactable PICK_UP (refusée si l'objet porte une charge : carry.supports_object), cycle_item/drop_object, HandAnchor, masquage ceinture, dépôt délégué au PlacementController (held_data/held_body/release_held) — CarryInventory, InteractionSensor, InteractionPrompt
 `game/props/test_item.tscn` + `.gd` — TestItem (StaticBody3D, couche 3) : ItemData exportée, cube emprise × height, enfant PlacementSurface (dessus, is_floor = false, taille = emprise), support_surface, loads (charges posées dessus), on_placed/on_picked_up/has_loads, rests_on_declared_support() (posé sur un support déclaré non-sol, pour le rangement à venir ; dessus déclaré seulement si item_data.provides_support), Interactable PICK_UP — ItemData, interactable.gd, placement_surface.gd
 `game/systems/placement/placement_surface.gd` — PlacementSurface (Node3D, class_name) : surface plate horizontale (face supérieure à l'origine), enfant d'un corps couche 1 ; size (XZ), is_floor, is_declared_support (vrai par défaut ; faux pour le dessus d'un objet ordinaire) ; of_body() — aucune
 `game/systems/placement/placement_check.gd` — PlacementCheck (RefCounted) : support par échantillonnage de l'empreinte (marge, couverture de PlacementRules), Outcome (Status OK/UNSUPPORTED + coverage), can_stack(haut, bas) piloté par STACK_TABLE (provisoire, GDD §15 pt 18) — PlacementRules, PlacementSurface, ItemData
@@ -37,6 +37,12 @@ Test : `tools/godot.sh --headless --path game --script res://tests/test_placemen
 `game/data/items/` — 11 ItemData de test (7 SMALL, 1 MEDIUM, 1 LARGE, 2 meubles libres LARGE provides_support : test_furniture_low 1,0x0,6x0,45, test_furniture_tall 0,6x0,5x0,9) — item_data.gd
 `game/tests/test_carry.gd` — règles de CarryInventory (tableau de cas, capacité 1 à 5, rangement auto, cycle (CYCLE_BLOCKED/NOTHING_TO_DO), dépôt, signaux) — carry_inventory.gd
 Test : `tools/godot.sh --headless --path game --script res://tests/test_carry.gd`
+`game/ui/inventory/inventory_panel.tscn` + `.gd` — InventoryPanel (CanvasLayer, class_name, enfant de Player) : inventory_open affiche/masque (non modal, inactif souris libre) la liste Main + emplacements de ceinture disponibles ; label permanent bas-gauche = objet tenu ; build_rows() statique pure ; mise à jour sur held_changed/belt_changed (interface provisoire) — CarryController, CarryInventory, ItemData
+`game/tests/test_inventory_panel.gd` — build_rows (main vide/tenue, ceinture partielle/pleine, capacité 1 et 5), instanciation et signaux — inventory_panel.gd
+Test : `tools/godot.sh --headless --path game --script res://tests/test_inventory_panel.gd`
+`game/tests/test_phase1_flow.gd` — scénario de bout en bout de la Phase 1 dans greybox.tscn (prise, rangement auto, rotation, pose, empilement, chute, reprise, meuble libre) — greybox.tscn
+Test : `tools/godot.sh --headless --path game --script res://tests/test_phase1_flow.gd`
+`docs/tech/PHASE1_CHECKLIST.md` — liste de vérification manuelle de la Phase 1 + valeurs provisoires à régler — greybox.tscn
 `InteractionPrompt.show_message(key)` — message temporaire ~2 s sous l'indice — interaction_prompt.gd
 
 ## Données et ressources
