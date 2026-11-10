@@ -18,6 +18,7 @@ func _run() -> void:
 	await _test_item_surface()
 	await _test_landing()
 	await _test_greybox_flow()
+	await _test_furniture()
 	print("test_placement : ", "OK" if _failures == 0 else "%d échec(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
 
@@ -596,6 +597,120 @@ func _test_greybox_flow() -> void:
 	var ray: Dictionary = space.intersect_ray(PhysicsRayQueryParameters3D.create(view_from, top, PlacementController.AIM_MASK))
 	_check(not ray.is_empty() and ray.get("collider") == large, "chute : l'objet est ciblable (rien ne le masque)")
 	room.queue_free()
+
+
+## Meubles libres (P1-E1) : propagation de provides_support, rests_on_declared_support, empilement, déplacement.
+func _test_furniture() -> void:
+	var room: Node3D = (load("res://rooms/test/greybox.tscn") as PackedScene).instantiate()
+	root.add_child(room)
+	await physics_frame
+	await physics_frame
+	var low: TestItem = room.get_node("TestItems/furniture_low")
+	var tall: TestItem = room.get_node("TestItems/furniture_tall")
+	var medium: TestItem = room.get_node("TestItems/medium_1")
+	var small: TestItem = room.get_node("TestItems/small_3")
+	var ordinary: TestItem = room.get_node("TestItems/large_1")
+	var floor_surface: PlacementSurface = PlacementSurface.of_body(room.get_node("Floor"))
+	var table_surface: PlacementSurface = PlacementSurface.of_body(room.get_node("Supports/TestTable"))
+
+	# Propagation de provides_support jusqu'au PlacementSurface.
+	_check(low.item_data.validate().is_empty() and tall.item_data.validate().is_empty(), "meubles : ItemData valides")
+	_check(low.item_data.provides_support and tall.item_data.provides_support, "meubles : provides_support = true")
+	_check(low.item_data.footprint != tall.item_data.footprint and low.item_data.height != tall.item_data.height, "meubles : dimensions distinctes")
+	_check(PlacementSurface.of_body(low).is_declared_support and PlacementSurface.of_body(tall).is_declared_support,
+			"meuble libre : dessus = support déclaré")
+	_check(not PlacementSurface.of_body(ordinary).is_declared_support and not PlacementSurface.of_body(small).is_declared_support,
+			"objet ordinaire : dessus non déclaré")
+	_check(floor_surface.is_declared_support and table_surface.is_declared_support, "sol et table : supports déclarés")
+
+	# rests_on_declared_support() : quatre cas.
+	_check(not small.rests_on_declared_support(), "non posé : faux")
+	small.on_placed(floor_surface)
+	_check(not small.rests_on_declared_support(), "au sol : faux")
+	small.on_picked_up()
+	small.on_placed(table_surface)
+	_check(small.rests_on_declared_support(), "sur support fixe déclaré : vrai")
+	small.on_picked_up()
+	small.on_placed(PlacementSurface.of_body(low))
+	_check(small.rests_on_declared_support(), "sur meuble libre : vrai")
+	small.on_picked_up()
+	small.on_placed(PlacementSurface.of_body(ordinary))
+	_check(not small.rests_on_declared_support(), "sur objet ordinaire : faux")
+	small.on_picked_up()
+
+	# Empilement selon STACK_TABLE inchangée (meuble LARGE).
+	var check: PlacementCheck = PlacementCheck.new()
+	_check(check.can_stack(small.item_data.category, low.item_data.category) and check.can_stack(medium.item_data.category, low.item_data.category),
+			"meuble : porte SMALL et MEDIUM")
+	_check(not check.can_stack(ordinary.item_data.category, low.item_data.category) and not check.can_stack(low.item_data.category, medium.item_data.category),
+			"meuble : ne porte pas un LARGE ; pas de meuble sur un MEDIUM")
+
+	var player: Player = room.get_node("Player")
+	var carry: CarryController = player.get_node("CarryController")
+	var placement: PlacementController = player.get_node("PlacementController")
+	var msg: Label = player.prompt.get_node("Message")
+	var low_top: Vector3 = low.global_position + Vector3.UP * low.item_data.height * 0.5
+
+	# Pose d'un MEDIUM sur le meuble bas.
+	_hold(carry, medium)
+	_aim_at(player, Vector3(-1.5, 0.05, 4.6), low_top)
+	await physics_frame
+	placement._update_target()
+	_check(placement._surface == PlacementSurface.of_body(low) and placement._verdict == PlacementController.Verdict.OK,
+			"MEDIUM sur meuble : OK (verdict %d)" % placement._verdict)
+	placement.place_held()
+	_check(medium.support_surface == PlacementSurface.of_body(low) and low.loads.has(medium) and medium.rests_on_declared_support(),
+			"MEDIUM posé : charge du meuble, posé sur support déclaré")
+	await physics_frame
+
+	# Un LARGE ordinaire ne se pose pas sur le meuble (CANNOT_STACK).
+	_hold(carry, ordinary)
+	_aim_at(player, Vector3(-1.5, 0.05, 4.6), low_top + Vector3(0.0, 0.0, 0.27)) # hors du MEDIUM posé au centre
+	await physics_frame
+	placement._update_target()
+	_check(placement._verdict == PlacementController.Verdict.CANNOT_STACK, "LARGE sur meuble : interdit (verdict %d)" % placement._verdict)
+	carry.inventory.drop_object()
+	carry._refresh_visuals()
+	ordinary.reparent(room.get_node("TestItems"), false) # remis à sa place d'origine
+	ordinary.global_transform = Transform3D(Basis.IDENTITY, Vector3(2.25, 0.45, -3.4))
+	ordinary.visible = true
+	ordinary.collision_layer = 4
+
+	# Meuble chargé : non prenable, puis prenable après retrait de la charge.
+	carry.pick_up(low.get_node("Interactable"))
+	_check(carry.held_body() == null and msg.text == "carry.supports_object" and low.has_loads(), "meuble chargé : non prenable")
+	carry.pick_up(medium.get_node("Interactable"))
+	_check(carry.held_body() == medium and not low.has_loads(), "charge retirée : le meuble est libéré")
+	_aim_at(player, Vector3(-3.0, 0.05, 2.2), Vector3(-3.0, 0.0, 1.5))
+	await physics_frame
+	placement._update_target()
+	placement.place_held()
+	_check(carry.held_body() == null and medium.support_surface == floor_surface, "MEDIUM reposé au sol")
+	await physics_frame
+	msg.text = ""
+	carry.pick_up(low.get_node("Interactable"))
+	_check(carry.held_body() == low and msg.text == "" and low.support_surface == null, "meuble sans charge : prise à deux mains")
+
+	# Déplacement : pose au sol ailleurs, puis nouvelle charge cohérente.
+	_aim_at(player, Vector3(1.0, 0.05, 2.9), Vector3(1.0, 0.0, 2.0))
+	await physics_frame
+	placement._update_target()
+	_check(placement._surface == floor_surface and placement._verdict == PlacementController.Verdict.OK,
+			"meuble : pose au sol valide (verdict %d)" % placement._verdict)
+	placement.place_held()
+	_check(carry.held_body() == null and low.support_surface == floor_surface and low.loads.is_empty() and not low.rests_on_declared_support(),
+			"meuble déplacé : au sol, sans charge")
+	await physics_frame
+	var moved_top: Vector3 = low.global_position + Vector3.UP * low.item_data.height * 0.5
+	_hold(carry, small)
+	_aim_at(player, Vector3(1.0, 0.05, 2.9), moved_top)
+	await physics_frame
+	placement._update_target()
+	placement.place_held()
+	_check(small.support_surface == PlacementSurface.of_body(low) and low.loads.has(small) and small.rests_on_declared_support(),
+			"meuble déplacé : porte une nouvelle charge, état cohérent")
+	room.queue_free()
+	await process_frame
 
 
 func _check(ok: bool, label: String) -> void:

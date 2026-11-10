@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/item_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"test_furniture_tall"
+name_key = "item.test.furniture_tall"
+category = 2
+footprint = Vector2(0.6, 0.5)
+height = 0.9
+provides_support = true

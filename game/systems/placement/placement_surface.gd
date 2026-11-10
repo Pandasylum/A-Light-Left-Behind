@@ -9,6 +9,9 @@ extends Node3D
 @export var size: Vector2 = Vector2(1.0, 1.0)
 ## Vrai pour le sol de la pièce.
 @export var is_floor: bool = false
+## Vrai pour un support déclaré (sol, palette, table, plot, dessus d'un meuble libre). Faux pour le dessus
+## d'un objet ordinaire : un objet posé dessus est non rangé.
+@export var is_declared_support: bool = true
 
 
 ## Surface (enfant PlacementSurface) du corps donné, ou null.
