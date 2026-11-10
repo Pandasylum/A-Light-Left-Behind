@@ -61,7 +61,10 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Empilement : un petit objet sur un grand objet (lampe de table sur un gros carton) ; petits objets empilables entre eux (livres).
 - Murs : objets décoratifs et cadres ; pas de plafond (exception possible : réparation d'un lustre). Gros objets portés, un seul à la fois.
 - Collisions : placement qui chevauche refusé, sauf empilement de petits objets.
-- Un objet qui tombe au sol fait baisser le 100 % ; une fois atteint, le 100 % reste acquis définitivement.
+- Un objet tombe au sol s'il est lâché ou posé trop près du bord de son support. Un objet tombé fait baisser le 100 %. Une fois le 100 % atteint, il reste acquis définitivement.
+- Pièce 1 (tutoriel), 2026-11-10 : apprentissage libre avec indices (le personnage commente à voix haute, sans forcer) ; outils de nettoyage trouvés progressivement ; ceinture = récompense (clé trouvée pendant le rangement, vieux coffre en bois fermé à clé près de la porte de sortie) ; le coffre est le gros objet d'apprentissage (saisie, port à deux mains, dépôt précis, rotation par orientations prédéfinies) ; rinçage du seau découvert seul ; durée visée 15 minutes ; sortie = 100 % ET ceinture ; narration : le nouveau Gardien n'a pas envie d'être là mais le fait pour sa fille malade ; trousse à outils obtenue à l'atelier.
+- Saleté et outils (2026-11-10) : poussière et traces = éponge ; vitres = éponge puis raclette ; sols = serpillière ; rouille superficielle = éponge abrasive (amélioration, après l'atelier) ; métal profondément corrodé = réparation après un traitement (non défini).
+- Catégories d'objets (2026-11-10) : petits (à la main, un à la fois ; ceinture = 1 emplacement au départ, jusqu'à 5), moyens (à la main), gros (deux mains), fixes (non déplaçables).
 
 ## Décisions en attente (GDD §15)
 
