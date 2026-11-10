@@ -1,5 +1,5 @@
 extends SceneTree
-## Test de la pose simple (P1-D1). Lancer : tools/godot.sh --headless --path game --script res://tests/test_placement.gd
+## Test de la pose, de l'empilement et de la chute (P1-D1, P1-D2). Lancer : tools/godot.sh --headless --path game --script res://tests/test_placement.gd
 
 var _failures: int = 0
 
@@ -10,8 +10,12 @@ func _init() -> void:
 
 func _run() -> void:
 	_test_check_pure()
+	_test_can_stack()
+	_test_top_face()
 	_test_surface_transform()
 	await _test_shape_query()
+	await _test_item_surface()
+	await _test_landing()
 	await _test_greybox_flow()
 	print("test_placement : ", "OK" if _failures == 0 else "%d échec(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -115,10 +119,181 @@ func _test_shape_query() -> void:
 	await process_frame
 
 
+func _test_can_stack() -> void:
+	var cat: Dictionary = {"S": ItemData.Category.SMALL, "M": ItemData.Category.MEDIUM, "L": ItemData.Category.LARGE, "F": ItemData.Category.FIXED}
+	# [dessus, dessous, attendu]
+	var cases: Array = [
+		["S", "S", true], ["S", "M", true], ["S", "L", true], ["S", "F", false],
+		["M", "S", false], ["M", "M", false], ["M", "L", true], ["M", "F", false],
+		["L", "S", false], ["L", "M", false], ["L", "L", false], ["L", "F", false],
+		["F", "S", false], ["F", "M", false], ["F", "L", false], ["F", "F", false],
+	]
+	for c: Array in cases:
+		_check(PlacementCheck.can_stack(cat[c[0]], cat[c[1]]) == c[2], "can_stack(%s sur %s) = %s" % [c[0], c[1], c[2]])
+
+
+func _test_top_face() -> void:
+	_check(PlacementController.is_top_face(Vector3.UP), "face : normale vers le haut -> visable")
+	_check(PlacementController.is_top_face(Vector3(0.1, 0.995, 0.0).normalized()), "face : légèrement inclinée (~6°) -> visable")
+	_check(not PlacementController.is_top_face(Vector3(0.6, 0.8, 0.0)), "face : 37° d'inclinaison -> aucune surface")
+	_check(not PlacementController.is_top_face(Vector3(0.0, 0.0, 1.0)), "face : flanc vertical -> aucune surface")
+	_check(not PlacementController.is_top_face(Vector3.DOWN), "face : dessous -> aucune surface")
+	_check(not PlacementController.is_top_face(Vector3(0.0, 0.9, 0.436).normalized()), "face : 0,9 de produit scalaire (< 0,95) -> aucune surface")
+
+
+func _item_data(name: String) -> ItemData:
+	return load("res://data/items/%s.tres" % name) as ItemData
+
+
+func _item(name: String, pos: Vector3, yaw: float = 0.0) -> TestItem:
+	var item: TestItem = (load("res://props/test_item.tscn") as PackedScene).instantiate()
+	item.item_data = _item_data(name)
+	item.transform = Transform3D(Basis(Vector3.UP, yaw), pos)
+	root.add_child(item)
+	return item
+
+
+func _test_item_surface() -> void:
+	var medium: TestItem = _item("test_medium_1", Vector3(10.0, 0.2, 0.0), PI / 2.0)
+	var surface: PlacementSurface = PlacementSurface.of_body(medium)
+	_check(surface != null and not surface.is_floor, "objet : enfant PlacementSurface, is_floor = false")
+	_check(surface.size == medium.item_data.footprint, "objet : taille de la surface = emprise")
+	_check(is_equal_approx(surface.top_y(), 0.2 + medium.item_data.height * 0.5), "objet : surface à la hauteur du dessus")
+	_check(is_equal_approx(surface.to_local_yaw(PI / 2.0), 0.0), "objet tourné : la surface suit la rotation du corps")
+	# Contrôle de couverture sur le dessus d'un objet tourné de 90° (emprise 0,8 x 0,2).
+	var thin: ItemData = ItemData.new()
+	thin.footprint = Vector2(0.8, 0.2)
+	thin.height = 0.2
+	var rotated: TestItem = (load("res://props/test_item.tscn") as PackedScene).instantiate()
+	rotated.item_data = thin
+	rotated.transform = Transform3D(Basis(Vector3.UP, PI / 2.0), Vector3(14.0, 0.2, 0.0))
+	root.add_child(rotated)
+	var small: ItemData = _item_data("test_small_1")
+	var check: PlacementCheck = PlacementCheck.new()
+	var top_y: float = 0.2 + thin.height * 0.5
+	var surf: PlacementSurface = PlacementSurface.of_body(rotated)
+	# Axe long de l'objet = Z monde (rotation 90°) : un SMALL à 0,3 m du centre le long de Z tient, le long de X il déborde.
+	_check(check.evaluate(small, PI / 2.0, Vector3(14.0, top_y, -0.3), surf).status == PlacementCheck.Status.OK,
+			"dessus d'objet : SMALL le long de l'axe long -> OK")
+	_check(check.evaluate(small, PI / 2.0, Vector3(14.3, top_y, 0.0), surf).status == PlacementCheck.Status.UNSUPPORTED,
+			"dessus d'objet : SMALL le long de l'axe court -> déborde")
+	_check(check.evaluate(small, 0.0, Vector3(14.0, top_y, 0.0), surf).status == PlacementCheck.Status.OK, "dessus d'objet : centré -> OK")
+	# Pas de pose sur un objet moins grand que soi : couverture insuffisante.
+	var big: ItemData = _item_data("test_medium_1")
+	_check(check.evaluate(big, 0.0, Vector3(10.0, top_y, 0.0), PlacementSurface.of_body(medium)).status == PlacementCheck.Status.OK,
+			"dessus d'objet : MEDIUM centré sur MEDIUM -> couverture OK (c'est can_stack qui refuse)")
+	for n: Node in [medium, rotated]:
+		n.queue_free()
+	await process_frame
+
+
+## Support de test : corps de `size` dont la face supérieure est centrée en `top`, surface de même taille (XZ).
+func _support(top: Vector3, size: Vector3, layer: int = 1, is_floor: bool = false) -> StaticBody3D:
+	var b: StaticBody3D = _body(layer, top - Vector3(0.0, size.y * 0.5, 0.0), size)
+	var surf: PlacementSurface = PlacementSurface.new()
+	surf.size = Vector2(size.x, size.z)
+	surf.is_floor = is_floor
+	surf.position = Vector3(0.0, size.y * 0.5, 0.0)
+	b.add_child(surf)
+	return b
+
+
+func _land(data: ItemData, start: Vector3, origin: StaticBody3D) -> PlacementLanding.Landing:
+	var space: PhysicsDirectSpaceState3D = (root as Node).get_viewport().world_3d.direct_space_state
+	return PlacementLanding.resolve(space, PlacementCheck.new(), data, 0.0, start, origin.get_rid(), RID())
+
+
+func _test_landing() -> void:
+	var data: ItemData = ItemData.new() # SMALL 0,3 x 0,3 x 0,1
+	data.footprint = Vector2(0.3, 0.3)
+	data.height = 0.1
+	var floor_body: StaticBody3D = _support(Vector3(0, 0, 0), Vector3(8, 0.2, 8), 1, true)
+	var shelf: StaticBody3D = _support(Vector3(0, 0.75, 0), Vector3(1.0, 0.02, 0.6)) # étagère mince
+	await physics_frame
+	await physics_frame
+	var space: PhysicsDirectSpaceState3D = (root as Node).get_viewport().world_3d.direct_space_state
+	var shelf_surface: PlacementSurface = PlacementSurface.of_body(shelf)
+	var floor_surface: PlacementSurface = PlacementSurface.of_body(floor_body)
+	var edge: Vector3 = Vector3(0.5, 0.75, 0.0) # centre sur le bord de l'étagère : instable
+	var check: PlacementCheck = PlacementCheck.new()
+	_check(PlacementLanding.evaluate_pose(space, check, data, 0.0, edge, shelf_surface) == PlacementLanding.Verdict.UNSTABLE,
+			"pose sur le bord : instable (et non refusée)")
+	_check(PlacementLanding.evaluate_pose(space, check, data, 0.0, Vector3(0, 0.75, 0), shelf_surface) == PlacementLanding.Verdict.OK,
+			"pose centrée : OK")
+
+	# Chute vers le sol.
+	var l: PlacementLanding.Landing = _land(data, edge, shelf)
+	_check(l.ok and l.surface == floor_surface and l.iterations == 1, "chute vers le sol : atterrit sur le sol en 1 itération")
+	_check(l.ok and is_equal_approx(l.center.y, 0.0) and is_equal_approx(l.center.x, 0.5), "chute : verticale exacte, y = dessus du sol")
+	# Enfoncement dans le meuble (attendu avec la règle provisoire) : l'étagère est ignorée pendant la chute.
+	_check(not PlacementLanding.is_blocked(space, data, 0.0, l.center, [shelf.get_rid()]), "chute : sans l'étagère, pose libre")
+	await physics_frame
+
+	# Chute vers un support plus bas (palette large).
+	var pallet: StaticBody3D = _support(Vector3(0, 0.15, 0), Vector3(2.0, 0.15, 2.0))
+	await physics_frame
+	l = _land(data, edge, shelf)
+	_check(l.ok and l.surface == PlacementSurface.of_body(pallet) and is_equal_approx(l.center.y, 0.15), "chute vers un support plus bas : palette")
+	pallet.free()
+
+	# Cascade : plaque étroite sous l'étagère, puis le sol.
+	var plate: StaticBody3D = _support(Vector3(0.5, 0.4, 0.0), Vector3(0.1, 0.02, 0.1))
+	await physics_frame
+	l = _land(data, edge, shelf)
+	_check(l.ok and l.surface == floor_surface and l.iterations == 2, "cascade : plaque instable puis sol (%d itérations)" % l.iterations)
+	plate.free()
+
+	# Empilement interdit à l'atterrissage : un MEDIUM tombe sur un SMALL posé -> refus.
+	var small_item: TestItem = _item("test_small_1", Vector3(0.5, 0.05, 0.0))
+	await physics_frame
+	var medium_data: ItemData = _item_data("test_medium_1")
+	l = _land(medium_data, Vector3(0.5, 0.75, 0.0), shelf)
+	_check(not l.ok, "chute sur un SMALL : MEDIUM, empilement interdit -> refus")
+	# Un SMALL sur un SMALL est permis, mais le dessus (0,12 x 0,12) est trop petit pour 0,3 : il retombe jusqu'au sol.
+	l = _land(data, edge, shelf)
+	_check(l.ok and l.surface == floor_surface and l.iterations == 2, "chute sur un SMALL trop petit : retombe au sol (%d itérations)" % l.iterations)
+	small_item.free()
+
+	# Vide sous l'étagère : aucun atterrissage -> refus.
+	floor_body.free()
+	await physics_frame
+	l = _land(data, edge, shelf)
+	_check(not l.ok and l.iterations == 1, "aucune surface dessous : refus")
+	shelf.free()
+
+	# Itérations : origine + n plaques étroites espacées de 0,15 m, puis le sol.
+	floor_body = _support(Vector3(0, 0, 0), Vector3(8, 0.2, 8), 1, true)
+	var plates: Array[StaticBody3D] = []
+	var origin: StaticBody3D = _support(Vector3(0, 1.6, 0), Vector3(1.0, 0.02, 1.0))
+	for j: int in range(1, 10):
+		plates.append(_support(Vector3(0.5, 1.6 - 0.15 * j, 0.0), Vector3(0.1, 0.02, 0.1)))
+	var start: Vector3 = Vector3(0.5, 1.6, 0.0)
+	await physics_frame
+	await physics_frame
+	l = _land(data, start, origin)
+	_check(not l.ok and l.iterations == PlacementLanding.MAX_ITERATIONS, "9 plaques : refus après 8 itérations (%d)" % l.iterations)
+	plates.pop_back().free()
+	plates.pop_back().free() # il reste 7 plaques : le sol est atteint à la 8e itération
+	await physics_frame
+	l = _land(data, start, origin)
+	_check(l.ok and l.surface == PlacementSurface.of_body(floor_body) and l.iterations == 8, "7 plaques : sol à la 8e itération (%d)" % l.iterations)
+	for b: Node in plates + [origin, floor_body]:
+		b.free()
+	await process_frame
+
+
 func _aim(player: Player, pos: Vector3, yaw: float, pitch_deg: float) -> void:
 	player.global_position = pos
 	player.rotation.y = yaw
 	player.head.rotation.x = deg_to_rad(pitch_deg)
+
+
+## Place le joueur en `pos` et oriente la caméra vers `target` (monde).
+func _aim_at(player: Player, pos: Vector3, target: Vector3) -> void:
+	player.global_position = pos
+	var dir: Vector3 = target - player.get_node("Head/Camera3D").global_position
+	player.rotation.y = atan2(-dir.x, -dir.z)
+	player.head.rotation.x = atan2(dir.y, Vector2(dir.x, dir.z).length())
 
 
 func _hold(carry: CarryController, item: Node3D) -> void:
@@ -150,7 +325,7 @@ func _test_greybox_flow() -> void:
 	var table_surface: PlacementSurface = PlacementSurface.of_body(room.get_node("Supports/TestTable"))
 
 	# Pose valide sur la table (plateau à 0,75 m).
-	var item: TestItem = room.get_node("TestItems/small_1")
+	var item: TestItem = room.get_node("TestItems/small_2") # 0,15 m : porteur assez large pour un SMALL de 0,12
 	_hold(carry, item)
 	_aim(player, Vector3(3.5, 0.05, 0.7), 0.0, -35.3)
 	await physics_frame
@@ -165,30 +340,83 @@ func _test_greybox_flow() -> void:
 	_check(item.visible, "pose : objet visible")
 	await physics_frame
 
-	# Pose bloquée : même endroit, objet déjà posé.
-	var second: TestItem = room.get_node("TestItems/small_2")
-	var second_origin: Transform3D = second.global_transform
+	var small_1_top: Vector3 = item.global_position + Vector3.UP * item.item_data.height * 0.5
+	var table_top: float = table_surface.top_y()
+
+	# Pose bloquée : sur la table, contre l'objet déjà posé (la boîte le chevauche).
+	var second: TestItem = room.get_node("TestItems/small_1")
 	_hold(carry, second)
+	_aim_at(player, Vector3(3.5, 0.05, 0.7), Vector3(item.global_position.x, table_top, item.global_position.z + 0.1))
 	await physics_frame
 	placement._update_target()
-	_check(placement._verdict == PlacementController.Verdict.BLOCKED, "même endroit : bloqué (verdict %d)" % placement._verdict)
+	_check(placement._surface == table_surface and placement._verdict == PlacementController.Verdict.BLOCKED,
+			"contre l'objet posé : bloqué (verdict %d)" % placement._verdict)
 	placement.place_held()
 	_check(carry.held_body() == second and msg.text == "place.blocked", "bloqué : message place.blocked, objet toujours en main")
 	_check(second.get_parent() != placed_root and second.collision_layer == 0, "bloqué : aucun changement d'état")
 
-	# Pose instable : objet moyen (0,45) sur le plot 0,3 x 0,3.
-	carry.inventory.drop_object() # libère la main pour le test (second est remis à son parent ci-dessous)
-	second.reparent(room.get_node("TestItems"), false)
-	second.global_transform = second_origin
-	second.collision_layer = 4
-	var medium: TestItem = room.get_node("TestItems/medium_1")
-	_hold(carry, medium)
-	_aim(player, Vector3(3.5, 0.05, 0.7), PI, -60.3)
+	# Empilement : le raycast lit les objets posés, la surface visée est le dessus de l'objet.
+	_aim_at(player, Vector3(3.5, 0.05, 0.7), small_1_top)
 	await physics_frame
 	placement._update_target()
-	_check(placement._verdict == PlacementController.Verdict.UNSTABLE, "plot trop petit : instable (verdict %d)" % placement._verdict)
+	_check(placement._surface == PlacementSurface.of_body(item) and placement._verdict == PlacementController.Verdict.OK,
+			"SMALL sur SMALL : surface = dessus de l'objet, OK (verdict %d)" % placement._verdict)
+	_check(placement._material.albedo_color == PlacementController.COLOR_VALID, "empilement valide : aperçu vert")
 	placement.place_held()
-	_check(carry.held_body() == medium and msg.text == "place.unstable", "instable : message place.unstable, objet toujours en main")
+	_check(second.get_parent() == placed_root and is_equal_approx(second.global_position.y, small_1_top.y + second.item_data.height * 0.5),
+			"empilement : posé sur le dessus (y = %.3f)" % second.global_position.y)
+	_check(second.support_surface == PlacementSurface.of_body(item) and item.loads.has(second), "empilement : charge mémorisée par le porteur")
+	await physics_frame
+
+	# Reprise refusée tant que le porteur porte une charge, puis autorisée.
+	carry.pick_up(item.get_node("Interactable"))
+	_check(carry.held_body() == null and msg.text == "carry.supports_object" and item.get_parent() == placed_root,
+			"porteur : reprise refusée (carry.supports_object)")
+	carry.pick_up(second.get_node("Interactable"))
+	_check(carry.held_body() == second and second.support_surface == null and not item.has_loads(), "charge reprise : porteur libéré")
+	_aim_at(player, Vector3(-2.0, 0.05, 2.2), Vector3(-2.0, 0.0, 1.5))
+	await physics_frame
+	placement._update_target()
+	placement.place_held() # SMALL reposé au sol, mains libres
+	_check(carry.held_body() == null and second.support_surface.is_floor, "SMALL reposé au sol, mains libres")
+	await physics_frame
+	msg.text = ""
+	carry.pick_up(item.get_node("Interactable"))
+	_check(carry.held_body() == item and msg.text == "", "porteur sans charge : reprise autorisée")
+	carry.inventory.drop_object() # remet l'objet sur la table pour la suite
+	item.reparent(placed_root, false)
+	item.global_position = small_1_top - Vector3.UP * item.item_data.height * 0.5
+	item.collision_layer = 4
+	item.visible = true
+	item.on_placed(table_surface)
+
+	# Empilement interdit : un MEDIUM sur un SMALL.
+	var medium: TestItem = room.get_node("TestItems/medium_1")
+	_hold(carry, medium)
+	_aim_at(player, Vector3(3.5, 0.05, 0.7), small_1_top)
+	await physics_frame
+	placement._update_target()
+	_check(placement._verdict == PlacementController.Verdict.CANNOT_STACK, "MEDIUM sur SMALL : interdit (verdict %d)" % placement._verdict)
+	_check(placement._material.albedo_color == PlacementController.COLOR_INVALID, "empilement interdit : aperçu rouge")
+	placement.place_held()
+	_check(carry.held_body() == medium and msg.text == "place.cannot_stack" and not item.has_loads(),
+			"empilement interdit : place.cannot_stack, objet toujours en main")
+	# MEDIUM sur LARGE : permis (dessus du LARGE posé au sol).
+	var large: TestItem = room.get_node("TestItems/large_1")
+	_aim_at(player, Vector3(2.25, 0.05, -2.0), large.global_position + Vector3.UP * large.item_data.height * 0.5)
+	await physics_frame
+	placement._update_target()
+	_check(placement._surface == PlacementSurface.of_body(large) and placement._verdict == PlacementController.Verdict.OK,
+			"MEDIUM sur LARGE : permis (verdict %d)" % placement._verdict)
+
+	# Flanc : une face touchée non horizontale ne donne aucune surface (pas de projection sur le plan du dessus).
+	_aim_at(player, Vector3(3.5, 0.05, 1.0), Vector3(3.5, 0.35, table_surface.global_position.z + 0.4))
+	await physics_frame
+	placement._update_target()
+	_check(placement._verdict == PlacementController.Verdict.NO_SURFACE and placement._surface == null, "flanc de la table : aucune surface visée")
+	_check(not placement._preview.visible, "flanc : aucun aperçu")
+	placement.place_held()
+	_check(carry.held_body() == medium and msg.text == "place.no_surface", "flanc : place.no_surface")
 
 	# Aucune surface visée.
 	_aim(player, Vector3(0, 0.05, 0.7), 0.0, 30.0)
@@ -210,6 +438,34 @@ func _test_greybox_flow() -> void:
 	placement.place_held()
 	_check(medium.get_parent() == placed_root and medium.support_surface.is_floor, "sol : posé, surface porteuse = sol")
 	_check(is_equal_approx(medium.global_transform.basis.get_euler().y, deg_to_rad(-15.0)), "sol : orientation appliquée")
+	await physics_frame
+
+	# Pose instable : un LARGE sur le plot 0,3 x 0,3 -> aperçu orange, puis chute verticale jusqu'au sol.
+	var plot: Node3D = room.get_node("Supports/TestPlot")
+	var plot_surface: PlacementSurface = PlacementSurface.of_body(plot)
+	placement._yaw = 0.0
+	_hold(carry, large)
+	_aim_at(player, Vector3(3.5, 0.05, 0.2), plot_surface.global_position)
+	await physics_frame
+	placement._update_target()
+	_check(placement._surface == plot_surface and placement._verdict == PlacementController.Verdict.UNSTABLE,
+			"plot trop petit : instable (verdict %d)" % placement._verdict)
+	_check(placement._material.albedo_color == PlacementController.COLOR_FALL, "instable : aperçu orange")
+	var placement_x: float = placement._center.x
+	var placement_z: float = placement._center.z
+	placement.place_held()
+	_check(carry.held_body() == null and large.get_parent() == placed_root, "instable : l'objet est posé (chute)")
+	_check(msg.text == "place.fell", "instable : message place.fell (%s)" % msg.text)
+	_check(large.support_surface == floor_surface and is_equal_approx(large.global_position.y, floor_surface.top_y() + large.item_data.height * 0.5),
+			"chute : atterri sur le sol (y = %.3f)" % large.global_position.y)
+	_check(absf(large.global_position.x - placement_x) < 0.001 and absf(large.global_position.z - placement_z) < 0.001,
+			"chute : verticale (x, z inchangés par rapport à la visée)")
+	_check(large.collision_layer == 4 and large.visible, "chute : collision couche 3 réactivée, visible")
+	# Enfoncement dans le meuble : le plot est ignoré pendant la chute, le LARGE le recouvre (règle provisoire).
+	await physics_frame
+	_check(PlacementController.is_blocked((root as Node).get_viewport().world_3d.direct_space_state, large.item_data, 0.0,
+			large.global_position - Vector3.UP * large.item_data.height * 0.5, [large.get_rid()]),
+			"chute : le LARGE tombé s'enfonce dans le plot (signalé, attendu)")
 	room.queue_free()
 
 

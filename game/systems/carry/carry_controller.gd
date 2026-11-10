@@ -41,17 +41,23 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Prise de l'objet porté par l'Interactable (son parent).
 func pick_up(interactable: Interactable) -> void:
-	if not _is_active() or interactable.action != Interactable.Action.PICK_UP:
+	if interactable.action != Interactable.Action.PICK_UP:
 		return
 	var body: Node3D = interactable.get_parent() as Node3D
 	var data: ItemData = body.get("item_data") as ItemData if body != null else null
 	if data == null:
 		return
+	if data.category != ItemData.Category.FIXED and body.has_method(&"has_loads") and body.call(&"has_loads"):
+		_prompt.show_message("carry.supports_object") ## un objet qui porte un autre objet ne se prend pas
+		return
 	var result: CarryInventory.Result = inventory.pick_up(data, body)
 	if result != CarryInventory.Result.OK:
 		_show_refusal(result)
 		return
-	body.set(&"support_surface", null) ## objet repris : plus de surface porteuse
+	if body.has_method(&"on_picked_up"):
+		body.call(&"on_picked_up") ## objet repris : plus de surface porteuse, retiré des charges du porteur
+	else:
+		body.set(&"support_surface", null)
 	_refresh_visuals()
 
 
@@ -98,7 +104,8 @@ func _on_target_changed(target: Interactable) -> void:
 
 
 func _on_interacted(_player: Node, interactable: Interactable) -> void:
-	pick_up(interactable)
+	if _is_active():
+		pick_up(interactable)
 
 
 ## Applique la visibilité, la collision et la parenté selon l'état de l'inventaire. Un objet rangé

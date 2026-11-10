@@ -8,12 +8,28 @@ enum Status { OK, UNSUPPORTED }
 
 const SAMPLES_PER_AXIS: int = 10
 
+## Règle d'empilement PROVISOIRE (GDD §15 point 18 ouvert) : catégorie du dessus -> catégories du dessous
+## acceptées. À modifier ici seulement. Une catégorie absente de la table ne se pose jamais sur un objet ;
+## FIXED n'est jamais porté et ne porte pas.
+const STACK_TABLE: Dictionary = {
+	ItemData.Category.SMALL: [ItemData.Category.SMALL, ItemData.Category.MEDIUM, ItemData.Category.LARGE],
+	ItemData.Category.MEDIUM: [ItemData.Category.LARGE],
+	ItemData.Category.LARGE: [],
+	ItemData.Category.FIXED: [],
+}
+
 ## Résultat d'une vérification.
 class Outcome extends RefCounted:
 	var status: Status = Status.UNSUPPORTED
 	var coverage: float = 0.0 ## part de l'empreinte soutenue, dans [0, 1]
 
 var rules: PlacementRules
+
+
+## Vrai si un objet de catégorie `top` peut être posé sur un objet de catégorie `bottom` (fonction pure).
+static func can_stack(top: ItemData.Category, bottom: ItemData.Category) -> bool:
+	var allowed: Array = STACK_TABLE.get(top, [])
+	return allowed.has(bottom)
 
 
 func _init(placement_rules: PlacementRules = null) -> void:

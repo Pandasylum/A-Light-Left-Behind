@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://props/test_item.gd" id="1_item"]
 [ext_resource type="Script" path="res://systems/interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="Script" path="res://systems/placement/placement_surface.gd" id="3_surface"]
 
 [node name="TestItem" type="StaticBody3D"]
 collision_layer = 4
@@ -16,3 +17,7 @@ script = ExtResource("1_item")
 script = ExtResource("2_interactable")
 prompt_key = "interact.pick_up"
 action = 0
+
+[node name="PlacementSurface" type="Node3D" parent="."]
+script = ExtResource("3_surface")
+is_floor = false
