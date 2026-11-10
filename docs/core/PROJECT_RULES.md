@@ -187,6 +187,8 @@ L'identité visuelle repose sur le contraste entre l'extérieur et l'intérieur 
 
 Le contraste entre le froid extérieur et la chaleur intérieure doit renforcer l'impression de refuge.
 
+L'intérieur évolue avec la progression : à l'état abandonné, il est froid (teinte, lumière, étalonnage). La chaleur apparaît avec la restauration. Le contraste chaud / froid et l'impression de refuge s'appliquent donc à l'état restauré, et non au point de départ.
+
 ### 4.3. Palette de couleurs indicative
 
 | Couleur | Code |
@@ -202,7 +204,7 @@ Cette palette constitue une référence visuelle et non une limitation stricte.
 ### 4.4. Règles visuelles à respecter
 
 1. L'extérieur doit évoquer le froid, la mer, le vent, la pluie et le brouillard.
-2. L'intérieur doit évoquer la chaleur, le bois, les petites lumières et le confort.
+2. L'intérieur doit évoquer la chaleur, le bois, les petites lumières et le confort une fois restauré. À l'état abandonné, il reste froid, sans devenir horrifique ni trop sombre.
 3. Les objets doivent montrer leur âge à travers l'usure, la rouille, la poussière et les réparations.
 
 Éviter une direction artistique horrifique, trop sombre ou excessivement sinistre.
