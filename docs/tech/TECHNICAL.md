@@ -20,3 +20,9 @@ Légende : ✅ décision validée · 🟡 à décider en Phase 0
 4. 🟡 Représentation de la saleté (masque ou zones), à tester en Phase 2.
 5. ✅ 2026-11-10 — Architecture : trois autoloads maximum (sauvegarde, progression, réglages) ; physique par requêtes uniquement (raycast, shape query), aucun RigidBody persistant. Sauvegarde : JSON versionné dans `user://`, écriture atomique, jamais de .tres/ResourceSaver.
 6. 🟡 Représentation des objets et de leurs emplacements de rangement.
+
+## Input Map (provisoire) 🟡
+Actions définies dans `game/project.godot` (clavier/souris, touches provisoires, codes physiques ; aucune manette). Le regard à la souris est lu directement, hors Input Map. Les actions `ui_*` par défaut sont conservées.
+- Déplacement : `move_forward`, `move_back`, `move_left`, `move_right`, `walk_slow`
+- Interaction : `interact`, `use_primary`, `use_secondary`, `drop_object`, `rotate_left`, `rotate_right`, `cycle_item`
+- Interface : `inventory_open`, `journal_open`, `pause_menu`
