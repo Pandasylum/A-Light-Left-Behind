@@ -57,6 +57,14 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 - Le nettoyage et la réparation doivent produire un retour visuel et sonore satisfaisant.
 - Les systèmes doivent permettre une forte différence visible entre l'état abandonné et l'état restauré.
 
+Types de saleté et outils :
+- Poussière (dépôts secs sur meubles, étagères, objets, installations) : éponge.
+- Traces et salissures (doigts, graisse, dépôts collants, saleté incrustée) : éponge.
+- Vitres et surfaces vitrées (voile terne, traces d'eau, pluie séchée) : éponge puis raclette.
+- Sols sales (poussière accumulée, traces de pas, boue) : serpillière.
+- Rouille et corrosion superficielles : éponge avec une face abrasive (amélioration de l'éponge, donc après l'atelier).
+- Métal profondément corrodé : réparation avec les outils de réparation, après un traitement (traitement non défini, §15).
+
 🟡 La liste exacte des outils de départ, les types de salissures, les matériaux et les gestes de réparation seront déterminés par le prototype et le contenu de la première pièce.
 
 ## 5. Manipulation, transport et rangement ✅
@@ -71,8 +79,13 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 - Empilement : un petit objet peut être posé sur un grand objet (par exemple une lampe de table sur un gros carton) ; les petits objets sont empilables entre eux (livres).
 - Murs : objets décoratifs et cadres. Pas de plafond (exception possible : la réparation d'un lustre).
 - Gros objets : portés, un seul à la fois.
+- Catégories d'objets :
+  - Petits objets (livres, outils, boîtes, vaisselle) : portés à la main, un à la fois. La ceinture ajoute des emplacements supplémentaires pour petits objets (1 au départ, jusqu'à 5 avec les améliorations).
+  - Objets moyens (chaises, caisses, tabourets) : portés à la main.
+  - Gros objets (armoires, commodes, tables) : transport à deux mains.
+  - Objets fixes (radiateurs, installations, éléments muraux) : ne peuvent pas être déplacés.
 - Collisions : un placement qui chevauche est refusé, sauf l'empilement de petits objets.
-- Un objet qui tombe au sol fait baisser le 100 %. Une fois le 100 % atteint, il reste acquis définitivement.
+- Un objet tombe au sol s'il est lâché ou posé trop près du bord de son support. Un objet tombé fait baisser le 100 %. Une fois le 100 % atteint, il reste acquis définitivement.
 - Les meubles libres peuvent être déplacés après avoir été nettoyés et réparés ; leur positionnement reste libre.
 - Les installations fixes et gros équipements ne sont pas déplaçables.
 - Les réparations de meubles dépendent de leur matériau.
@@ -91,6 +104,18 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 - Les pièces déjà restaurées restent accessibles. Le joueur peut y revenir pour modifier leur organisation ou poursuivre l'entretien.
 - Les pièces sont initialement très sales et encombrées.
 - La restauration transforme visiblement et progressivement chaque espace.
+
+### Pièce 1 — tutoriel
+
+- Apprentissage libre avec indices : le personnage commente à voix haute (par exemple « Il faudrait que je récupère cette éponge pour nettoyer »), sans jamais forcer le joueur.
+- Les outils de nettoyage sont trouvés progressivement dans la pièce.
+- La ceinture est une récompense : le joueur trouve une clé pendant le rangement (par exemple sur une table) ; le personnage dit en substance qu'il se demande ce qu'elle ouvre. Un vieux coffre en bois fermé à clé, placé à côté de la porte de sortie, contient la ceinture.
+- Le coffre en bois est le gros objet utilisé pour apprendre : saisir un objet volumineux, le porter à deux mains, le déposer à un emplacement précis et le tourner selon les orientations prédéfinies.
+- Le joueur découvre seul la nécessité de rincer le seau ; le personnage peut la commenter.
+- Durée visée : 15 minutes.
+- Sortie de la pièce 1 : 100 % de la pièce requis ET possession de la ceinture.
+- Narration : le nouveau Gardien n'a pas envie d'être là, mais il le faut pour sa fille malade.
+- La trousse à outils est obtenue à l'atelier.
 
 ### Après la campagne ✅
 
@@ -241,6 +266,9 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 - Passage sous le phare pouvant éventuellement conduire jusqu'à la côte : idée d'extension future, pas une fonctionnalité requise pour la sortie initiale.
 - Support manette en bonus, si facile. Non engagé : le clavier/souris reste la référence.
 - Renouvellement de l'eau du seau : retiré du périmètre actuel, à reconsidérer plus tard.
+- Coffre en bois de la pièce 1 utilisable ensuite comme rangement.
+- Catégorie « objets d'histoire » (clés, documents, souvenirs) hors des règles de rangement, avec un journal ou un inventaire.
+- Mobilité réduite en portant un gros objet.
 
 ## 15. Points à préciser pendant le prototypage 🟡
 
@@ -250,25 +278,30 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 2. Liste des pièces et graphe exact des embranchements.
 3. Liste des orientations autorisées par objet.
 4. Liste, ordre et coûts des améliorations d'outils.
-5. Contenu précis de la première pièce tutorielle et de la deuxième pièce, qui est l'atelier.
+5. Contenu précis de la deuxième pièce, qui est l'atelier, et du reste de la première pièce tutorielle (voir « Pièce 1 — tutoriel », §6).
 6. Langues de sous-titrage supplémentaires éventuelles.
 7. Détails techniques des sauvegardes, contrôles et compatibilité selon la plateforme.
 8. Mécanique de réparation : déroulé exact des étapes et variantes selon le matériau.
 9. Origine des pièces de remplacement (fusibles, etc.) fournies par la trousse à outils.
 10. L'outil multifonction est-il consommable ?
 11. Liste et nombre des réparations spécifiques (lampe du phare, chaufferie, électricité, etc.) et de leur impact sur le lore.
-12. Quand et où le joueur obtient la trousse à outils.
+12. ~~Quand et où le joueur obtient la trousse à outils.~~ Réglé : à l'atelier (§6).
 13. Contenu exact de la trousse à outils.
 14. La trousse à outils est-elle améliorable ?
 15. Rythme de salissure des outils, signal visuel d'outil sale, effet exact des améliorations du seau sur la fréquence de rinçage.
 16. Comportement de l'outil multifonction selon la cible.
 17. Définition de « désordre ».
-18. Catégories de taille (petit, grand, gros) et règles d'empilement.
+18. Règles d'empilement par catégorie d'objets (petits, moyens, gros, fixes).
 19. Liste des zones de rangement par catégorie.
 20. Valeur des paliers de rotation (15° à confirmer).
 21. Articulation entre orientations autorisées et paliers de rotation.
 22. Portée du 100 % acquis (par pièce ou global).
-23. Cause exacte de la chute d'un objet.
+23. Distance limite au bord d'un support et signal d'aperçu avant le placement.
+24. Emplacements et ordre de découverte des outils dans la pièce 1.
+25. Ordre entre l'ouverture du coffre, son rangement et la sortie.
+26. Traitement du métal corrodé avant réparation.
+27. Pièces où la rouille apparaît.
+28. Catalogue des améliorations (l'éponge abrasive en est le premier exemple).
 
 ---
 
