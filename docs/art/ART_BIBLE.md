@@ -39,6 +39,11 @@ Statut : seul le principe général est validé. Le reste est une proposition �
 - Palette commune à tout le phare, variations par pièce.
 - Lumière froide et bleutée au début, plus chaude avec la restauration.
 
+### Ambiance initiale 🟡
+- Tout l'intérieur est teinté de froid : matériaux, lumière, étalonnage. Ambiance pesante.
+- Le froid passe par l'éclairage et l'étalonnage (Godot), pas par les textures. Les textures restent neutres et désaturées, pour que le réchauffement soit un réglage de lumière et non un second jeu de textures.
+- Le contraste de valeur (clair / sombre) reste suffisant pour lire la saleté. Seules la teinte et la saturation sont froides et ternes.
+
 ### Palette commune 🟡
 - Bois : brun vieilli, délavé, sombre.
 - Métal : fer noirci, cuivre terni, acier rouillé.
