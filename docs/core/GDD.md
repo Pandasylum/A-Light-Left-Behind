@@ -112,7 +112,8 @@ Types de saleté et outils :
   - Une pièce se débloque quand la précédente (dans sa branche) est à 100 %. Exception : le hub est accessible sans que l'atelier soit à 100 %. À partir du hub, plusieurs branches peuvent être explorées en parallèle et l'ordre de certaines pièces est libre. Seul le dernier étage (la lampe) reste bloqué tant que le reste n'est pas terminé.
   - Liste des pièces (décisions validées le 2026-11-10). Rez-de-chaussée, 3 zones autour du hub : hall central (hub), point de circulation donnant accès aux pièces et à l'atelier, qui contient l'escalier central ; cuisine (mobilier, vaisselle, surfaces et équipements) ; salle de vie (canapé, bibliothèque, cheminée et objets personnels) ; atelier (réparation, rangement des outils et améliorations). Premier étage, 2 zones : chambre (ancien espace personnel du gardien) ; salle d'archives (documents, cartes, registres et souvenirs). Sommet, 1 zone : salle de la lanterne, dernière zone, cœur du phare et conclusion de la restauration.
   - L'escalier central est débloqué quand les 3 zones autour du hub (cuisine, salle de vie, atelier) sont à 100 %.
-  - Réparations particulières par pièce : hall central (installation électrique générale, interrupteurs, éclairage, câblage) ; cuisine (robinetterie, évier, tuyauterie, équipements de cuisine) ; salle de vie (cheminée, conduits, mobilier nécessitant une restauration particulière) ; atelier (établi, éclairage technique, prises, équipements d'amélioration des outils) ; chambre (mobilier abîmé, lit, armoire, éléments en bois) ; salle d'archives (étagères, tiroirs, boîtes de rangement, mobilier de conservation) ; salle de la lanterne (mécanisme optique, rotation de la lanterne, alimentation lumineuse, système de signalisation).
+  - Réparations particulières par pièce : hall central (installation électrique générale, interrupteurs, éclairage, câblage) ; cuisine (robinetterie, évier, tuyauterie, équipements de cuisine) ; salle de vie (cheminée, conduits, mobilier nécessitant une restauration particulière) ; atelier (établi, éclairage technique, prises, équipements d'amélioration des outils) ; chambre (mobilier abîmé, lit, armoire, éléments en bois) ; salle d'archives (étagères, tiroirs, boîtes de rangement, mobilier de conservation) ; salle de la lanterne (mécanisme optique, rotation de la lanterne, alimentation lumineuse, système de signalisation). Réparation signature par pièce : hall central, tableau électrique ; cuisine, évier et robinetterie ; salle de vie, cheminée ; atelier, établi ; chambre, lit du gardien ; salle d'archives, meuble à tiroirs ; salle de la lanterne, mécanisme et lampe. Les autres réparations de chaque pièce restent classiques (bois, métal, surfaces, mobilier).
+  - Chaufferie : au sous-sol, dans l'extension prévue (trappe vers le tunnel, §14), hors des 7 pièces. Le jeu de base garde le chauffage via la cheminée de la salle de vie et la plomberie de la cuisine.
   - Direction artistique (principe) : palette commune à tout le phare, avec des variations de matériaux, mobilier, décoration et éclairage propres à chaque pièce. La lumière est froide au début et devient progressivement plus chaude avec la restauration. Les détails relèvent du projet Art et de ART_BIBLE.md.
   - Courant de l'atelier : le joueur lance un générateur de secours pour alimenter l'atelier le temps de trouver l'installation électrique ; le personnage indique qu'il faut la chercher en priorité dans le hub. L'installation électrique générale (tableau principal) est dans le hub et se répare là.
   - Les étages supérieurs deviennent accessibles progressivement. Le phare monte vers la lanterne, au sommet, dernière grande étape : rallumer la lampe est l'aboutissement du jeu.
@@ -291,7 +292,7 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 
 - Coopération à deux joueurs, uniquement si elle devient techniquement réaliste sans compromettre l'expérience solo. Aucune contrainte d'architecture ne doit être imposée à la première version pour cette possibilité.
 - Nouveaux espaces après la campagne (sous-sol, cabanon extérieur, autres extensions).
-- Extension : trappe vers un sous-sol menant à un tunnel.
+- Extension : trappe vers un sous-sol menant à un tunnel ; le sous-sol accueillerait la chaufferie.
 - Extension : cabanon extérieur.
 - Passage sous le phare pouvant éventuellement conduire jusqu'à la côte : idée d'extension future, pas une fonctionnalité requise pour la sortie initiale.
 - Support manette en bonus, si facile. Non engagé : le clavier/souris reste la référence.
@@ -307,9 +308,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 1. Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.
 2. Graphe des pièces :
    - position du vestibule (pièce 1) par rapport au hub et à l'atelier ;
-   - place de la chaufferie (zone technique ou annexe, hors des 7 pièces) ;
    - fonctionnement du générateur de secours et emplacement exact du tableau principal dans le hub ;
-   - nombre et nature des réparations particulières par pièce ;
    - connexion physique entre la pièce 1, l'atelier et le hub, et condition d'ouverture de la première branche ;
    - nombre d'étages ;
    - définition exacte de « le reste » pour débloquer le dernier étage (la lampe) ;
@@ -323,7 +322,6 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
    - forme de l'item d'amélioration (porté ou stocké) et combien, où, dans quelles pièces ;
    - liste des arbres d'amélioration (quels outils) et contenu de chacun ;
    - condition de sortie de l'atelier ;
-   - ce que fait « lancer le générateur de secours de l'atelier » (portée et effets) ;
    - confirmation de la chaise comme réparation d'apprentissage ;
    - contenu exact des notes et du plan du phare.
 6. Langues de sous-titrage supplémentaires éventuelles.
