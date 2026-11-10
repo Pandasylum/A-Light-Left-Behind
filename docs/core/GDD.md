@@ -1,6 +1,6 @@
 # A LIGHT LEFT BEHIND — Game Design Document
 
-Dernière mise à jour : 2026-11-09  
+Dernière mise à jour : 2026-11-10  
 Statut : document de référence des décisions de conception validées.
 
 **Légende** : ✅ décision validée · 💡 piste non engagée · 🟡 à préciser pendant le prototypage
@@ -76,7 +76,7 @@ Types de saleté et outils :
 - La manipulation est volontairement simplifiée et se concentre principalement sur les surfaces ; elle ne vise pas une simulation physique complexe.
 - Le placement est libre, avec une aimantation douce sur les surfaces. Les objets sont figés une fois posés (pas de simulation physique persistante).
 - La rotation se fait par paliers, avec une touche ou la molette (valeur proposée : 15°, à confirmer). Chaque objet a des orientations autorisées (par exemple un livre debout ou à plat).
-- Rangement : zones souples par catégorie d'objets, sans position imposée. Un objet est rangé s'il est posé (ni tenu, ni au sol) dans une zone qui accepte sa catégorie.
+- Rangement : zones souples par catégorie d'objets, sans position imposée. Un objet est rangé s'il repose directement sur un support déclaré, dans une zone qui accepte sa catégorie. Le sol de la pièce n'est jamais une zone. Un support déclaré (palette, étagère basse…) n'est pas du sol, même posé au niveau du sol. Un objet posé sur un autre objet qui n'est pas un support déclaré n'est pas rangé. Déplacer un support qui porte des objets est interdit.
 - Empilement : un petit objet peut être posé sur un objet plus gros (exemple : une lampe de table sur un gros carton) ; les petits objets sont empilables entre eux (livres).
 - Murs : objets décoratifs et cadres. Pas de plafond (exception possible : la réparation d'un lustre).
 - Gros objets : portés à deux mains, un seul à la fois.
@@ -88,7 +88,7 @@ Types de saleté et outils :
 - Collisions : un placement qui chevauche est refusé, sauf l'empilement de petits objets.
 - Un objet tombe au sol s'il est lâché ou posé trop près du bord de son support. Avant le premier passage d'une pièce à 100 %, un objet tombé fait baisser le pourcentage. Au premier passage à 100 %, le statut « restaurée » de la pièce est verrouillé définitivement (verrou par pièce). Un axe ajouté plus tard (par exemple la réparation) ne retire pas ce statut.
 - Les meubles libres peuvent être déplacés après avoir été nettoyés et réparés ; leur positionnement reste libre.
-- Un meuble ne peut pas être déplacé tant qu'il porte au moins un objet ; un message d'indice l'explique au joueur.
+- Un message d'indice explique au joueur pourquoi un support qui porte des objets ne peut pas être déplacé.
 - Les installations fixes et gros équipements ne sont pas déplaçables.
 - Les réparations de meubles dépendent de leur matériau.
 - La ceinture de transport n'est pas possédée au départ : le joueur la trouve dans la pièce tutoriel. Sa capacité de départ est de 1 petit objet, en plus de l'objet tenu en main (la main n'est pas comptée dans les emplacements : 5 emplacements au maximum, plus la main). Chaque amélioration (à l'atelier) augmente cette capacité de 1, jusqu'à un plafond de 5 petits objets. L'arbre d'amélioration de la ceinture compte 4 améliorations (de 1 à 5 emplacements).
