@@ -24,6 +24,7 @@ func _ready() -> void:
 	var top: PlacementSurface = $PlacementSurface
 	top.position = Vector3(0.0, item_data.height * 0.5, 0.0)
 	top.size = item_data.footprint
+	top.is_declared_support = item_data.provides_support
 
 
 static func cube_size(data: ItemData) -> Vector3:
@@ -53,3 +54,9 @@ func on_picked_up() -> void:
 		if carrier != null and carrier.get(&"loads") != null:
 			(carrier.get(&"loads") as Array).erase(self)
 	support_surface = null
+
+
+## Vrai si l'objet est posé sur une surface qui n'est pas le sol et qui est un support déclaré
+## (installation fixe ou meuble libre). Réservé au rangement (lot ultérieur).
+func rests_on_declared_support() -> bool:
+	return support_surface != null and not support_surface.is_floor and support_surface.is_declared_support

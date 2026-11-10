@@ -4,7 +4,7 @@ extends SceneTree
 
 func _init() -> void:
 	var cases: Array[Callable] = [
-		_valid_item, _invalid_item, _valid_zone, _invalid_zone,
+		_valid_item, _invalid_item, _furniture_support, _valid_zone, _invalid_zone,
 		_valid_room, _invalid_room, _default_rules, _invalid_rules,
 	]
 	for c: Callable in cases:
@@ -44,6 +44,23 @@ func _invalid_item() -> String:
 		"id vide", "emprise non strictement positive", "hauteur non strictement positive",
 		"un objet FIXED ne suit pas l'axe rangement",
 	])
+
+
+func _furniture_support() -> String:
+	var i: ItemData = ItemData.new()
+	i.id = &"meuble"
+	i.provides_support = true
+	for c: ItemData.Category in [ItemData.Category.SMALL, ItemData.Category.FIXED]:
+		i.category = c
+		var e: String = _expect(i.validate(), ["provides_support exige une catégorie MEDIUM ou LARGE"])
+		if e != "":
+			return e
+	for c: ItemData.Category in [ItemData.Category.MEDIUM, ItemData.Category.LARGE]:
+		i.category = c
+		var e2: String = _expect(i.validate(), [])
+		if e2 != "":
+			return e2
+	return ""
 
 
 func _valid_zone() -> String:

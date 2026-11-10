@@ -20,6 +20,8 @@ enum Category { SMALL, MEDIUM, LARGE, FIXED }
 @export var tracks_cleaning: bool = false
 @export var tracks_repair: bool = false
 @export var tracks_storing: bool = false
+## Meuble libre : l'objet porte une surface de pose déclarée (MEDIUM ou LARGE uniquement).
+@export var provides_support: bool = false
 
 
 ## Renvoie la liste des erreurs de validation (vide si valide).
@@ -33,4 +35,6 @@ func validate() -> PackedStringArray:
 		errors.append("hauteur non strictement positive")
 	if category == Category.FIXED and tracks_storing:
 		errors.append("un objet FIXED ne suit pas l'axe rangement")
+	if provides_support and category != Category.MEDIUM and category != Category.LARGE:
+		errors.append("provides_support exige une catégorie MEDIUM ou LARGE")
 	return errors
