@@ -59,7 +59,7 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Placement libre avec aimantation douce sur les surfaces ; objets figés une fois posés (pas de simulation physique persistante).
 - Rotation par paliers (touche ou molette), valeur proposée 15° À CONFIRMER ; chaque objet a des orientations autorisées.
 - Empilement : un petit objet posé sur un objet plus gros (exemple : une lampe de table sur un gros carton) ; petits objets empilables entre eux (livres).
-- Murs : objets décoratifs et cadres ; pas de plafond (exception possible : réparation d'un lustre). Gros objets portés, un seul à la fois.
+- Murs : objets décoratifs et cadres ; pas de plafond (exception possible : réparation d'un lustre). Gros objets portés à deux mains, un seul à la fois.
 - Collisions : placement qui chevauche refusé, sauf empilement de petits objets.
 - Un objet tombe au sol s'il est lâché ou posé trop près du bord de son support. Un objet tombé fait baisser le 100 %. Une fois le 100 % atteint, il reste acquis définitivement.
 - Pièce 1 (tutoriel), 2026-11-10 : apprentissage libre avec indices (le personnage commente à voix haute, sans forcer) ; outils de nettoyage trouvés progressivement ; ceinture = récompense (clé trouvée pendant le rangement, vieux coffre en bois fermé à clé près de la porte de sortie) ; le coffre est le gros objet d'apprentissage (saisie, port à deux mains, dépôt précis, rotation par orientations prédéfinies) ; rinçage du seau découvert seul ; durée visée 15 minutes ; sortie = 100 % ET ceinture ; narration : le nouveau Gardien n'a pas envie d'être là mais le fait pour sa fille malade ; trousse à outils obtenue à l'atelier.
@@ -74,7 +74,7 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 2. Définition technique du 100 % (nettoyage, réparation, rangement).
 3. Liste des pièces et graphe des embranchements.
 4. Nombre d'orientations prédéfinies par objet ou famille.
-5. Liste, ordre et coûts des améliorations d'outils.
+5. Catalogue des améliorations d'outils et ordre de déblocage (sans coût en matériaux : déblocage par la récupération d'items d'amélioration).
 6. Contenu restant de la pièce 1 et de l'atelier (points ouverts au GDD §15).
 7. Langues de sous-titrage supplémentaires.
 8. Détails des sauvegardes, contrôles et compatibilité par plateforme.

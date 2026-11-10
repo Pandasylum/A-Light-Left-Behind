@@ -89,7 +89,7 @@ Types de saleté et outils :
 - Les meubles libres peuvent être déplacés après avoir été nettoyés et réparés ; leur positionnement reste libre.
 - Les installations fixes et gros équipements ne sont pas déplaçables.
 - Les réparations de meubles dépendent de leur matériau.
-- La ceinture de transport n'est pas possédée au départ : le joueur la trouve dans la pièce tutoriel. Sa capacité de départ est de 1 petit objet, en plus de l'objet tenu en main. Chaque amélioration (à l'atelier) augmente cette capacité de 1, jusqu'à un plafond de 5 petits objets (soit 4 améliorations).
+- La ceinture de transport n'est pas possédée au départ : le joueur la trouve dans la pièce tutoriel. Sa capacité de départ est de 1 petit objet, en plus de l'objet tenu en main. Chaque amélioration (à l'atelier) augmente cette capacité de 1, jusqu'à un plafond de 5 petits objets. L'arbre d'amélioration de la ceinture compte 4 améliorations (de 1 à 5 emplacements).
 - L'inventaire sert à gérer les objets transportés. Le joueur peut changer rapidement d'objet tenu avec une commande dédiée.
 - L'ouverture de l'inventaire ne met pas le jeu en pause.
 
@@ -152,11 +152,11 @@ Types de saleté et outils :
   - Marteau : réparations du bois et éléments à redresser.
   - Outil multifonction : visserie, plomberie, petites réparations ; il reprend le rôle de reboucher, colmater et restaurer les surfaces abîmées.
 - La trousse à outils est un objet distinct de la ceinture de transport. Elle fournit les pièces de remplacement nécessaires à certaines réparations (par exemple un fusible). Ces pièces n'occupent pas les emplacements de la ceinture et ne se collectent pas.
-- Les déblocages sont liés à la restauration de certaines pièces et à la récupération naturelle de matériaux.
+- Les déblocages sont liés à la restauration de certaines pièces et à la récupération d'items d'amélioration (voir « Pièce 2 — atelier », §6).
 - Pas de grind artificiel, pas de niveaux ni de système d'XP.
 - Les améliorations restent modestes et ne doivent pas accélérer excessivement le nettoyage.
 
-🟡 Le catalogue d'améliorations, les coûts en matériaux et l'ordre de déblocage seront définis après les premiers essais de nettoyage.
+🟡 Le catalogue d'améliorations et l'ordre de déblocage seront définis après les premiers essais de nettoyage.
 
 ## 8. Exploration, découvertes et journal ✅
 
@@ -288,8 +288,9 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 1. Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.
 2. Liste des pièces et graphe exact des embranchements.
 3. Liste des orientations autorisées par objet.
-4. Liste, ordre et coûts des améliorations d'outils.
-5. Contenu précis restant de l'atelier (voir « Pièce 2 — atelier », §6) et du reste de la première pièce tutorielle (voir « Pièce 1 — tutoriel », §6). Points ouverts de l'atelier :
+4. ~~Liste, ordre et coûts des améliorations d'outils.~~ Fusionné au point 5.
+5. Catalogue des améliorations d'outils (arbres, contenu de chacun) et ordre de déblocage. Les améliorations n'ont pas de coût en matériaux : elles se débloquent par la récupération d'items d'amélioration. L'éponge abrasive en est le premier exemple.
+   Contenu précis restant de l'atelier (voir « Pièce 2 — atelier », §6) et du reste de la première pièce tutorielle (voir « Pièce 1 — tutoriel », §6). Points ouverts de l'atelier :
    - forme de l'item d'amélioration (porté ou stocké) et combien, où, dans quelles pièces ;
    - liste des arbres d'amélioration (quels outils) et contenu de chacun ;
    - condition de sortie de l'atelier ;
@@ -318,7 +319,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 25. Ordre entre l'ouverture du coffre, son rangement et la sortie.
 26. Traitement du métal corrodé avant réparation.
 27. Pièces où la rouille apparaît.
-28. Catalogue des améliorations (l'éponge abrasive en est le premier exemple).
+28. ~~Catalogue des améliorations (l'éponge abrasive en est le premier exemple).~~ Fusionné au point 5.
 
 ---
 
