@@ -78,6 +78,8 @@ La liste et les noms des pièces relèvent du GDD (§6, graphe non figé). Ici, 
 1. Bois vieilli (sombre ; variante brute pour l'atelier). 2. Pierre grise. 3. Enduit / peinture écaillée. 4. Fer noirci / acier rouillé (masque de rouille). 5. Cuivre / laiton terni. 6. Textile désaturé (teinte paramétrable).
 Deuxième vague : carrelage / faïence, papier jauni, verre.
 
+2026-11-11 : test technique. Le shader sale/propre à masque (Godot 4.6, Forward+) fonctionne sur un plan avec textures synthétiques. Style non validé.
+
 ### Points ouverts
 Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
 
