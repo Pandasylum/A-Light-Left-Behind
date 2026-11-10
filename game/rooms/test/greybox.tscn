@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c3k8vgk513yuk"]
 
 [ext_resource type="PackedScene" path="res://systems/player/player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://systems/interaction/interactable.gd" id="2_interactable"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(10, 0.2, 10)
@@ -8,9 +9,39 @@ size = Vector3(10, 0.2, 10)
 [sub_resource type="BoxMesh" id="BoxMesh_floor"]
 size = Vector3(10, 0.2, 10)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_border_ns"]
+size = Vector3(10.4, 1, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_border_ew"]
+size = Vector3(0.2, 1, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cube"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_border_ns"]
+size = Vector3(10.4, 1, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_border_ew"]
+size = Vector3(0.2, 1, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cube"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="GDScript" id="GDScript_greybox"]
+script/source = "extends Node3D
+## Test : affiche le nom du cube interagi.
+
+
+func _ready() -> void:
+	for cube: Node in $TestCubes.get_children():
+		var it: Interactable = cube.get_node(\"Interactable\")
+		it.interacted.connect(func(_player: Node) -> void: print(\"Interaction : \", cube.name))
+"
+
 [sub_resource type="Environment" id="Environment_default"]
 
 [node name="Greybox" type="Node3D" unique_id=1387488027]
+script = SubResource("GDScript_greybox")
 
 [node name="Floor" type="StaticBody3D" parent="." unique_id=603871906]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
@@ -32,3 +63,95 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 4
 
 [node name="Player" parent="." unique_id=833020242 instance=ExtResource("1_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+
+[node name="Borders" type="Node3D" parent="."]
+
+[node name="North" type="StaticBody3D" parent="Borders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -5.1)
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Borders/North"]
+shape = SubResource("BoxShape3D_border_ns")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Borders/North"]
+mesh = SubResource("BoxMesh_border_ns")
+
+[node name="South" type="StaticBody3D" parent="Borders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 5.1)
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Borders/South"]
+shape = SubResource("BoxShape3D_border_ns")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Borders/South"]
+mesh = SubResource("BoxMesh_border_ns")
+
+[node name="East" type="StaticBody3D" parent="Borders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.1, 0.5, 0)
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Borders/East"]
+shape = SubResource("BoxShape3D_border_ew")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Borders/East"]
+mesh = SubResource("BoxMesh_border_ew")
+
+[node name="West" type="StaticBody3D" parent="Borders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.1, 0.5, 0)
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Borders/West"]
+shape = SubResource("BoxShape3D_border_ew")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Borders/West"]
+mesh = SubResource("BoxMesh_border_ew")
+
+[node name="TestCubes" type="Node3D" parent="."]
+
+[node name="CubePickUp" type="StaticBody3D" parent="TestCubes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, -1.8)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TestCubes/CubePickUp"]
+shape = SubResource("BoxShape3D_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TestCubes/CubePickUp"]
+mesh = SubResource("BoxMesh_cube")
+
+[node name="Interactable" type="Node" parent="TestCubes/CubePickUp"]
+script = ExtResource("2_interactable")
+prompt_key = "interact.test.pick_up"
+action = 0
+
+[node name="CubeUse" type="StaticBody3D" parent="TestCubes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.8)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TestCubes/CubeUse"]
+shape = SubResource("BoxShape3D_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TestCubes/CubeUse"]
+mesh = SubResource("BoxMesh_cube")
+
+[node name="Interactable" type="Node" parent="TestCubes/CubeUse"]
+script = ExtResource("2_interactable")
+prompt_key = "interact.test.use"
+action = 1
+
+[node name="CubeOpen" type="StaticBody3D" parent="TestCubes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.25, -1.8)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TestCubes/CubeOpen"]
+shape = SubResource("BoxShape3D_cube")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="TestCubes/CubeOpen"]
+mesh = SubResource("BoxMesh_cube")
+
+[node name="Interactable" type="Node" parent="TestCubes/CubeOpen"]
+script = ExtResource("2_interactable")
+prompt_key = "interact.test.open"
+action = 3
