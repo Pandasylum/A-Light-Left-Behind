@@ -36,7 +36,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 
 - Vue à la première personne et déplacement libre en 3D.
 - Possibilité de marcher plus lentement.
-- La caméra peut être verrouillée pendant certaines manipulations pour faciliter le placement.
+- Pendant la manipulation d'un objet, la caméra reste toujours libre. Pendant le nettoyage, le joueur peut verrouiller la caméra avec une touche à bascule. Le verrouillage n'est jamais imposé et la caméra est libre par défaut.
 - Les sensations de déplacement et de nettoyage doivent rester confortables sur PC.
 - Les commandes exactes et leur personnalisation seront définies lors du prototype d'interaction.
 
