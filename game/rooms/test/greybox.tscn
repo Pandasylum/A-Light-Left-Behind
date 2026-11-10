@@ -1,7 +1,16 @@
 [gd_scene format=3 uid="uid://c3k8vgk513yuk"]
 
 [ext_resource type="PackedScene" path="res://systems/player/player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://systems/interaction/interactable.gd" id="2_interactable"]
+[ext_resource type="PackedScene" path="res://props/test_item.tscn" id="2_item"]
+[ext_resource type="Resource" path="res://data/items/test_small_1.tres" id="d_small_1"]
+[ext_resource type="Resource" path="res://data/items/test_small_2.tres" id="d_small_2"]
+[ext_resource type="Resource" path="res://data/items/test_small_3.tres" id="d_small_3"]
+[ext_resource type="Resource" path="res://data/items/test_small_4.tres" id="d_small_4"]
+[ext_resource type="Resource" path="res://data/items/test_small_5.tres" id="d_small_5"]
+[ext_resource type="Resource" path="res://data/items/test_small_6.tres" id="d_small_6"]
+[ext_resource type="Resource" path="res://data/items/test_small_7.tres" id="d_small_7"]
+[ext_resource type="Resource" path="res://data/items/test_medium_1.tres" id="d_medium_1"]
+[ext_resource type="Resource" path="res://data/items/test_large_1.tres" id="d_large_1"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(10, 0.2, 10)
@@ -15,33 +24,15 @@ size = Vector3(10.4, 1, 0.2)
 [sub_resource type="BoxShape3D" id="BoxShape3D_border_ew"]
 size = Vector3(0.2, 1, 10)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_cube"]
-size = Vector3(0.5, 0.5, 0.5)
-
 [sub_resource type="BoxMesh" id="BoxMesh_border_ns"]
 size = Vector3(10.4, 1, 0.2)
 
 [sub_resource type="BoxMesh" id="BoxMesh_border_ew"]
 size = Vector3(0.2, 1, 10)
 
-[sub_resource type="BoxMesh" id="BoxMesh_cube"]
-size = Vector3(0.5, 0.5, 0.5)
-
-[sub_resource type="GDScript" id="GDScript_greybox"]
-script/source = "extends Node3D
-## Test : affiche le nom du cube interagi.
-
-
-func _ready() -> void:
-	for cube: Node in $TestCubes.get_children():
-		var it: Interactable = cube.get_node(\"Interactable\")
-		it.interacted.connect(func(_player: Node) -> void: print(\"Interaction : \", cube.name))
-"
-
 [sub_resource type="Environment" id="Environment_default"]
 
 [node name="Greybox" type="Node3D" unique_id=1387488027]
-script = SubResource("GDScript_greybox")
 
 [node name="Floor" type="StaticBody3D" parent="." unique_id=603871906]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
@@ -106,52 +97,40 @@ shape = SubResource("BoxShape3D_border_ew")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Borders/West"]
 mesh = SubResource("BoxMesh_border_ew")
 
-[node name="TestCubes" type="Node3D" parent="."]
+[node name="TestItems" type="Node3D" parent="."]
 
-[node name="CubePickUp" type="StaticBody3D" parent="TestCubes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.25, -1.8)
-collision_layer = 4
-collision_mask = 0
+[node name="small_1" parent="TestItems" instance=ExtResource("2_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.060, -1.8)
+item_data = ExtResource("d_small_1")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TestCubes/CubePickUp"]
-shape = SubResource("BoxShape3D_cube")
+[node name="small_2" parent="TestItems" instance=ExtResource("2_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.075, -1.8)
+item_data = ExtResource("d_small_2")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="TestCubes/CubePickUp"]
-mesh = SubResource("BoxMesh_cube")
+[node name="small_3" parent="TestItems" instance=ExtResource("2_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.090, -1.8)
+item_data = ExtResource("d_small_3")
 
-[node name="Interactable" type="Node" parent="TestCubes/CubePickUp"]
-script = ExtResource("2_interactable")
-prompt_key = "interact.test.pick_up"
-action = 0
+[node name="small_4" parent="TestItems" instance=ExtResource("2_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.105, -1.8)
+item_data = ExtResource("d_small_4")
 
-[node name="CubeUse" type="StaticBody3D" parent="TestCubes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -1.8)
-collision_layer = 4
-collision_mask = 0
+[node name="small_5" parent="TestItems" instance=ExtResource("2_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.120, -1.8)
+item_data = ExtResource("d_small_5")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TestCubes/CubeUse"]
-shape = SubResource("BoxShape3D_cube")
+[node name="small_6" parent="TestItems" instance=ExtResource("2_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.25, 0.135, -3.4)
+item_data = ExtResource("d_small_6")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="TestCubes/CubeUse"]
-mesh = SubResource("BoxMesh_cube")
+[node name="small_7" parent="TestItems" instance=ExtResource("2_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.150, -3.4)
+item_data = ExtResource("d_small_7")
 
-[node name="Interactable" type="Node" parent="TestCubes/CubeUse"]
-script = ExtResource("2_interactable")
-prompt_key = "interact.test.use"
-action = 1
+[node name="medium_1" parent="TestItems" instance=ExtResource("2_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0.225, -3.4)
+item_data = ExtResource("d_medium_1")
 
-[node name="CubeOpen" type="StaticBody3D" parent="TestCubes"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.25, -1.8)
-collision_layer = 4
-collision_mask = 0
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TestCubes/CubeOpen"]
-shape = SubResource("BoxShape3D_cube")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="TestCubes/CubeOpen"]
-mesh = SubResource("BoxMesh_cube")
-
-[node name="Interactable" type="Node" parent="TestCubes/CubeOpen"]
-script = ExtResource("2_interactable")
-prompt_key = "interact.test.open"
-action = 3
+[node name="large_1" parent="TestItems" instance=ExtResource("2_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.25, 0.400, -3.4)
+item_data = ExtResource("d_large_1")
