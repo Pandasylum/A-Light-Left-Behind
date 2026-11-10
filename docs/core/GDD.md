@@ -96,15 +96,18 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 
 ## 7. Outils, améliorations et atelier ✅
 
-- Les outils de nettoyage et de rangement de base sont trouvés dans la première pièce du tutoriel.
+- Le jeu compte six outils au total : quatre de nettoyage et de rangement, deux de réparation.
+- Les outils de nettoyage et de rangement de base sont trouvés dans la première pièce du tutoriel :
+  - Éponge : nettoyage courant.
+  - Raclette : vitres et surfaces lisses.
+  - Serpillière : sols.
+  - Seau : rincer les outils et renouveler leur eau.
 - Ils sont tous accessibles dès l'arrivée dans cette pièce ; les améliorations, elles, se débloquent au fil de la progression.
 - Une pièce dédiée, l'atelier, est la deuxième pièce restaurée. Elle introduit la réparation et ses outils, puis permet d'améliorer les outils, ceinture comprise.
 - L'atelier ne fabrique jamais d'objets.
-- Les quatre outils de réparation :
-  - Marteau : remettre en place, redresser et réparer les éléments en bois.
-  - Tournevis : resserrer, démonter et réparer les petites pièces mécaniques.
-  - Clé à molette : réparer les installations métalliques et la plomberie.
-  - Kit de réparation : reboucher, colmater et restaurer les surfaces abîmées.
+- Les deux outils de réparation :
+  - Marteau : réparations du bois et éléments à redresser.
+  - Outil multifonction : visserie, plomberie, petites réparations ; il reprend le rôle de reboucher, colmater et restaurer les surfaces abîmées.
 - La trousse à outils est un objet distinct de la ceinture de transport. Elle fournit les pièces de remplacement nécessaires à certaines réparations (par exemple un fusible). Ces pièces n'occupent pas les emplacements de la ceinture et ne se collectent pas.
 - Les déblocages sont liés à la restauration de certaines pièces et à la récupération naturelle de matériaux.
 - Pas de grind artificiel, pas de niveaux ni de système d'XP.
@@ -235,21 +238,22 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 
 Ces points ne remettent pas en cause les décisions de conception ci-dessus ; ils demandent des choix concrets de production ou des essais :
 
-1. Liste exacte des outils de nettoyage et de rangement trouvés dans la première pièce.
-2. Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.
-3. Liste des pièces et graphe exact des embranchements.
-4. Nombre d'orientations prédéfinies par objet ou famille d'objets.
-5. Liste, ordre et coûts des améliorations d'outils.
-6. Contenu précis de la première pièce tutorielle et de la deuxième pièce, qui est l'atelier.
-7. Langues de sous-titrage supplémentaires éventuelles.
-8. Détails techniques des sauvegardes, contrôles et compatibilité selon la plateforme.
-9. Mécanique de réparation : déroulé exact des étapes et variantes selon le matériau.
-10. Origine des pièces de remplacement (fusibles, etc.) fournies par la trousse à outils.
-11. Le kit de réparation est-il consommable ?
-12. Liste et nombre des réparations spécifiques (lampe du phare, chaufferie, électricité, etc.) et de leur impact sur le lore.
-13. Quand et où le joueur obtient la trousse à outils.
-14. Contenu exact de la trousse à outils.
-15. La trousse à outils est-elle améliorable ?
+1. Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.
+2. Liste des pièces et graphe exact des embranchements.
+3. Nombre d'orientations prédéfinies par objet ou famille d'objets.
+4. Liste, ordre et coûts des améliorations d'outils.
+5. Contenu précis de la première pièce tutorielle et de la deuxième pièce, qui est l'atelier.
+6. Langues de sous-titrage supplémentaires éventuelles.
+7. Détails techniques des sauvegardes, contrôles et compatibilité selon la plateforme.
+8. Mécanique de réparation : déroulé exact des étapes et variantes selon le matériau.
+9. Origine des pièces de remplacement (fusibles, etc.) fournies par la trousse à outils.
+10. L'outil multifonction est-il consommable ?
+11. Liste et nombre des réparations spécifiques (lampe du phare, chaufferie, électricité, etc.) et de leur impact sur le lore.
+12. Quand et où le joueur obtient la trousse à outils.
+13. Contenu exact de la trousse à outils.
+14. La trousse à outils est-elle améliorable ?
+15. Comportement du seau (rinçage, eau).
+16. Comportement de l'outil multifonction selon la cible.
 
 ---
 
