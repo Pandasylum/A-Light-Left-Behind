@@ -39,10 +39,10 @@ Statut : seul le principe général est validé. Le reste est une proposition �
 - Palette commune à tout le phare, variations par pièce.
 - Lumière froide et bleutée au début, plus chaude avec la restauration.
 
-### Ambiance initiale 🟡
-- Tout l'intérieur est teinté de froid : matériaux, lumière, étalonnage. Ambiance pesante.
-- Le froid passe par l'éclairage et l'étalonnage (Godot), pas par les textures. Les textures restent neutres et désaturées, pour que le réchauffement soit un réglage de lumière et non un second jeu de textures.
-- Le contraste de valeur (clair / sombre) reste suffisant pour lire la saleté. Seules la teinte et la saturation sont froides et ternes.
+### Ambiance initiale ✅ (2026-11-10)
+- Tout l'intérieur est teinté de froid (matériaux, lumière, étalonnage) : ambiance pesante par la teinte et la lumière.
+- La luminosité n'est pas abaissée : le contraste de valeur reste suffisant pour lire la saleté.
+- Le froid passe par l'éclairage et l'étalonnage (Godot), pas par les textures, qui restent neutres et désaturées.
 
 ### Palette commune 🟡
 - Bois : brun vieilli, délavé, sombre.
