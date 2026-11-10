@@ -105,11 +105,16 @@ Types de saleté et outils :
 - Les pièces sont initialement très sales et encombrées.
 - La restauration transforme visiblement et progressivement chaque espace.
 - Graphe des pièces (décisions validées le 2026-11-10) :
-  - Le jeu compte 7 pièces principales, sans compter les deux zones tutoriel (pièce 1 et atelier). Durée visée : 45 minutes à 1 heure par pièce principale, environ 7 heures de jeu au total. Le contenu est produit par étapes, pas tout d'un coup.
+  - Le jeu compte 7 pièces principales, hub et atelier compris, plus la pièce 1 (tutoriel), vestibule d'entrée et 8e zone jouable distincte des 7. Durée visée : 45 minutes à 1 heure par pièce principale, environ 7 heures de jeu au total. Le contenu est produit par étapes, pas tout d'un coup.
   - Structure : noyau de départ (pièce 1 et atelier) → hub central (rez-de-chaussée) → branches de restauration → étages supérieurs → sommet du phare.
   - Le hub est le point central de circulation. Plusieurs portes donnent accès aux pièces ; certaines sont verrouillées et se débloquent progressivement. Le hub doit lui-même être restauré. L'escalier central s'y trouve ; il est débloqué quand toutes les zones autour du hub sont à 100 %.
   - L'atelier est collé au hub, ouvert et facilement accessible. Il sert de tutoriel.
-  - Une pièce se débloque quand la précédente (dans sa branche) est à 100 %. À partir du hub, plusieurs branches peuvent être explorées en parallèle et l'ordre de certaines pièces est libre. Seul le dernier étage (la lampe) reste bloqué tant que le reste n'est pas terminé.
+  - Une pièce se débloque quand la précédente (dans sa branche) est à 100 %. Exception : le hub est accessible sans que l'atelier soit à 100 %. À partir du hub, plusieurs branches peuvent être explorées en parallèle et l'ordre de certaines pièces est libre. Seul le dernier étage (la lampe) reste bloqué tant que le reste n'est pas terminé.
+  - Liste des pièces (décisions validées le 2026-11-10). Rez-de-chaussée, 3 zones autour du hub : hall central (hub), point de circulation donnant accès aux pièces et à l'atelier, qui contient l'escalier central ; cuisine (mobilier, vaisselle, surfaces et équipements) ; salle de vie (canapé, bibliothèque, cheminée et objets personnels) ; atelier (réparation, rangement des outils et améliorations). Premier étage, 2 zones : chambre (ancien espace personnel du gardien) ; salle d'archives (documents, cartes, registres et souvenirs). Sommet, 1 zone : salle de la lanterne, dernière zone, cœur du phare et conclusion de la restauration.
+  - L'escalier central est débloqué quand les 3 zones autour du hub (cuisine, salle de vie, atelier) sont à 100 %.
+  - Réparations particulières par pièce : hall central (installation électrique générale, interrupteurs, éclairage, câblage) ; cuisine (robinetterie, évier, tuyauterie, équipements de cuisine) ; salle de vie (cheminée, conduits, mobilier nécessitant une restauration particulière) ; atelier (établi, éclairage technique, prises, équipements d'amélioration des outils) ; chambre (mobilier abîmé, lit, armoire, éléments en bois) ; salle d'archives (étagères, tiroirs, boîtes de rangement, mobilier de conservation) ; salle de la lanterne (mécanisme optique, rotation de la lanterne, alimentation lumineuse, système de signalisation).
+  - Direction artistique (principe) : palette commune à tout le phare, avec des variations de matériaux, mobilier, décoration et éclairage propres à chaque pièce. La lumière est froide au début et devient progressivement plus chaude avec la restauration. Les détails relèvent du projet Art et de ART_BIBLE.md.
+  - Courant de l'atelier : le joueur lance un générateur de secours pour alimenter l'atelier le temps de trouver l'installation électrique ; le personnage indique qu'il faut la chercher en priorité dans le hub. L'installation électrique générale (tableau principal) est dans le hub et se répare là.
   - Les étages supérieurs deviennent accessibles progressivement. Le phare monte vers la lanterne, au sommet, dernière grande étape : rallumer la lampe est l'aboutissement du jeu.
   - Chaque pièce principale doit être nettoyée, rangée et réparée à 100 % (selon ce que la pièce permet) pour être validée. Le 100 % acquis reste acquis, même si le joueur modifie ensuite le rangement. Les objets narratifs, clés et découvertes restent facultatifs (exception : la clé du tutoriel).
   - Après la campagne : exploration libre et restauration complémentaire. L'extérieur n'est pas jouable pour l'instant (visible par les fenêtres seulement).
@@ -134,7 +139,7 @@ Types de saleté et outils :
 - Durée visée : 20 minutes.
 - Le joueur peut revenir à l'atelier à tout moment. L'atelier compte dans le 100 % : il se nettoie, se range et se répare.
 - Les outils de réparation (marteau, outil multifonction) sont trouvés progressivement dans l'atelier.
-- Réparations d'apprentissage : remettre le courant ; réparer le meuble de l'atelier lui-même pour pouvoir l'utiliser. Réparer une chaise est une proposition À CONFIRMER.
+- Réparations d'apprentissage : lancer le générateur de secours de l'atelier ; réparer le meuble de l'atelier lui-même pour pouvoir l'utiliser. Réparer une chaise est une proposition À CONFIRMER.
 - Améliorer un outil : le joueur trouve des items d'amélioration dans les pièces suivantes. À l'atelier, il clique sur le meuble de l'atelier, ce qui ouvre un menu d'amélioration. Tout l'arbre est visible d'avance et le menu indique ce qui est faisable. Il suffit de cliquer sur l'amélioration avec l'item pour la valider. L'item ne compte pas dans la ceinture.
 - Les améliorations se débloquent par la récupération d'items d'amélioration. Elles sont organisées en arbres par type d'objet (outil), de 3 ou 4 améliorations chacun. L'éponge abrasive est la première amélioration de l'éponge (début d'arbre), pour qu'elle ne bloque pas la progression.
 - Les améliorations sont simples : de simples réglages de paramètres (par exemple plus rapide, surface plus large, outil qui se salit moins vite donc moins de rinçages), sans nouvelle mécanique.
@@ -301,12 +306,13 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 
 1. Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.
 2. Graphe des pièces :
-   - liste, noms, rôles et branches des 7 pièces principales ;
-   - le hub compte-t-il parmi les 7 pièces ;
+   - position du vestibule (pièce 1) par rapport au hub et à l'atelier ;
+   - place de la chaufferie (zone technique ou annexe, hors des 7 pièces) ;
+   - fonctionnement du générateur de secours et emplacement exact du tableau principal dans le hub ;
+   - nombre et nature des réparations particulières par pièce ;
    - connexion physique entre la pièce 1, l'atelier et le hub, et condition d'ouverture de la première branche ;
    - nombre d'étages ;
    - définition exacte de « le reste » pour débloquer le dernier étage (la lampe) ;
-   - l'atelier compte-t-il parmi les zones autour du hub pour débloquer l'escalier ;
    - relation entre le déblocage de l'escalier et celui du dernier étage (lampe) ;
    - mécanisme de l'évolution de l'atmosphère (globale ou par pièce) ;
    - rôle, contenu et fonctionnement du journal (mentionné comme découverte du noyau de départ).
@@ -317,7 +323,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
    - forme de l'item d'amélioration (porté ou stocké) et combien, où, dans quelles pièces ;
    - liste des arbres d'amélioration (quels outils) et contenu de chacun ;
    - condition de sortie de l'atelier ;
-   - ce que fait « remettre le courant » (portée et effets) ;
+   - ce que fait « lancer le générateur de secours de l'atelier » (portée et effets) ;
    - confirmation de la chaise comme réparation d'apprentissage ;
    - contenu exact des notes et du plan du phare.
 6. Langues de sous-titrage supplémentaires éventuelles.
