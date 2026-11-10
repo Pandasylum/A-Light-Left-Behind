@@ -79,11 +79,16 @@ Types de saleté et outils :
 - Rangement : zones souples par catégorie d'objets, sans position imposée. Un objet est rangé s'il repose directement sur un support déclaré, dans une zone qui accepte sa catégorie. Le sol de la pièce n'est jamais une zone. Un support déclaré (palette, étagère basse…) n'est pas du sol, même posé au niveau du sol. Un objet posé sur un autre objet qui n'est pas un support déclaré n'est pas rangé. Déplacer un support qui porte des objets est interdit.
 - Empilement : un petit objet peut être posé sur un objet plus gros (exemple : une lampe de table sur un gros carton) ; les petits objets sont empilables entre eux (livres).
 - Murs : objets décoratifs et cadres. Pas de plafond (exception possible : la réparation d'un lustre).
-- Gros objets : portés à deux mains, un seul à la fois.
+- Prise en main : le joueur dispose d'une main (un objet) et d'une ceinture qui n'accepte que les petits objets (capacité de départ et améliorations : voir la ceinture ci-dessous).
+  - Petit objet : pris en main si elle est libre ; sinon rangé dans la ceinture si un emplacement est libre ; sinon refusé.
+  - Objet moyen ou gros : pris en main. Si la main tient un petit objet, celui-ci est rangé automatiquement dans un emplacement libre de la ceinture ; si la ceinture est pleine, la prise est refusée.
+  - Quand la main tient un objet moyen ou gros, toute prise d'objet est refusée, petits objets compris.
+  - Un gros objet se porte à deux mains ; un seul à la fois.
+  - Le joueur peut échanger l'objet en main avec un objet de la ceinture, sauf si la main tient un objet moyen ou gros.
 - Catégories d'objets :
-  - Petits objets (livres, outils, boîtes, vaisselle) : portés à la main, un à la fois. La ceinture ajoute des emplacements supplémentaires pour petits objets (1 au départ, jusqu'à 5 avec les améliorations).
-  - Objets moyens (chaises, caisses, tabourets) : portés à la main.
-  - Gros objets (armoires, commodes, tables) : transport à deux mains.
+  - Petits objets (livres, outils, boîtes, vaisselle).
+  - Objets moyens (chaises, caisses, tabourets).
+  - Gros objets (armoires, commodes, tables).
   - Objets fixes (radiateurs, installations, éléments muraux) : ne peuvent pas être déplacés.
 - Collisions : un placement qui chevauche est refusé, sauf l'empilement de petits objets.
 - Un objet tombe au sol s'il est lâché ou posé trop près du bord de son support. Avant le premier passage d'une pièce à 100 %, un objet tombé fait baisser le pourcentage. Au premier passage à 100 %, le statut « restaurée » de la pièce est verrouillé définitivement (verrou par pièce). Un axe ajouté plus tard (par exemple la réparation) ne retire pas ce statut.
@@ -95,7 +100,7 @@ Types de saleté et outils :
 - L'inventaire sert à gérer les objets transportés. Le joueur peut changer rapidement d'objet tenu avec une commande dédiée.
 - L'ouverture de l'inventaire ne met pas le jeu en pause.
 
-🟡 Les règles précises de placement valide, de collision, de prise en main et de transport seront stabilisées au prototype. Elles doivent préserver la liberté d'organisation sans permettre les placements absurdes ou bloquants.
+🟡 Les règles précises de placement valide, de collision et de transport seront stabilisées au prototype. Elles doivent préserver la liberté d'organisation sans permettre les placements absurdes ou bloquants.
 
 ## 6. Progression et structure des pièces ✅
 
