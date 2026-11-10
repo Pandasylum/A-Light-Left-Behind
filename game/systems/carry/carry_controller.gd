@@ -7,7 +7,7 @@ extends Node
 const HAND_OFFSET: Vector3 = Vector3(0.3, -0.25, -0.6)
 const LARGE_EXTRA_OFFSET: Vector3 = Vector3(-0.3, 0.05, -0.3) ## LARGE : plus centré
 
-var inventory: CarryInventory = CarryInventory.new()
+var inventory: CarryInventory = CarryInventory.new() ## recréé dans _ready selon Player.belt_capacity
 
 var _sensor: InteractionSensor
 var _prompt: InteractionPrompt
@@ -19,6 +19,7 @@ var _debug_label: Label
 
 func _ready() -> void:
 	var player: Node = get_parent()
+	inventory = CarryInventory.new((player as Player).belt_capacity)
 	_sensor = player.get_node("Head/InteractionSensor")
 	_prompt = player.get_node("InteractionPrompt")
 	_anchor = player.get_node("Head/HandAnchor")
@@ -58,6 +59,8 @@ func pick_up(interactable: Interactable) -> void:
 
 func cycle() -> void:
 	var result: CarryInventory.Result = inventory.cycle_item()
+	if result == CarryInventory.Result.NOTHING_TO_DO:
+		return
 	if result != CarryInventory.Result.OK:
 		_show_refusal(result)
 		return
@@ -91,7 +94,9 @@ func _on_interacted(_player: Node, interactable: Interactable) -> void:
 	pick_up(interactable)
 
 
-## Applique la visibilité, la collision et la parenté selon l'état de l'inventaire.
+## Applique la visibilité, la collision et la parenté selon l'état de l'inventaire. Un objet rangé
+## automatiquement (main -> ceinture avant une prise) est traité par la boucle de ceinture :
+## masqué, collision désactivée.
 func _refresh_visuals() -> void:
 	var held: Node3D = inventory.held_ref() as Node3D
 	if held != null:
@@ -99,7 +104,7 @@ func _refresh_visuals() -> void:
 		held.position = LARGE_EXTRA_OFFSET if inventory.held().category == ItemData.Category.LARGE else Vector3.ZERO
 		held.rotation = Vector3.ZERO
 		held.visible = true
-	for slot: int in CarryInventory.BELT_SIZE:
+	for slot: int in inventory.capacity():
 		var stowed: Node3D = inventory.belt_ref(slot) as Node3D
 		if stowed != null:
 			_attach(stowed)
@@ -118,6 +123,7 @@ func _show_refusal(result: CarryInventory.Result) -> void:
 		CarryInventory.Result.HANDS_FULL: "carry.hands_full",
 		CarryInventory.Result.BELT_FULL: "carry.belt_full",
 		CarryInventory.Result.NOT_STOWABLE: "carry.not_stowable",
+		CarryInventory.Result.CYCLE_BLOCKED: "carry.cycle_blocked",
 	}
 	_prompt.show_message(keys[result])
 
@@ -139,4 +145,4 @@ func _build_debug_label() -> void:
 func _update_label() -> void:
 	var held: ItemData = inventory.held()
 	var held_name: String = tr(held.name_key) if held != null else "-"
-	_debug_label.text = "Main : %s / Ceinture : %d/%d" % [held_name, inventory.belt_count(), CarryInventory.BELT_SIZE]
+	_debug_label.text = "Main : %s / Ceinture : %d/%d" % [held_name, inventory.belt_count(), inventory.capacity()]
