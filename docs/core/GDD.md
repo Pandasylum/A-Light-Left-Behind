@@ -105,6 +105,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
   - Tournevis : resserrer, démonter et réparer les petites pièces mécaniques.
   - Clé à molette : réparer les installations métalliques et la plomberie.
   - Kit de réparation : reboucher, colmater et restaurer les surfaces abîmées.
+- La trousse à outils est un objet distinct de la ceinture de transport. Elle fournit les pièces de remplacement nécessaires à certaines réparations (par exemple un fusible). Ces pièces n'occupent pas les emplacements de la ceinture et ne se collectent pas.
 - Les déblocages sont liés à la restauration de certaines pièces et à la récupération naturelle de matériaux.
 - Pas de grind artificiel, pas de niveaux ni de système d'XP.
 - Les améliorations restent modestes et ne doivent pas accélérer excessivement le nettoyage.
@@ -242,11 +243,13 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 6. Contenu précis de la première pièce tutorielle et de la deuxième pièce, qui est l'atelier.
 7. Langues de sous-titrage supplémentaires éventuelles.
 8. Détails techniques des sauvegardes, contrôles et compatibilité selon la plateforme.
-9. Liste exacte des outils de réparation introduits à l'atelier.
-10. Mécanique de réparation : déroulé exact des étapes et variantes selon le matériau.
-11. Origine des pièces de remplacement (fusibles, etc.) fournies par la trousse à outils.
-12. Le kit de réparation est-il consommable ?
-13. Liste et nombre des réparations spécifiques (lampe du phare, chaufferie, électricité, etc.) et de leur impact sur le lore.
+9. Mécanique de réparation : déroulé exact des étapes et variantes selon le matériau.
+10. Origine des pièces de remplacement (fusibles, etc.) fournies par la trousse à outils.
+11. Le kit de réparation est-il consommable ?
+12. Liste et nombre des réparations spécifiques (lampe du phare, chaufferie, électricité, etc.) et de leur impact sur le lore.
+13. Quand et où le joueur obtient la trousse à outils.
+14. Contenu exact de la trousse à outils.
+15. La trousse à outils est-elle améliorable ?
 
 ---
 

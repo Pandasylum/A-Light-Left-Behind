@@ -5,7 +5,7 @@ Statut : plan de réalisation proposé à partir du GDD validé. L'ordre est une
 
 ## 1. Principe directeur
 
-Construire d'abord une **vertical slice** : une première pièce jouable qui contient la boucle centrale complète (explorer, nettoyer, réparer, déplacer/ranger, découvrir, valider). Ne pas produire toutes les pièces avant d'avoir vérifié que cette boucle est agréable, compréhensible et techniquement fiable.
+Construire d'abord une **vertical slice** : une première pièce jouable qui contient la boucle centrale complète (explorer, nettoyer, déplacer/ranger, découvrir, valider). Ne pas produire toutes les pièces avant d'avoir vérifié que cette boucle est agréable, compréhensible et techniquement fiable.
 
 Le plan est organisé par dépendances et livrables. Les durées ne sont pas estimées : elles dépendront du moteur, de l'état actuel du projet, des outils déjà en place et du temps disponible.
 
@@ -219,13 +219,13 @@ Audit du projet
       ↓
 Déplacements et interactions
       ↓
-Nettoyage + réparation
+Nettoyage
       ↓
 Rangement + critères de validation à 100 %
       ↓
 Première pièce complète (vertical slice)
       ↓
-Progression + atelier + inventaire
+Progression + atelier (réparation) + inventaire
       ↓
 Journal et narration ─────────┐
       ↓                       │
