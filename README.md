@@ -10,12 +10,12 @@ Jeu solo contemplatif à la première personne : nettoyer, réparer, ranger et r
 
 | Fichier | Rôle |
 |---|---|
-| `GDD.md` | Décisions de conception validées (fait foi) |
-| `PLAN_DE_PRODUCTION.md` | Phases, dépendances et risques |
-| `ROADMAP.md` | Suivi de l'avancement |
-| `PROJECT_RULES.md` | Règles fondamentales du projet |
-| `CLAUDE_PROJECTS.md` | Organisation des projets Claude spécialisés |
-| `docs/archive/` | Documents obsolètes conservés pour mémoire |
+| `docs/core/GDD.md` | Décisions de conception validées (fait foi) |
+| `docs/core/PLAN_DE_PRODUCTION.md` | Phases, dépendances et risques |
+| `docs/direction/ROADMAP.md` | Suivi de l'avancement |
+| `docs/core/PROJECT_RULES.md` | Règles fondamentales du projet |
+| `docs/direction/CLAUDE_PROJECTS.md` | Organisation des projets Claude spécialisés |
+| `docs/direction/archive/` | Documents obsolètes conservés pour mémoire |
 
 ## Méthode
 
