@@ -125,7 +125,7 @@ Tâches :
 - Implémenter la ceinture : capacité de départ de 1 petit objet (en plus de l'objet tenu en main), +1 par amélioration à l'atelier, plafond de 5 petits objets (soit 4 améliorations).
 - Implémenter le déblocage des améliorations selon les pièces restaurées et les matériaux récupérés naturellement.
 - Construire la pièce dédiée à l'atelier, probablement la deuxième pièce restaurée.
-- Introduire la réparation à l'atelier avec ses quatre outils (marteau, tournevis, clé à molette, kit de réparation).
+- Introduire la réparation à l'atelier avec ses deux outils (marteau, outil multifonction).
 - Créer l'interface d'amélioration des outils ; aucune fabrication d'objets.
 - Implémenter les améliorations modestes et leurs effets.
 - Créer le graphe de progression des pièces : ordre principal et embranchements.
