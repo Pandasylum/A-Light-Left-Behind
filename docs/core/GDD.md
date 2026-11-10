@@ -52,6 +52,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 - Une réparation a un effet fonctionnel dans le jeu.
 - Certaines réparations spécifiques (lampe du phare, chaufferie, électricité, etc.) peuvent avoir un impact sur le lore.
 - Les réparations se font par étapes et tiennent compte du matériau de l'objet ou de l'élément concerné.
+- Métal très corrodé : le traitement est intégré au geste de réparation (outil multifonction), sans étape distincte. Aucun métal très corrodé avant l'atelier.
 - La réparation compte dans le 100 % de la pièce (§6).
 - Les installations lourdes et fixes (par exemple radiateurs et équipements intégrés) restent en place.
 - Le nettoyage et la réparation doivent produire un retour visuel et sonore satisfaisant.
@@ -70,12 +71,12 @@ Types de saleté et outils :
 ## 5. Manipulation, transport et rangement ✅
 
 - Le joueur peut prendre, déplacer et placer les objets libres.
-- Les objets possèdent des emplacements logiques (étagère, table, crochet, etc.).
+- Les objets se posent sur des surfaces de pose (étagère, table, crochet, etc.). Le rangement repose sur des zones par catégorie, pas sur des emplacements imposés.
 - Le joueur choisit librement leur position précise dans l'espace autorisé par l'emplacement logique.
 - La manipulation est volontairement simplifiée et se concentre principalement sur les surfaces ; elle ne vise pas une simulation physique complexe.
 - Le placement est libre, avec une aimantation douce sur les surfaces. Les objets sont figés une fois posés (pas de simulation physique persistante).
 - La rotation se fait par paliers, avec une touche ou la molette (valeur proposée : 15°, à confirmer). Chaque objet a des orientations autorisées (par exemple un livre debout ou à plat).
-- Rangement : zones souples par catégorie d'objets, sans position imposée. Un objet compte comme rangé s'il est hors du sol et hors du désordre.
+- Rangement : zones souples par catégorie d'objets, sans position imposée. Un objet est rangé s'il est posé (ni tenu, ni au sol) dans une zone qui accepte sa catégorie.
 - Empilement : un petit objet peut être posé sur un objet plus gros (exemple : une lampe de table sur un gros carton) ; les petits objets sont empilables entre eux (livres).
 - Murs : objets décoratifs et cadres. Pas de plafond (exception possible : la réparation d'un lustre).
 - Gros objets : portés à deux mains, un seul à la fois.
@@ -85,11 +86,12 @@ Types de saleté et outils :
   - Gros objets (armoires, commodes, tables) : transport à deux mains.
   - Objets fixes (radiateurs, installations, éléments muraux) : ne peuvent pas être déplacés.
 - Collisions : un placement qui chevauche est refusé, sauf l'empilement de petits objets.
-- Un objet tombe au sol s'il est lâché ou posé trop près du bord de son support. Un objet tombé fait baisser le 100 %. Une fois le 100 % atteint, il reste acquis définitivement.
+- Un objet tombe au sol s'il est lâché ou posé trop près du bord de son support. Avant le premier passage d'une pièce à 100 %, un objet tombé fait baisser le pourcentage. Au premier passage à 100 %, le statut « restaurée » de la pièce est verrouillé définitivement (verrou par pièce). Un axe ajouté plus tard (par exemple la réparation) ne retire pas ce statut.
 - Les meubles libres peuvent être déplacés après avoir été nettoyés et réparés ; leur positionnement reste libre.
+- Un meuble ne peut pas être déplacé tant qu'il porte au moins un objet ; un message d'indice l'explique au joueur.
 - Les installations fixes et gros équipements ne sont pas déplaçables.
 - Les réparations de meubles dépendent de leur matériau.
-- La ceinture de transport n'est pas possédée au départ : le joueur la trouve dans la pièce tutoriel. Sa capacité de départ est de 1 petit objet, en plus de l'objet tenu en main. Chaque amélioration (à l'atelier) augmente cette capacité de 1, jusqu'à un plafond de 5 petits objets. L'arbre d'amélioration de la ceinture compte 4 améliorations (de 1 à 5 emplacements).
+- La ceinture de transport n'est pas possédée au départ : le joueur la trouve dans la pièce tutoriel. Sa capacité de départ est de 1 petit objet, en plus de l'objet tenu en main (la main n'est pas comptée dans les emplacements : 5 emplacements au maximum, plus la main). Chaque amélioration (à l'atelier) augmente cette capacité de 1, jusqu'à un plafond de 5 petits objets. L'arbre d'amélioration de la ceinture compte 4 améliorations (de 1 à 5 emplacements).
 - L'inventaire sert à gérer les objets transportés. Le joueur peut changer rapidement d'objet tenu avec une commande dédiée.
 - L'ouverture de l'inventaire ne met pas le jeu en pause.
 
@@ -335,16 +337,16 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 14. La trousse à outils est-elle améliorable ?
 15. Rythme de salissure des outils, signal visuel d'outil sale, effet exact des améliorations du seau sur la fréquence de rinçage.
 16. Comportement de l'outil multifonction selon la cible.
-17. Définition de « désordre ».
+17. ~~Définition de « désordre ».~~ Réglé : critère de rangement testable (§5).
 18. Règles d'empilement par catégorie d'objets (petits, moyens, gros, fixes).
 19. Liste des zones de rangement par catégorie.
 20. Valeur des paliers de rotation (15° à confirmer).
 21. Articulation entre orientations autorisées et paliers de rotation.
-22. Portée du 100 % acquis (par pièce ou global).
+22. ~~Portée du 100 % acquis (par pièce ou global).~~ Réglé : verrou par pièce, au premier 100 % (§5).
 23. Distance limite au bord d'un support et signal d'aperçu avant le placement.
 24. Emplacements et ordre de découverte des outils dans la pièce 1.
 25. Ordre entre l'ouverture du coffre, son rangement et la sortie.
-26. Traitement du métal corrodé avant réparation.
+26. ~~Traitement du métal corrodé avant réparation.~~ Réglé : intégré à la réparation (§5/§6).
 27. Pièces où la rouille apparaît.
 28. ~~Catalogue des améliorations (l'éponge abrasive en est le premier exemple).~~ Fusionné au point 5.
 
