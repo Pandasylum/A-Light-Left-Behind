@@ -5,7 +5,7 @@ Mis à jour par Claude Code à chaque PR touchant l'architecture. 100 lignes max
 Format d'une entrée : `chemin` — rôle en une ligne — dépendances principales.
 
 ## Systèmes
-(vide)
+`game/project.godot` [input] — actions Input Map provisoires (liste dans docs/tech/TECHNICAL.md) — aucune
 
 ## Scènes
 `game/core/main.tscn` — scène principale (Node3D), instancie la scène grise — greybox.tscn
