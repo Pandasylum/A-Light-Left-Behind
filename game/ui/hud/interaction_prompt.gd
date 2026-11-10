@@ -16,3 +16,22 @@ func set_target(interactable: Interactable) -> void:
 		return
 	hint.text = tr(interactable.prompt_key)
 	hint.visible = true
+
+
+const MESSAGE_DURATION: float = 2.0 ## s
+
+var _message_left: float = 0.0
+
+
+func _process(delta: float) -> void:
+	if _message_left > 0.0:
+		_message_left -= delta
+		if _message_left <= 0.0:
+			$Message.visible = false
+
+
+## Affiche un message temporaire (tr(key), ~2 s).
+func show_message(key: String) -> void:
+	$Message.text = tr(key)
+	$Message.visible = true
+	_message_left = MESSAGE_DURATION

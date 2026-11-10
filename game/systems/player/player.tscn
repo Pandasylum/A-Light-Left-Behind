@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://systems/player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://systems/interaction/interaction_sensor.gd" id="2_sensor"]
+[ext_resource type="Script" path="res://systems/carry/carry_controller.gd" id="4_carry"]
 [ext_resource type="PackedScene" path="res://ui/hud/interaction_prompt.tscn" id="3_prompt"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
@@ -25,5 +26,11 @@ current = true
 
 [node name="InteractionSensor" type="Node" parent="Head"]
 script = ExtResource("2_sensor")
+
+[node name="HandAnchor" type="Node3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, -0.25, -0.6)
+
+[node name="CarryController" type="Node" parent="."]
+script = ExtResource("4_carry")
 
 [node name="InteractionPrompt" parent="." instance=ExtResource("3_prompt")]

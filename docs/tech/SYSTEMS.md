@@ -14,7 +14,7 @@ Test : `tools/godot.sh --headless --path game --script res://tests/save_roundtri
 
 ## Scènes
 `game/core/main.tscn` — scène principale (Node3D), instancie la scène grise — greybox.tscn
-`game/rooms/test/greybox.tscn` — pièce grise de test : sol 10x10, lumière, environnement, caméra fixe (current=false), bordures 1 m (couche 1), 3 cubes de test interactifs (couche 3), instancie Player — player.tscn
+`game/rooms/test/greybox.tscn` — pièce grise de test : sol 10x10, lumière, environnement, caméra fixe (current=false), bordures 1 m (couche 1), 9 objets de test ramassables (TestItems), instancie Player — player.tscn, test_item.tscn
 `game/systems/player/player.gd` + `player.tscn` — Player (CharacterBody3D, classe Player) : marche/marche lente, regard souris (yaw Player, pitch Head), Échap libère la souris, clic gauche la recapture, capteur + indice d'interaction, remise au départ sous fall_limit_y ; couche 2, masque 1 — Input Map
 `game/systems/interaction/interactable.gd` — Interactable (Node, class_name) : enfant d'un corps sur la couche 3 ; prompt_key, action (PICK_UP/USE/PLACE/OPEN), signal interacted, interact() — aucune
 `game/systems/interaction/interaction_sensor.gd` — InteractionSensor (enfant de Head) : raycast physique 2 m (couches 1+3), target_changed, action interact ; inactif si souris non capturée — Interactable
@@ -24,6 +24,14 @@ Test : `tools/godot.sh --headless --path game --script res://tests/test_interact
 Couches de collision : 1 monde, 2 joueur, 3 interactifs (nouvelle ; valeur de masque 4).
 `game/tests/test_player.gd` — structure de player.tscn, valeurs par défaut, logique de déplacement/regard — player.gd
 Test : `tools/godot.sh --headless --path game --script res://tests/test_player.gd`
+
+`game/systems/carry/carry_inventory.gd` — CarryInventory (RefCounted) : logique pure main + ceinture 5 SMALL, pick_up/add_to_belt/cycle_item/drop_object, énum Result, signaux held_changed/belt_changed — ItemData
+`game/systems/carry/carry_controller.gd` — CarryController (enfant de Player) : prise via Interactable PICK_UP, cycle_item/drop_object, HandAnchor, masquage ceinture, dépôt provisoire à l'origine (remplacé en P1-D), label de debug (provisoire, P1-E) — CarryInventory, InteractionSensor, InteractionPrompt
+`game/props/test_item.tscn` + `.gd` — TestItem (StaticBody3D, couche 3) : ItemData exportée, cube suivant l'emprise, Interactable PICK_UP — ItemData, interactable.gd
+`game/data/items/` — 9 ItemData de test (7 SMALL, 1 MEDIUM, 1 LARGE) — item_data.gd
+`game/tests/test_carry.gd` — règles de CarryInventory (tableau de cas, capacité 6, cycle, dépôt, signaux) — carry_inventory.gd
+Test : `tools/godot.sh --headless --path game --script res://tests/test_carry.gd`
+`InteractionPrompt.show_message(key)` — message temporaire ~2 s sous l'indice — interaction_prompt.gd
 
 ## Données et ressources
 `game/data/item_data.gd` — ItemData (Resource) : id, nom, catégorie, emprise, orientations, axes suivis ; validate() — aucune

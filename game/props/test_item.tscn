@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://props/test_item.gd" id="1_item"]
+[ext_resource type="Script" path="res://systems/interaction/interactable.gd" id="2_interactable"]
+
+[node name="TestItem" type="StaticBody3D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_item")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+
+[node name="Interactable" type="Node" parent="."]
+script = ExtResource("2_interactable")
+prompt_key = "interact.pick_up"
+action = 0
