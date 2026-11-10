@@ -400,3 +400,4 @@ Sound Design, World & Content et QA & Production sont créés quand leur phase a
 - Entre projets : fiche de transmission de 10 lignes maximum (décision, pourquoi, demande, contraintes, livrable).
 - Prompts Claude Code : techniques écrits par Godot Engineering, documentation et game design par Direction. Règles permanentes dans `CLAUDE.md`, carte du code dans `SYSTEMS.md`.
 - Claude Code ne prend aucune décision : doute de conception → Direction ; doute technique → Godot Engineering.
+- Rangement (2026-11-10) : `docs/core` est partagé par les trois projets ; `docs/direction`, `docs/tech` et `docs/art` appartiennent chacun à leur projet. Chaque projet synchronise `docs/core` plus son dossier.

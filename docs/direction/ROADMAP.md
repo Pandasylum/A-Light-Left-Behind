@@ -58,4 +58,4 @@ Rien.
 
 ## Archive
 
-`docs/archive/PRODUCTION_ROADMAP.md` : ancienne feuille de route, obsolète. À reprendre plus tard si le GDD le confirme : pipeline 3D assisté par IA (§3.1 à 3.3) et catalogue d'améliorations (§5.1).
+`docs/direction/archive/PRODUCTION_ROADMAP.md` : ancienne feuille de route, obsolète. À reprendre plus tard si le GDD le confirme : pipeline 3D assisté par IA (§3.1 à 3.3) et catalogue d'améliorations (§5.1).

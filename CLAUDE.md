@@ -2,13 +2,15 @@
 
 Jeu : A Light Left Behind (Godot 4.6, PC uniquement, développeur solo). Règles fondamentales : `PROJECT_RULES.md`. Décisions de conception : `GDD.md` (fait foi). Avancement : `ROADMAP.md`. Carte du code : `SYSTEMS.md`.
 
+Documents rangés dans `docs/` : `core/` (GDD, PROJECT_RULES, PLAN_DE_PRODUCTION), `direction/` (ROADMAP, CLAUDE_PROJECTS, archive), `tech/` (TECHNICAL, SYSTEMS), `art/` (ART_BIBLE, references).
+
 ## Cadre de travail
 - Une session = un sujet = une branche = une PR. Tu ne fusionnes jamais.
 - Tu exécutes le prompt reçu. Aucune décision de conception ou d'architecture non validée. Si une ambiguïté importante bloque : arrête-toi et demande.
 - Reste dans le périmètre du prompt. Ne modifie rien d'autre, sauf SYSTEMS.md (voir Documents).
 
 ## Lectures
-- Commence par `SYSTEMS.md` plutôt que d'explorer le dépôt.
+- Commence par `docs/tech/SYSTEMS.md` plutôt que d'explorer le dépôt.
 - Maximum 2 fichiers lus en entier par tâche, sauf autorisation. Préfère grep ou sed ciblés. Aucune lecture générale du projet.
 - Jamais de réécriture complète d'un fichier pour une modification limitée.
 
