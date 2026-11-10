@@ -17,4 +17,9 @@ Test : `tools/godot.sh --headless --path game --script res://tests/save_roundtri
 `game/rooms/test/greybox.tscn` — pièce grise de test : sol 10x10, lumière, environnement, caméra fixe — aucune
 
 ## Données et ressources
-(vide)
+`game/data/item_data.gd` — ItemData (Resource) : id, nom, catégorie, emprise, orientations, axes suivis ; validate() — aucune
+`game/data/zone_data.gd` — ZoneData (Resource) : id, catégories acceptées (règles d'un volume Area3D de rangement) ; validate() — ItemData
+`game/data/room_data.gd` — RoomData (Resource) : id, nom, pièce précédente, axes actifs ; validate() — aucune
+`game/data/placement_rules.gd` — PlacementRules (Resource) : pas de rotation, marge, couverture (valeurs provisoires) ; validate() — aucune
+`game/tests/data_validation_test.gd` — test de validate() des 4 classes de données — game/data/*
+Test : `tools/godot.sh --headless --path game --script res://tests/data_validation_test.gd`
