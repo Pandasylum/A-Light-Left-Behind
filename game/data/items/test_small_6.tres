@@ -8,3 +8,4 @@ id = &"test_small_6"
 name_key = "item.test.small_6"
 category = 0
 footprint = Vector2(0.27, 0.27)
+height = 0.3

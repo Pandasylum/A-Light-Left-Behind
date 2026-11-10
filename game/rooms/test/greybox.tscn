@@ -12,6 +12,8 @@
 [ext_resource type="Resource" path="res://data/items/test_medium_1.tres" id="d_medium_1"]
 [ext_resource type="Resource" path="res://data/items/test_large_1.tres" id="d_large_1"]
 
+[ext_resource type="Script" path="res://systems/placement/placement_surface.gd" id="3_surface"]
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(10, 0.2, 10)
 
@@ -30,6 +32,24 @@ size = Vector3(10.4, 1, 0.2)
 [sub_resource type="BoxMesh" id="BoxMesh_border_ew"]
 size = Vector3(0.2, 1, 10)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_table"]
+size = Vector3(1.2, 0.75, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_table"]
+size = Vector3(1.2, 0.75, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pallet"]
+size = Vector3(1.2, 0.15, 1.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pallet"]
+size = Vector3(1.2, 0.15, 1.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_plot"]
+size = Vector3(0.3, 0.2, 0.3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_plot"]
+size = Vector3(0.3, 0.2, 0.3)
+
 [sub_resource type="Environment" id="Environment_default"]
 
 [node name="Greybox" type="Node3D" unique_id=1387488027]
@@ -42,6 +62,12 @@ shape = SubResource("BoxShape3D_floor")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=278687536]
 mesh = SubResource("BoxMesh_floor")
+
+[node name="PlacementSurface" type="Node3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+script = ExtResource("3_surface")
+size = Vector2(10, 10)
+is_floor = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1065742170]
 transform = Transform3D(1, 0, 0, 0, 0.7071, 0.7071, 0, -0.7071, 0.7071, 0, 5, 0)
@@ -98,40 +124,92 @@ shape = SubResource("BoxShape3D_border_ew")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Borders/West"]
 mesh = SubResource("BoxMesh_border_ew")
 
+[node name="PlacedObjects" type="Node3D" parent="."]
+
+[node name="Supports" type="Node3D" parent="."]
+
+[node name="TestTable" type="StaticBody3D" parent="Supports"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.375, -0.5)
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Supports/TestTable"]
+shape = SubResource("BoxShape3D_table")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Supports/TestTable"]
+mesh = SubResource("BoxMesh_table")
+
+[node name="PlacementSurface" type="Node3D" parent="Supports/TestTable"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+script = ExtResource("3_surface")
+size = Vector2(1.2, 0.8)
+is_floor = false
+
+[node name="TestPallet" type="StaticBody3D" parent="Supports"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.075, -0.5)
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Supports/TestPallet"]
+shape = SubResource("BoxShape3D_pallet")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Supports/TestPallet"]
+mesh = SubResource("BoxMesh_pallet")
+
+[node name="PlacementSurface" type="Node3D" parent="Supports/TestPallet"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+script = ExtResource("3_surface")
+size = Vector2(1.2, 1.0)
+is_floor = false
+
+[node name="TestPlot" type="StaticBody3D" parent="Supports"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.1, 1.5)
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Supports/TestPlot"]
+shape = SubResource("BoxShape3D_plot")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Supports/TestPlot"]
+mesh = SubResource("BoxMesh_plot")
+
+[node name="PlacementSurface" type="Node3D" parent="Supports/TestPlot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+script = ExtResource("3_surface")
+size = Vector2(0.3, 0.3)
+is_floor = false
+
 [node name="TestItems" type="Node3D" parent="."]
 
 [node name="small_1" parent="TestItems" instance=ExtResource("2_item")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.060, -1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.050, -1.8)
 item_data = ExtResource("d_small_1")
 
 [node name="small_2" parent="TestItems" instance=ExtResource("2_item")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.075, -1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.100, -1.8)
 item_data = ExtResource("d_small_2")
 
 [node name="small_3" parent="TestItems" instance=ExtResource("2_item")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.090, -1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.060, -1.8)
 item_data = ExtResource("d_small_3")
 
 [node name="small_4" parent="TestItems" instance=ExtResource("2_item")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.105, -1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.125, -1.8)
 item_data = ExtResource("d_small_4")
 
 [node name="small_5" parent="TestItems" instance=ExtResource("2_item")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.120, -1.8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.075, -1.8)
 item_data = ExtResource("d_small_5")
 
 [node name="small_6" parent="TestItems" instance=ExtResource("2_item")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.25, 0.135, -3.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.25, 0.150, -3.4)
 item_data = ExtResource("d_small_6")
 
 [node name="small_7" parent="TestItems" instance=ExtResource("2_item")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.150, -3.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 0.090, -3.4)
 item_data = ExtResource("d_small_7")
 
 [node name="medium_1" parent="TestItems" instance=ExtResource("2_item")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0.225, -3.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 0.200, -3.4)
 item_data = ExtResource("d_medium_1")
 
 [node name="large_1" parent="TestItems" instance=ExtResource("2_item")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.25, 0.400, -3.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.25, 0.450, -3.4)
 item_data = ExtResource("d_large_1")

@@ -1,8 +1,11 @@
 class_name TestItem
 extends StaticBody3D
-## Objet de test ramassable. Le cube suit l'emprise de l'ItemData (x, z = emprise ; hauteur = x).
+## Objet de test ramassable. Le cube suit l'ItemData (x, z = emprise ; hauteur = height).
 
 @export var item_data: ItemData
+
+## Surface de pose porteuse (null tant que l'objet n'est pas posé ; vidée à la reprise).
+var support_surface: PlacementSurface = null
 
 
 func _ready() -> void:
@@ -18,4 +21,4 @@ func _ready() -> void:
 
 
 static func cube_size(data: ItemData) -> Vector3:
-	return Vector3(data.footprint.x, data.footprint.x, data.footprint.y)
+	return Vector3(data.footprint.x, data.height, data.footprint.y)
