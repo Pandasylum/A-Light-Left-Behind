@@ -91,8 +91,8 @@ Types de saleté et outils :
   - Gros objets (armoires, commodes, tables).
   - Objets fixes (radiateurs, installations, éléments muraux) : ne peuvent pas être déplacés.
 - Collisions : un placement qui chevauche est refusé, sauf l'empilement autorisé (voir Empilement).
-- Un objet tombe s'il est lâché ou posé trop près du bord de son support. Il est alors décalé au plus court hors du support quitté, vers un point de dépôt atteignable (jamais dans un mur ni sous un meuble inaccessible). Un objet tombé n'est jamais détruit ni perdu ; il passe en « non rangé », sans autre conséquence. Avant le premier passage d'une pièce à 100 %, un objet tombé fait baisser le pourcentage. Au premier passage à 100 %, le statut « restaurée » de la pièce est verrouillé définitivement (verrou par pièce). Un axe ajouté plus tard (par exemple la réparation) ne retire pas ce statut.
-- Meubles (décision validée le 2026-11-10) : le meuble libre est la palette ; les meubles fixes sont la table, l'étagère basse et la bibliothèque. Un meuble libre peut être déplacé après avoir été nettoyé et réparé ; son positionnement reste libre. La palette ne se déplace que vide (règle ci-dessus). Le souhait de déplacer la table est abandonné.
+- Un objet tombe s'il est lâché ou posé trop près du bord de son support. Il est alors décalé au plus court hors du support quitté, vers un point de dépôt atteignable (jamais dans un mur ni sous un meuble inaccessible). Un objet tombé n'est jamais détruit ni perdu ; il passe en « non rangé », sans pénalité supplémentaire ; le pourcentage se rétablit dès que l'objet est reposé. Avant le premier passage d'une pièce à 100 %, un objet tombé fait baisser le pourcentage. Au premier passage à 100 %, le statut « restaurée » de la pièce est verrouillé définitivement (verrou par pièce). Un axe ajouté plus tard (par exemple la réparation) ne retire pas ce statut.
+- Meubles (décision validée le 2026-11-10) : les meubles libres sont la palette et la table ; les meubles fixes sont l'étagère basse et la bibliothèque. Un meuble libre peut être déplacé après avoir été nettoyé et réparé ; son positionnement reste libre. La palette et la table ne se déplacent que vides (règle ci-dessus).
 - Un message d'indice explique au joueur pourquoi un support qui porte des objets ne peut pas être déplacé.
 - Les installations fixes et gros équipements ne sont pas déplaçables.
 - Les réparations de meubles dépendent de leur matériau.
@@ -135,7 +135,7 @@ Types de saleté et outils :
 - Apprentissage libre avec indices : le personnage commente à voix haute (par exemple « Il faudrait que je récupère cette éponge pour nettoyer »), sans jamais forcer le joueur.
 - Les outils de nettoyage sont trouvés progressivement dans la pièce.
 - La ceinture est une récompense : le joueur trouve une clé pendant le rangement (par exemple sur une table) ; le personnage dit en substance qu'il se demande ce qu'elle ouvre. Un vieux coffre en bois fermé à clé, placé à côté de la porte de sortie, contient la ceinture.
-- Le coffre en bois est le gros objet utilisé pour apprendre : saisir un objet volumineux, le porter à deux mains, le déposer à un emplacement précis et le tourner selon les orientations prédéfinies.
+- Le coffre en bois est le gros objet utilisé pour apprendre : saisir un objet volumineux, le porter à deux mains, le déposer à un emplacement précis et le faire pivoter autour de la verticale.
 - Le joueur découvre seul la nécessité de rincer le seau ; le personnage peut la commenter.
 - Durée visée : 15 minutes.
 - Sortie de la pièce 1 : 100 % de la pièce requis ET possession de la ceinture.
