@@ -75,9 +75,9 @@ Types de saleté et outils :
 - Le joueur choisit librement leur position précise dans l'espace autorisé par l'emplacement logique.
 - La manipulation est volontairement simplifiée et se concentre principalement sur les surfaces ; elle ne vise pas une simulation physique complexe.
 - Le placement est libre, avec une aimantation douce sur les surfaces. Les objets sont figés une fois posés (pas de simulation physique persistante).
-- La rotation se fait par paliers, avec une touche ou la molette (valeur proposée : 15°, à confirmer). Chaque objet a des orientations autorisées (par exemple un livre debout ou à plat).
+- Orientation (décision validée le 2026-11-10) : le joueur ne règle que l'angle autour de la verticale, par paliers, avec une touche ou la molette. Il ne choisit jamais de posture. Quelques objets ont plusieurs postures (par exemple un livre : à plat ou debout) ; la posture est imposée par la zone de pose (bibliothèque = debout, surface de table = à plat). Hors zone de pose, la posture par défaut est « à plat ». La valeur du pas de rotation est un réglage de départ, à ajuster après essai (grossier par défaut, mode fin optionnel si l'essai le réclame) : voir TECHNICAL.md.
 - Rangement : zones souples par catégorie d'objets, sans position imposée. Un objet est rangé s'il repose directement sur un support déclaré, dans une zone qui accepte sa catégorie. Le sol de la pièce n'est jamais une zone. Un support déclaré (palette, étagère basse…) n'est pas du sol, même posé au niveau du sol. Un objet posé sur un autre objet qui n'est pas un support déclaré n'est pas rangé. Déplacer un support qui porte des objets est interdit.
-- Empilement : un petit objet peut être posé sur un objet plus gros (exemple : une lampe de table sur un gros carton) ; les petits objets sont empilables entre eux (livres).
+- Empilement par catégorie (décision validée le 2026-11-10) : un petit objet peut être posé sur tout (exemple : une lampe de table sur un gros carton) ; un objet moyen peut être posé sur un gros objet ; rien ne se pose sur un objet fixe, sauf les supports déclarés fixes (une étagère fixe reste une zone de pose). Petit sur petit (livres) est permis physiquement mais l'objet du dessus est « non rangé » (règle ci-dessus : objet posé sur un non-support). Marge au bord et couverture minimale du support sont des réglages de départ, à ajuster après essai : voir TECHNICAL.md.
 - Murs : objets décoratifs et cadres. Pas de plafond (exception possible : la réparation d'un lustre).
 - Prise en main : le joueur dispose d'une main (un objet) et d'une ceinture qui n'accepte que les petits objets (capacité de départ et améliorations : voir la ceinture ci-dessous).
   - Petit objet : pris en main si elle est libre ; sinon rangé dans la ceinture si un emplacement est libre ; sinon refusé.
@@ -90,9 +90,9 @@ Types de saleté et outils :
   - Objets moyens (chaises, caisses, tabourets).
   - Gros objets (armoires, commodes, tables).
   - Objets fixes (radiateurs, installations, éléments muraux) : ne peuvent pas être déplacés.
-- Collisions : un placement qui chevauche est refusé, sauf l'empilement de petits objets.
-- Un objet tombe au sol s'il est lâché ou posé trop près du bord de son support. Avant le premier passage d'une pièce à 100 %, un objet tombé fait baisser le pourcentage. Au premier passage à 100 %, le statut « restaurée » de la pièce est verrouillé définitivement (verrou par pièce). Un axe ajouté plus tard (par exemple la réparation) ne retire pas ce statut.
-- Les meubles libres peuvent être déplacés après avoir été nettoyés et réparés ; leur positionnement reste libre.
+- Collisions : un placement qui chevauche est refusé, sauf l'empilement autorisé (voir Empilement).
+- Un objet tombe s'il est lâché ou posé trop près du bord de son support. Il est alors décalé au plus court hors du support quitté, vers un point de dépôt atteignable (jamais dans un mur ni sous un meuble inaccessible). Un objet tombé n'est jamais détruit ni perdu ; il passe en « non rangé », sans autre conséquence. Avant le premier passage d'une pièce à 100 %, un objet tombé fait baisser le pourcentage. Au premier passage à 100 %, le statut « restaurée » de la pièce est verrouillé définitivement (verrou par pièce). Un axe ajouté plus tard (par exemple la réparation) ne retire pas ce statut.
+- Meubles (décision validée le 2026-11-10) : le meuble libre est la palette ; les meubles fixes sont la table, l'étagère basse et la bibliothèque. Un meuble libre peut être déplacé après avoir été nettoyé et réparé ; son positionnement reste libre. La palette ne se déplace que vide (règle ci-dessus). Le souhait de déplacer la table est abandonné.
 - Un message d'indice explique au joueur pourquoi un support qui porte des objets ne peut pas être déplacé.
 - Les installations fixes et gros équipements ne sont pas déplaçables.
 - Les réparations de meubles dépendent de leur matériau.
@@ -322,7 +322,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
    - relation entre le déblocage de l'escalier et celui du dernier étage (lampe) ;
    - mécanisme de l'évolution de l'atmosphère (globale ou par pièce) ;
    - rôle, contenu et fonctionnement du journal (mentionné comme découverte du noyau de départ).
-3. Liste des orientations autorisées par objet.
+3. Liste des postures par objet et par zone de pose (voir §5, Orientation).
 4. ~~Liste, ordre et coûts des améliorations d'outils.~~ Fusionné au point 5.
 5. Catalogue des améliorations d'outils (arbres, contenu de chacun) et ordre de déblocage. Les améliorations n'ont pas de coût en matériaux : elles se débloquent par la récupération d'items d'amélioration. L'éponge abrasive en est le premier exemple.
    Contenu précis restant de l'atelier (voir « Pièce 2 — atelier », §6) et du reste de la première pièce tutorielle (voir « Pièce 1 — tutoriel », §6). Points ouverts de l'atelier :
@@ -343,12 +343,12 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 15. Rythme de salissure des outils, signal visuel d'outil sale, effet exact des améliorations du seau sur la fréquence de rinçage.
 16. Comportement de l'outil multifonction selon la cible.
 17. ~~Définition de « désordre ».~~ Réglé : critère de rangement testable (§5).
-18. Règles d'empilement par catégorie d'objets (petits, moyens, gros, fixes).
+18. ~~Règles d'empilement par catégorie d'objets.~~ Réglé : voir §5, Empilement (2026-11-10).
 19. Liste des zones de rangement par catégorie.
-20. Valeur des paliers de rotation (15° à confirmer).
-21. Articulation entre orientations autorisées et paliers de rotation.
+20. Valeur du pas de rotation (grossier par défaut, mode fin optionnel après essai) : réglage de départ, voir TECHNICAL.md.
+21. ~~Articulation entre orientations autorisées et paliers de rotation.~~ Réglé : le joueur ne règle que l'angle vertical, la posture est imposée par la zone (§5).
 22. ~~Portée du 100 % acquis (par pièce ou global).~~ Réglé : verrou par pièce, au premier 100 % (§5).
-23. Distance limite au bord d'un support et signal d'aperçu avant le placement.
+23. Marge au bord (petite) et couverture minimale (généreuse) : réglages de départ, voir TECHNICAL.md. Signal d'aperçu avant le placement, et marche lente en bascule (à confirmer en jeu).
 24. Emplacements et ordre de découverte des outils dans la pièce 1.
 25. Ordre entre l'ouverture du coffre, son rangement et la sortie.
 26. ~~Traitement du métal corrodé avant réparation.~~ Réglé : intégré à la réparation (§5/§6).
