@@ -216,6 +216,7 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 - Coopération à deux joueurs, uniquement si elle devient techniquement réaliste sans compromettre l'expérience solo. Aucune contrainte d'architecture ne doit être imposée à la première version pour cette possibilité.
 - Nouveaux espaces après la campagne (sous-sol, cabanon extérieur, autres extensions).
 - Passage sous le phare pouvant éventuellement conduire jusqu'à la côte : idée d'extension future, pas une fonctionnalité requise pour la sortie initiale.
+- Support manette en bonus, si facile. Non engagé : le clavier/souris reste la référence.
 
 ## 15. Points à préciser pendant le prototypage 🟡
 
