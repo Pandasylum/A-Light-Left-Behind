@@ -9,6 +9,8 @@ const PITCH_LIMIT: float = deg_to_rad(89.0)
 @export var mouse_sensitivity: float = 0.002 ## rad/pixel
 @export var gravity: float = 9.8 ## m/s²
 
+@export_range(1, 5) var belt_capacity: int = 1 ## emplacements de ceinture (SMALL), 1 au départ, 5 au maximum
+
 @export var fall_limit_y: float = -10.0 ## m ; sous cette hauteur, retour au départ
 
 @onready var head: Node3D = $Head
