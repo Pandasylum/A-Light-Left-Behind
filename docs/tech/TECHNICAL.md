@@ -28,3 +28,9 @@ Actions définies dans `game/project.godot` (clavier/souris, touches provisoires
 - Interface : `inventory_open`, `journal_open`, `pause_menu`
 
 Vérification automatique : `tools/check_project.sh` (Godot headless Linux, version épinglée à 4.7.2).
+
+## Sauvegarde ✅
+- Service `SaveService` (autoload) : enveloppe JSON {format_version, written_at, checksum, payload}, écriture via .tmp relu et validé, ancienne sauvegarde conservée en .bak.
+- Le JSON de Godot relit tous les nombres en flottants (un entier revient en 1.0) : les consommateurs convertissent en entier à la lecture.
+- Les vecteurs sont stockés sous forme de tableaux ; aucun objet sérialisé, le fichier est traité comme non fiable.
+- Une version de format plus récente que celle supportée est refusée ; point d'extension `_migrate` vide.
