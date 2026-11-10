@@ -25,6 +25,10 @@ Documents rangés dans `docs/` : `core/` (GDD, PROJECT_RULES, PLAN_DE_PRODUCTION
 - Ne crée aucun nouveau document sans demande explicite du prompt.
 - Modifications ciblées, jamais de réécriture complète.
 
+## Godot
+- Après toute modification sous `game/` : lance `tools/check_project.sh`.
+- Si le téléchargement de Godot échoue : une seule tentative, puis arrête-toi et signale.
+
 ## Git
 - Branche indiquée par le prompt. Un commit clair, une PR avec description courte.
 - Si un push échoue (403 ou autre) : une seule tentative, puis arrête-toi et signale.
