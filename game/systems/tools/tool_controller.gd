@@ -32,7 +32,21 @@ func _ready() -> void:
 	_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	_label.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_label.position += Vector2(-16.0, 16.0)
+	var carry: Node = _player.get_node_or_null(^"CarryController") if _player != null else null
+	if carry != null and carry.has_signal(&"held_changed"):
+		carry.connect(&"held_changed", on_held_item_changed)
 	equip(tool)
+
+
+## Point unique de relâchement : l'outil n'est plus tenu -> le verrou caméra est relâché.
+func set_tool_held(held: bool) -> void:
+	if not held and _player != null:
+		_player.set_camera_locked(false)
+
+
+## L'objet tenu a changé (prise = rangement de l'outil, changement, dépôt) : verrou relâché.
+func on_held_item_changed() -> void:
+	set_tool_held(false)
 
 
 ## Équipe un outil propre (null = retire l'outil).
@@ -40,6 +54,7 @@ func equip(tool_data: ToolData) -> void:
 	tool = tool_data
 	state = ToolState.new(tool_data) if tool_data != null else null
 	_stroking = false
+	set_tool_held(tool_data != null)
 	_refresh_label()
 
 

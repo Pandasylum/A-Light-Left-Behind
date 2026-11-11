@@ -21,8 +21,10 @@ const STEP_MARGIN: float = 0.005 ## m, marge au-dessus de l'arête franchie
 @onready var sensor: InteractionSensor = $Head/InteractionSensor
 @onready var prompt: InteractionPrompt = $InteractionPrompt
 
-## Caméra figée (lock_camera maintenu) : le regard ne tourne plus, le curseur est libre dans la fenêtre.
+## Caméra figée (lock_camera, bascule) : le regard ne tourne plus, le curseur est libre dans la fenêtre.
 var camera_locked: bool = false
+
+var _skip_motion: bool = false ## ignore le 1er mouvement après le déverrouillage (pas de saut de caméra)
 
 var _start_position: Vector3
 var _step_hold: float = 0.0 ## s restantes sans gravité après un step-up (passage du bord de la marche)
@@ -41,10 +43,12 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		look_by((event as InputEventMouseMotion).relative)
-	elif event.is_action(&"lock_camera"):
-		if not event.is_echo():
-			set_camera_locked(event.is_pressed())
+		if _skip_motion:
+			_skip_motion = false
+		else:
+			look_by((event as InputEventMouseMotion).relative)
+	elif event.is_action_pressed(&"lock_camera", false):
+		set_camera_locked(not camera_locked)
 	elif slow_walk_toggle and event.is_action_pressed(&"walk_slow", false):
 		_slow_walk_on = not _slow_walk_on
 	elif event.is_action_pressed(&"pause_menu"):
@@ -145,12 +149,13 @@ func check_fall() -> void:
 		velocity = Vector3.ZERO
 
 
-## Fige ou libère la rotation de la caméra. Figée : curseur visible, confiné à la fenêtre
+## Fige ou libère la rotation de la caméra (bascule C ; relâché par ToolController). Figée : curseur visible, confiné à la fenêtre
 ## (les outils visent alors au curseur). Sans effet si la souris n'est pas capturée au départ.
 func set_camera_locked(locked: bool) -> void:
 	if locked == camera_locked or (locked and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED):
 		return
 	camera_locked = locked
+	_skip_motion = not locked ## la recapture peut émettre un grand déplacement relatif
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED if locked else Input.MOUSE_MODE_CAPTURED
 
 
