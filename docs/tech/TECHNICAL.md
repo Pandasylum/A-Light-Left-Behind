@@ -63,7 +63,7 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Périmètre : mousse sur pierre architecturale. Verrière, rambardes et mobilier : décisions séparées.
 - Correspondance point visé / UV analytique via SurfaceMapping : plan (murs droits, marches, contremarches), cylindre (fût, noyau). Maillages quelconques non retenus.
 - Épaisseur en coordonnées monde (projection plane ou cylindrique), mêmes paramètres pour le shader et le CPU. Matériau propre à chaque face ; UV2 = développée linéaire, sans recouvrement.
-- Unité du 100 % : la surface. Reste = texels couverts (épaisseur − propreté > epsilon) / texels couverts initiaux ; nettoyée quand reste ≤ tau.
+- Unité du 100 % : non fixée (GDD §15 pt 2). La face nettoyable (cellule du masque) est une unité technique : état, sauvegarde, fin de geste à tau. Reste = texels couverts (épaisseur − propreté > epsilon) / texels couverts initiaux ; face finie quand reste ≤ tau.
 - Fin de geste ✅ (Direction, 2026-11-11) : à tau, les résidus s'effacent (fondu ≈ 0,5 s) et la surface est nettoyée. Le shader rend la mousse invisible à epsilon.
 - Valeurs 🟡 provisoires, à régler en playtest, constantes uniques : epsilon = 0,05 ; tau = 0,02. Réserve : plafond en m² à rediscuter si 2 % est trop visible sur la plus grande surface.
 - Sauvegarde : JSON du SaveService, R8 compressé puis base64, id = chemin du nœud depuis la racine de la pièce, taille attendue dérivée de la scène, clé absente = sale.
