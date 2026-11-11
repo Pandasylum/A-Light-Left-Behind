@@ -1,6 +1,6 @@
 # A LIGHT LEFT BEHIND — Game Design Document
 
-Dernière mise à jour : 2026-11-10  
+Dernière mise à jour : 2026-11-12  
 Statut : document de référence des décisions de conception validées.
 
 **Légende** : ✅ décision validée · 💡 piste non engagée · 🟡 à préciser pendant le prototypage
@@ -70,10 +70,18 @@ Types de saleté et outils :
 
 🟡 La liste exacte des outils de départ, les types de salissures, les matériaux et les gestes de réparation seront déterminés par le prototype et le contenu de la première pièce.
 
+### Surfaces à nettoyer (décision validée le 2026-11-12)
+
+- Une surface à nettoyer est une zone d'un objet ou du décor reconnaissable par le joueur (plateau, pan de mur, dalle, marche). Elle regroupe plusieurs faces de nettoyage.
+- Les grandes surfaces (sol, grands murs) sont découpées en plusieurs surfaces à nettoyer.
+- Une surface est terminée quand il ne reste que quelques faces sales : seuil absolu, valeur de départ 3 faces, à régler après essai (§15). Le reste se finit automatiquement.
+- Ne pas confondre « surface à nettoyer » (nettoyage) et « surface de pose » (rangement, §5).
+- À la fin de chaque surface : petit retour visuel et sonore discret. Plusieurs variantes sonores, de hauteur légèrement différente, évitent la saturation. La production de ce retour relève d'Art (visuel) et de Sound Design (son).
+
 ## 5. Manipulation, transport et rangement ✅
 
 - Le joueur peut prendre, déplacer et placer les objets libres.
-- Les objets se posent sur des surfaces de pose (étagère, table, crochet, etc.). Le rangement repose sur des zones par catégorie, pas sur des emplacements imposés.
+- Les objets se posent sur des surfaces de pose (étagère, table, crochet, etc. ; à ne pas confondre avec les surfaces à nettoyer, §4). Le rangement repose sur des zones par catégorie, pas sur des emplacements imposés.
 - Le joueur choisit librement leur position précise dans l'espace autorisé par l'emplacement logique.
 - La manipulation est volontairement simplifiée et se concentre principalement sur les surfaces ; elle ne vise pas une simulation physique complexe.
 - Le placement est libre, avec une aimantation douce sur les surfaces. Les objets sont figés une fois posés (pas de simulation physique persistante).
@@ -250,10 +258,21 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 - Pas de message de bienvenue au premier lancement.
 - Les crédits sont accessibles depuis le menu principal uniquement.
 
+### Menu pause, options et recommencer (décision validée le 2026-11-12)
+
+- Écran-titre : Nouvelle partie (remplacée par Continuer dès qu'une sauvegarde existe), Options, Quitter.
+- Pause en jeu : Reprendre, Options, Retour au menu principal, Quitter.
+- Options : identiques à l'écran-titre et en pause. Contenu : mapping des touches, affichage, volumes, puis Recommencer (en rouge).
+- Recommencer : alerte de validation dont le choix par défaut est « Annuler ». Efface la sauvegarde sans modifier les réglages, puis ramène à l'écran-titre, qui affiche alors Nouvelle partie.
+- Pas de réinitialisation des réglages pour l'instant.
+- Retour au menu principal et Quitter sauvegardent la partie. Si une action d'outil est en cours, elle se termine ou s'annule proprement avant.
+
 ### Sauvegarde
 
 - Une seule sauvegarde locale ; pas de synchronisation cloud prévue.
 - Sauvegarde automatique et notification discrète.
+- Déclencheurs de la sauvegarde automatique : rangement d'un outil, sortie, changement de pièce, fin d'une surface à nettoyer (§4). Pas d'intervalle fixe. Détail technique : TECHNICAL.md.
+- Un seul emplacement de sauvegarde ; pas de sauvegarde manuelle (décision validée le 2026-11-12).
 - Export manuel de la sauvegarde dans un fichier et import depuis un fichier.
 - L'import demande confirmation s'il remplace une progression existante.
 - Le fichier importé est contrôlé (intégrité et compatibilité) avant toute modification ; un fichier invalide ou incompatible est rejeté sans toucher à la sauvegarde actuelle.
@@ -360,6 +379,8 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 27. Pièces où la rouille apparaît.
 28. ~~Catalogue des améliorations (l'éponge abrasive en est le premier exemple).~~ Fusionné au point 5.
 29. Mousse tenace : outil et moment de déblocage à définir (piste non validée : face abrasive de l'éponge, comme la rouille).
+30. Taille maximale d'une surface à nettoyer (§4) : à fixer avec Art et Engineering.
+31. Valeur exacte du seuil de fin de surface (§4) : 3 faces sales en valeur de départ, à régler après essai.
 
 ---
 
