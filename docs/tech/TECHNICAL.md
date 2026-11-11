@@ -72,15 +72,19 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Contraintes techniques 🟡 (2026-11-10, propositions pour les lots P1-F2 et P1-F3). (a) Une posture change l'emprise et la hauteur : PlacementCheck et PlacementLanding recevront une forme de pose (emprise, hauteur) ; ItemData.footprint et height restent la posture « à plat ». (b) La posture imposée par la zone suppose un lien PlacementSurface vers la zone, à créer avec le lot de rangement. (c) Atteignabilité du point de chute : anneau d'échantillons autour du point où une capsule joueur tient, avec ligne de vue vers l'objet, appliqué aux chutes seulement.
 
 ## Nettoyage localisé ✅ (2026-11-11)
-- Masque d'état par surface (R8, 0 = sale, 1 = propre). Aucun scalaire d'instance. Remplace le point 4 de la Phase 0.
+- Masque d'état par face nettoyable (CleanableFace) : RG8, R = proprete_salete, G = proprete_mousse ; 0 = sale, 1 = propre. Aucun scalaire d'instance. Remplace le point 4 de la Phase 0.
 - Périmètre : mousse sur pierre architecturale. Verrière, rambardes et mobilier : décisions séparées.
-- Correspondance point visé / UV analytique via SurfaceMapping : plan (murs droits, marches, contremarches), cylindre (fût, noyau). Maillages quelconques non retenus.
-- Épaisseur en coordonnées monde (projection plane ou cylindrique), mêmes paramètres pour le shader et le CPU. Matériau propre à chaque face ; UV2 = développée linéaire, sans recouvrement.
+- Correspondance point visé / UV analytique via SurfaceMapping : plan (murs droits, contremarches), cylindre (fût, noyau), secteur polaire (dessus de marche). Maillages quelconques non retenus.
+- Épaisseur et textures de pierre et de mousse en projection monde (plane ou cylindrique), mêmes paramètres pour le shader et le CPU ; échantillonneurs d'épaisseur sans mipmap (parité CPU/GPU). L'état est lu par l'UV2 de la face (îlot 0..1, v inversée par l'export glTF). Matériau propre à chaque face.
 - Unité du 100 % : non fixée (GDD §15 pt 2). La face nettoyable (cellule du masque) est une unité technique : état, sauvegarde, fin de geste à tau. Reste = texels couverts (épaisseur − propreté > epsilon) / texels couverts initiaux ; face finie quand reste ≤ tau.
 - Fin de geste ✅ (Direction, 2026-11-11) : à tau, les résidus s'effacent (fondu ≈ 0,5 s) et la surface est nettoyée. Le shader rend la mousse invisible à epsilon.
 - Valeurs 🟡 provisoires, à régler en playtest, constantes uniques : epsilon = 0,05 ; tau = 0,02. Réserve : plafond en m² à rediscuter si 2 % est trop visible sur la plus grande surface.
-- Sauvegarde : JSON du SaveService, R8 compressé puis base64, id = chemin du nœud depuis la racine de la pièce, taille attendue dérivée de la scène, clé absente = sale.
-- Noms : proprete_mousse, epaisseur_mousse, proprete_surface ; plus tard proprete_mousse_tenace et epaisseur_mousse_tenace.
+- Sauvegarde : JSON du SaveService, RG8 compressé sans perte puis base64, id = chemin du nœud depuis la racine de la pièce, taille attendue dérivée de la scène, clé absente = sale. Faces intactes absentes. Le poids n'est pas sauvegardé.
+- Noms : proprete_salete et proprete_mousse (états) ; masque_salete et masque_mousse (épaisseurs, vocabulaire d'Art) ; proprete_surface ; plus tard proprete_mousse_tenace et masque_mousse_tenace.
+- Écarts du spike P2-N1 validés par le développeur (2026-11-11) : reste pondéré par l'aire (le compte de texels est aussi tenu) ; fondu de fin de geste purement visuel, état écrit propre immédiatement ; dose de clean_stroke répartie sur les tampons ; l'éponge nettoie les deux couches ensemble (GDD §4) ; l'aire sale fine remplace l'aire grossière au premier contact.
+- Poids par aire sale initiale 🟡 (proposition Direction, non validée) : mesure seulement, non branché au 100 %, non sauvegardé.
+- Provisoire 🟡 : échelles de texture (Art), profil du pinceau (playtest).
+- À corriger : projection des faces verticales sur le plan de la face et préchauffage de la grille fine (lot P2-N2) ; subdivision du dessus de marche et masques en Lossless (Art).
 
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
