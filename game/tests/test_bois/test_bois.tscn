@@ -1,0 +1,112 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://tests/test_bois/test_bois.gd" id="1_scr"]
+[ext_resource type="Shader" path="res://tests/test_bois/bois.gdshader" id="2_sha"]
+[ext_resource type="Texture2D" path="res://tests/test_bois/tex/bois_albedo.jpg" id="3_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_bois/tex/bois_normal.jpg" id="4_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_bois/tex/bois_rugosite.jpg" id="5_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_bois/tex/masque_etat.png" id="6_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_bois/tex/bruit_tuilable.png" id="7_tex"]
+
+[sub_resource type="ShaderMaterial" id="Mat_bois"]
+shader = ExtResource("2_sha")
+shader_parameter/albedo_bois = ExtResource("3_tex")
+shader_parameter/normal_bois = ExtResource("4_tex")
+shader_parameter/roughness_bois = ExtResource("5_tex")
+shader_parameter/rugosite_bois = 1.0
+shader_parameter/force_normal = 1.0
+shader_parameter/uv_echelle = Vector2(1, 1)
+shader_parameter/masque_etat = ExtResource("6_tex")
+shader_parameter/douceur = 0.08
+shader_parameter/bruit = ExtResource("7_tex")
+shader_parameter/bruit_echelle = 3.0
+shader_parameter/bruit_force = 0.5
+shader_parameter/poussiere_couleur = Color(0.62, 0.6, 0.56, 1)
+shader_parameter/poussiere_eclaircit = 0.45
+shader_parameter/poussiere_desature = 0.8
+shader_parameter/poussiere_matite = 1.0
+shader_parameter/poussiere_aplatit = 0.35
+shader_parameter/douceur_poussiere = 0.3
+shader_parameter/traces_couleur = Color(0.3, 0.25, 0.22, 1)
+shader_parameter/traces_force = 0.85
+shader_parameter/traces_rugosite = 0.75
+shader_parameter/traces_percent_poussiere = 0.8
+shader_parameter/douceur_traces = 0.2
+
+[sub_resource type="PlaneMesh" id="Plan_bois"]
+add_uv2 = true
+size = Vector2(2, 2)
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 1
+background_color = Color(0.06, 0.08, 0.12, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.4, 0.48, 0.62, 1)
+ambient_light_energy = 0.5
+
+[node name="TestBois" type="Node3D"]
+script = ExtResource("1_scr")
+
+[node name="Reference" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 0, 0)
+mesh = SubResource("Plan_bois")
+surface_material_override/0 = SubResource("Mat_bois")
+instance_shader_parameters/proprete = 1.0
+
+[node name="Planche" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0, 0)
+mesh = SubResource("Plan_bois")
+surface_material_override/0 = SubResource("Mat_bois")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.5, 1.9, -0.4)
+current = true
+
+[node name="Lumiere" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.819152, -0.368688, 0.439385, 0, 0.766044, 0.642788, -0.573576, -0.526541, 0.627507, 0, 5, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="Interface" type="CanvasLayer" parent="."]
+
+[node name="Panneau" type="VBoxContainer" parent="Interface"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 424.0
+offset_bottom = 330.0
+
+[node name="Titre" type="Label" parent="Interface/Panneau"]
+text = "Gauche : référence propre — Droite : planche testée"
+
+[node name="EtiquettePropre" type="Label" parent="Interface/Panneau"]
+text = "proprete = 0.00"
+
+[node name="CurseurPropre" type="HSlider" parent="Interface/Panneau"]
+custom_minimum_size = Vector2(400, 0)
+max_value = 1.0
+step = 0.01
+
+[node name="EtiquettePoussiere" type="Label" parent="Interface/Panneau"]
+text = "poussiere = 1.00"
+
+[node name="CurseurPoussiere" type="HSlider" parent="Interface/Panneau"]
+custom_minimum_size = Vector2(400, 0)
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="EtiquetteTraces" type="Label" parent="Interface/Panneau"]
+text = "traces = 1.00"
+
+[node name="CurseurTraces" type="HSlider" parent="Interface/Panneau"]
+custom_minimum_size = Vector2(400, 0)
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="BoutonLumiere" type="Button" parent="Interface/Panneau"]
+text = "Lumière : froide"
+
+[node name="BoutonVue" type="Button" parent="Interface/Panneau"]
+text = "Vue : ensemble"

@@ -43,6 +43,7 @@ Test : `tools/godot.sh --headless --path game --script res://tests/test_inventor
 `game/tests/test_phase1_flow.gd` — scénario de bout en bout de la Phase 1 dans greybox.tscn (prise, rangement auto, rotation, pose, empilement, chute, reprise, meuble libre) — greybox.tscn
 Test : `tools/godot.sh --headless --path game --script res://tests/test_phase1_flow.gd`
 `docs/tech/PHASE1_CHECKLIST.md` — liste de vérification manuelle de la Phase 1 + valeurs provisoires à régler — greybox.tscn
+`game/tests/test_bois/test_bois.tscn` + `.gd` + `bois.gdshader` — test art NON OFFICIEL du bois à deux canaux (poussière mate + traces sombres) : paramètres d'instance proprete/poussiere/traces, masque d'état RVB en UV2 (R ordre de nettoyage, V poussière, B traces), bruit tuilable sur les bords, base Planks037A (CC0 ambientCG) ; planche de référence propre + planche testée, curseurs, lumière froide/chaude, 4 vues — tex/
 `InteractionPrompt.show_message(key)` — message temporaire ~2 s sous l'indice — interaction_prompt.gd
 
 ## Données et ressources
