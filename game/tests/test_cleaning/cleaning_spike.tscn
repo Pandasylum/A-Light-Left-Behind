@@ -1,0 +1,88 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://tests/test_cleaning/cleaning_spike.gd" id="1_scr"]
+[ext_resource type="PackedScene" path="res://systems/player/player.tscn" id="2_player"]
+[ext_resource type="Shader" path="res://systems/cleaning/pierre_nettoyable.gdshader" id="3_sha"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/masque_salete.png" id="4_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_alb_propre_peint.jpg" id="5_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_alb_sale_peint.jpg" id="6_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_rug_propre.jpg" id="7_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_rug_sale.jpg" id="8_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_normal.jpg" id="9_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/mousse_alb_peint.jpg" id="10_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/mousse_normal.jpg" id="11_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/masque_mousse.png" id="12_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/mousse_rug.jpg" id="13_tex"]
+
+[sub_resource type="ShaderMaterial" id="Mat_pierre"]
+shader = ExtResource("3_sha")
+shader_parameter/epsilon = 0.05
+shader_parameter/fondu = 0.0
+shader_parameter/albedo_propre = ExtResource("5_tex")
+shader_parameter/normal_propre = ExtResource("9_tex")
+shader_parameter/roughness_propre = ExtResource("7_tex")
+shader_parameter/rugosite_propre = 1.0
+shader_parameter/force_normal = 1.0
+shader_parameter/metal = 0.0
+shader_parameter/albedo_sale = ExtResource("6_tex")
+shader_parameter/roughness_sale = ExtResource("8_tex")
+shader_parameter/couleur_sale = Color(1, 1, 1, 1)
+shader_parameter/rugosite_sale = 1.0
+shader_parameter/masque_salete = ExtResource("4_tex")
+shader_parameter/douceur = 0.05
+shader_parameter/echelle_epaisseur = Vector2(0.33333334, 0.6666667)
+shader_parameter/poussiere_quantite = 0.25
+shader_parameter/poussiere_couleur = Color(0.55, 0.52, 0.47, 1)
+shader_parameter/albedo_mousse = ExtResource("10_tex")
+shader_parameter/normal_mousse = ExtResource("11_tex")
+shader_parameter/masque_mousse = ExtResource("12_tex")
+shader_parameter/roughness_mousse = ExtResource("13_tex")
+shader_parameter/echelle_mousse = Vector2(0.33333334, 0.33333334)
+shader_parameter/douceur_mousse = 0.25
+shader_parameter/rugosite_mousse = 1.2
+shader_parameter/force_normal_mousse = 1.0
+shader_parameter/uv_echelle = Vector2(0.33333334, 0.6666667)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(10, 0.2, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(10, 0.2, 10)
+
+[sub_resource type="Environment" id="Environment_default"]
+ambient_light_source = 2
+ambient_light_color = Color(0.62, 0.64, 0.7, 1)
+ambient_light_energy = 0.6
+
+[node name="CleaningSpike" type="Node3D"]
+script = ExtResource("1_scr")
+stone_material = SubResource("Mat_pierre")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8660254, 0.3535534, -0.3535534, 0, 0.7071068, 0.7071068, 0.5, -0.6123724, 0.6123724, 0, 5, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_default")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.05, 2.4)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Infos" type="Label" parent="HUD"]
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 700.0
+offset_bottom = 180.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
