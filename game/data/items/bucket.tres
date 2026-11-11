@@ -9,3 +9,4 @@ name_key = "item.bucket"
 category = 1
 footprint = Vector2(0.32, 0.32)
 height = 0.3
+can_support_items = false
