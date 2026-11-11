@@ -11,6 +11,7 @@ const STEP_MARGIN: float = 0.005 ## m, marge au-dessus de l'arête franchie
 @export var mouse_sensitivity: float = 0.002 ## rad/pixel
 @export var gravity: float = 9.8 ## m/s²
 @export var max_step_height: float = 0.3 ## m, PROVISOIRE ; plus haute marche franchie à pied (0 = désactivé)
+@export var step_smooth_time: float = 0.12 ## s, PROVISOIRE ; durée du lissage de la tête après un step-up (0 = aucun)
 
 @export_range(1, 5) var belt_capacity: int = 1 ## emplacements de ceinture (SMALL), 1 au départ, 5 au maximum
 
@@ -25,11 +26,15 @@ var camera_locked: bool = false
 
 var _start_position: Vector3
 var _step_hold: float = 0.0 ## s restantes sans gravité après un step-up (passage du bord de la marche)
+var _head_rest_y: float ## hauteur de repos de Head (locale)
+var _head_offset: float = 0.0 ## m, décalage visuel de Head (<= 0) après un step-up, ramené à 0
+var _head_rate: float = 0.0 ## m/s, vitesse constante de retour de Head, fixée à chaque step-up
 var _slow_walk_on: bool = false ## état de bascule de la marche lente (jamais remis à zéro automatiquement)
 
 
 func _ready() -> void:
 	_start_position = global_position
+	_head_rest_y = head.position.y
 	sensor.target_changed.connect(prompt.set_target)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
@@ -64,6 +69,7 @@ func _physics_process(delta: float) -> void:
 	if grounded:
 		try_step_up(Vector3(velocity.x, 0.0, velocity.z) * delta)
 	move_and_slide()
+	_smooth_head(delta)
 	check_fall()
 
 
@@ -90,8 +96,24 @@ func try_step_up(motion: Vector3) -> bool:
 	if PhysicsServer3D.body_test_motion(get_rid(), _motion_params(raised, motion), null):
 		return false # toujours bloqué une fois relevé : obstacle plus haut que l'arête mesurée
 	global_position.y += edge
+	if step_smooth_time > 0.0:
+		_head_offset -= edge # la tête reste à sa hauteur d'avant, puis redescend à 0 (_smooth_head)
+		_head_rate = absf(_head_offset) / step_smooth_time
+		head.position.y = _head_rest_y + _head_offset
 	_step_hold = _step_clear_distance() / maxf(motion.length() / get_physics_process_delta_time(), 0.01)
 	return true
+
+
+## Ramène le décalage visuel de Head vers 0 à vitesse constante : le décalage cumulé est résorbé en
+## step_smooth_time. N'agit que sur la position de Head (jamais sur le pitch, la descente ni les chutes).
+func _smooth_head(delta: float) -> void:
+	if _head_offset == 0.0:
+		return
+	if step_smooth_time <= 0.0:
+		_head_offset = 0.0
+	else:
+		_head_offset = move_toward(_head_offset, 0.0, _head_rate * delta)
+	head.position.y = _head_rest_y + _head_offset
 
 
 ## Distance horizontale à parcourir pour passer le bord d'une marche : rayon de la capsule + 0,1 m.
