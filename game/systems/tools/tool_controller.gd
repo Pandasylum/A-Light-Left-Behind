@@ -197,6 +197,18 @@ func stroke(from: Vector3, to: Vector3, delta: float) -> float:
 	return cleaned
 
 
+## Section « outils » d'une sauvegarde (clé ToolSlots.SAVE_KEY des données du SaveService).
+func export_tools() -> Dictionary:
+	return slots.export_state()
+
+
+## Restaure les outils depuis la section « outils » ({} = aucun outil ; voir ToolSlots.import_state).
+func import_tools(section: Dictionary, catalog: Array[ToolData]) -> bool:
+	var ok: bool = slots.import_state(section, catalog)
+	_refresh_label()
+	return ok
+
+
 ## Texte de debug : salissure et efficacité effective de l'outil en main ; "Outil : rangé" si
 ## aucun n'est en main ; "" sans emplacement.
 func debug_text() -> String:
