@@ -63,6 +63,7 @@ Types de saleté et outils :
 - Traces et salissures (doigts, graisse, dépôts collants, saleté incrustée) : éponge.
 - Vitres et surfaces vitrées (voile terne, traces d'eau, pluie séchée) : éponge puis raclette.
 - Sols sales (poussière accumulée, traces de pas, boue) : serpillière.
+- Mousse (pierre humide : murs, marches, rebords) : éponge. Une mousse tenace est prévue plus tard (§15).
 - Rouille et corrosion superficielles : éponge avec une face abrasive (amélioration de l'éponge, donc après l'atelier).
 - Métal profondément corrodé : réparation avec les outils de réparation, après un traitement (traitement non défini, §15).
 
@@ -354,6 +355,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 26. ~~Traitement du métal corrodé avant réparation.~~ Réglé : intégré à la réparation (§5/§6).
 27. Pièces où la rouille apparaît.
 28. ~~Catalogue des améliorations (l'éponge abrasive en est le premier exemple).~~ Fusionné au point 5.
+29. Mousse tenace : outil et moment de déblocage à définir (piste non validée : face abrasive de l'éponge, comme la rouille).
 
 ---
 
