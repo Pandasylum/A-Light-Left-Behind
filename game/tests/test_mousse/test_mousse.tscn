@@ -1,0 +1,103 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://tests/test_mousse/test_mousse.gd" id="1_scr"]
+[ext_resource type="Shader" path="res://tests/test_mousse/mousse.gdshader" id="2_sha"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/masque_salete.png" id="3_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_alb_propre_peint.jpg" id="4_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_alb_sale_peint.jpg" id="5_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_rug_propre.jpg" id="6_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_rug_sale.jpg" id="7_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/pierre_normal.jpg" id="8_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/mousse_alb_peint.jpg" id="9_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/mousse_normal.jpg" id="10_tex"]
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/masque_mousse.png" id="11_tex"]
+
+[ext_resource type="Texture2D" path="res://tests/test_mousse/tex/mousse_rug.jpg" id="12_tex"]
+
+[sub_resource type="ShaderMaterial" id="Mat_pierre"]
+shader = ExtResource("2_sha")
+shader_parameter/albedo_propre = ExtResource("4_tex")
+shader_parameter/normal_propre = ExtResource("8_tex")
+shader_parameter/roughness_propre = ExtResource("6_tex")
+shader_parameter/rugosite_propre = 1.0
+shader_parameter/force_normal = 1.0
+shader_parameter/metal = 0.0
+shader_parameter/albedo_sale = ExtResource("5_tex")
+shader_parameter/roughness_sale = ExtResource("7_tex")
+shader_parameter/couleur_sale = Color(1, 1, 1, 1)
+shader_parameter/rugosite_sale = 1.0
+shader_parameter/masque_salete = ExtResource("3_tex")
+shader_parameter/douceur = 0.05
+shader_parameter/poussiere_quantite = 0.25
+shader_parameter/poussiere_couleur = Color(0.55, 0.52, 0.47, 1)
+shader_parameter/albedo_mousse = ExtResource("9_tex")
+shader_parameter/normal_mousse = ExtResource("10_tex")
+shader_parameter/masque_mousse = ExtResource("11_tex")
+shader_parameter/douceur_mousse = 0.25
+shader_parameter/roughness_mousse = ExtResource("12_tex")
+shader_parameter/echelle_mousse = Vector2(1, 0.5)
+shader_parameter/rugosite_mousse = 1.2
+shader_parameter/force_normal_mousse = 1.0
+shader_parameter/uv_echelle = Vector2(1, 1)
+
+[sub_resource type="PlaneMesh" id="Plan_pierre"]
+size = Vector2(4, 2)
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 1
+background_color = Color(0.06, 0.08, 0.12, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.4, 0.48, 0.62, 1)
+ambient_light_energy = 0.5
+
+[node name="TestMousse" type="Node3D"]
+script = ExtResource("1_scr")
+
+[node name="Pierre" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("Plan_pierre")
+material_override = SubResource("Mat_pierre")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 2.4, 0)
+current = true
+
+[node name="Lumiere" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.819152, -0.368688, 0.439385, 0.000000, 0.766044, 0.642788, -0.573576, -0.526541, 0.627507, 0, 5, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="Interface" type="CanvasLayer" parent="."]
+
+[node name="Panneau" type="VBoxContainer" parent="Interface"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 424.0
+offset_bottom = 290.0
+
+[node name="EtiquettePropre" type="Label" parent="Interface/Panneau"]
+text = "proprete = 0.00"
+
+[node name="CurseurPropre" type="HSlider" parent="Interface/Panneau"]
+custom_minimum_size = Vector2(400, 0)
+max_value = 1.0
+step = 0.01
+
+[node name="EtiquetteMousse" type="Label" parent="Interface/Panneau"]
+text = "mousse = 1.00"
+
+[node name="CurseurMousse" type="HSlider" parent="Interface/Panneau"]
+custom_minimum_size = Vector2(400, 0)
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="BoutonLumiere" type="Button" parent="Interface/Panneau"]
+text = "Lumière : froide"
+
+[node name="BoutonStyle" type="Button" parent="Interface/Panneau"]
+text = "Style : peint"
+
+[node name="BoutonVue" type="Button" parent="Interface/Panneau"]
+text = "Vue : ensemble"
