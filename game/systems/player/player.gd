@@ -21,7 +21,7 @@ const STEP_MARGIN: float = 0.005 ## m, marge au-dessus de l'arête franchie
 @onready var sensor: InteractionSensor = $Head/InteractionSensor
 @onready var prompt: InteractionPrompt = $InteractionPrompt
 
-## Caméra figée (lock_camera, bascule) : le regard ne tourne plus, le curseur est libre dans la fenêtre.
+## Caméra figée (lock_camera, bascule) : le regard ne tourne plus, le curseur (masqué) est libre dans la fenêtre.
 var camera_locked: bool = false
 
 var _skip_motion: bool = false ## ignore le 1er mouvement après le déverrouillage (pas de saut de caméra)
@@ -149,14 +149,14 @@ func check_fall() -> void:
 		velocity = Vector3.ZERO
 
 
-## Fige ou libère la rotation de la caméra (bascule C ; relâché par ToolController). Figée : curseur visible, confiné à la fenêtre
-## (les outils visent alors au curseur). Sans effet si la souris n'est pas capturée au départ.
+## Fige ou libère la rotation de la caméra (bascule C ; relâché par ToolController). Figée : curseur système masqué, confiné à la fenêtre
+## (les outils visent alors au curseur, montré par le marqueur du ToolController). Sans effet si la souris n'est pas capturée au départ.
 func set_camera_locked(locked: bool) -> void:
 	if locked == camera_locked or (locked and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED):
 		return
 	camera_locked = locked
 	_skip_motion = not locked ## la recapture peut émettre un grand déplacement relatif
-	Input.mouse_mode = Input.MOUSE_MODE_CONFINED if locked else Input.MOUSE_MODE_CAPTURED
+	Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN if locked else Input.MOUSE_MODE_CAPTURED
 
 
 ## Applique une rotation souris (en pixels) : yaw sur Player, pitch sur Head.
