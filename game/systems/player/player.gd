@@ -3,12 +3,14 @@ extends CharacterBody3D
 ## Joueur à la première personne. Yaw sur Player, pitch sur Head. Valeurs provisoires.
 
 const PITCH_LIMIT: float = deg_to_rad(89.0)
+const STEP_MARGIN: float = 0.005 ## m, marge au-dessus de l'arête franchie
 
 @export var walk_speed: float = 2.5 ## m/s
 @export var slow_walk_speed: float = 1.2 ## m/s
 @export var slow_walk_toggle: bool = true ## true : walk_slow bascule la marche lente ; false : maintenu
 @export var mouse_sensitivity: float = 0.002 ## rad/pixel
 @export var gravity: float = 9.8 ## m/s²
+@export var max_step_height: float = 0.3 ## m, PROVISOIRE ; plus haute marche franchie à pied (0 = désactivé)
 
 @export_range(1, 5) var belt_capacity: int = 1 ## emplacements de ceinture (SMALL), 1 au départ, 5 au maximum
 
@@ -22,6 +24,7 @@ const PITCH_LIMIT: float = deg_to_rad(89.0)
 var camera_locked: bool = false
 
 var _start_position: Vector3
+var _step_hold: float = 0.0 ## s restantes sans gravité après un step-up (passage du bord de la marche)
 var _slow_walk_on: bool = false ## état de bascule de la marche lente (jamais remis à zéro automatiquement)
 
 
@@ -54,9 +57,58 @@ func _physics_process(delta: float) -> void:
 	var horizontal: Vector3 = compute_horizontal_velocity(input_dir, is_slow_walking())
 	velocity.x = horizontal.x
 	velocity.z = horizontal.z
-	velocity.y = 0.0 if is_on_floor() else velocity.y - gravity * delta
+	if _step_hold > 0.0:
+		_step_hold -= delta
+	var grounded: bool = is_on_floor() or _step_hold > 0.0
+	velocity.y = 0.0 if grounded else velocity.y - gravity * delta
+	if grounded:
+		try_step_up(Vector3(velocity.x, 0.0, velocity.z) * delta)
 	move_and_slide()
 	check_fall()
+
+
+## Step-up : si le déplacement horizontal `motion` est arrêté par un obstacle vertical (marche) d'au plus
+## max_step_height, pose le joueur à la hauteur du dessus de la marche et suspend la gravité le temps de
+## passer le bord (_step_hold), sinon la capsule glisserait sur l'arête. Retourne true si le joueur a été relevé.
+## Sans effet sans mouvement, sur une pente franchissable, sans sol au-dessus de la marche ou si l'obstacle est trop haut.
+func try_step_up(motion: Vector3) -> bool:
+	if max_step_height <= 0.0 or motion.length_squared() < 1e-10:
+		return false
+	var blocked: PhysicsTestMotionResult3D = PhysicsTestMotionResult3D.new()
+	if not PhysicsServer3D.body_test_motion(get_rid(), _motion_params(global_transform, motion), blocked):
+		return false
+	if blocked.get_collision_normal().y > cos(floor_max_angle) or blocked.get_collision_normal().y < -0.1:
+		return false # sol ou pente franchissable, ou plafond : pas une marche
+	# Hauteur de l'arête heurtée au-dessus des pieds, plus une marge ; au-delà du maximum : pas franchissable.
+	var edge: float = blocked.get_collision_point().y - global_position.y + STEP_MARGIN
+	if edge > max_step_height or edge <= STEP_MARGIN:
+		return false
+	var up: Vector3 = Vector3.UP * edge
+	if PhysicsServer3D.body_test_motion(get_rid(), _motion_params(global_transform, up), null):
+		return false # tête contre un plafond
+	var raised: Transform3D = global_transform.translated(up)
+	if PhysicsServer3D.body_test_motion(get_rid(), _motion_params(raised, motion), null):
+		return false # toujours bloqué une fois relevé : obstacle plus haut que l'arête mesurée
+	global_position.y += edge
+	_step_hold = _step_clear_distance() / maxf(motion.length() / get_physics_process_delta_time(), 0.01)
+	return true
+
+
+## Distance horizontale à parcourir pour passer le bord d'une marche : rayon de la capsule + 0,1 m.
+func _step_clear_distance() -> float:
+	var shape_node: CollisionShape3D = get_node_or_null("CollisionShape3D")
+	var radius: float = 0.3
+	if shape_node != null and shape_node.shape is CapsuleShape3D:
+		radius = (shape_node.shape as CapsuleShape3D).radius
+	return radius + 0.1
+
+
+func _motion_params(from: Transform3D, motion: Vector3) -> PhysicsTestMotionParameters3D:
+	var params: PhysicsTestMotionParameters3D = PhysicsTestMotionParameters3D.new()
+	params.from = from
+	params.motion = motion
+	params.margin = safe_margin
+	return params
 
 
 ## Marche lente active : état de bascule, ou touche maintenue si slow_walk_toggle = false.
