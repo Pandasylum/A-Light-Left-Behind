@@ -87,9 +87,11 @@ Types de saleté et outils :
   - Quand la main tient un objet moyen ou gros, toute prise d'objet est refusée, petits objets compris.
   - Un gros objet se porte à deux mains ; un seul à la fois.
   - Le joueur peut échanger l'objet en main avec un objet de la ceinture, sauf si la main tient un objet moyen ou gros.
+  - Outils de nettoyage (décision validée le 2026-11-11) : chaque outil de nettoyage a un emplacement dédié, distinct de la main et de la ceinture. Sortir un outil le place en main ; si le joueur prend un objet, l'outil retourne automatiquement dans son emplacement dédié. Le seau est l'exception : c'est un objet libre, sans emplacement dédié.
 - Catégories d'objets :
   - Petits objets (livres, outils, boîtes, vaisselle).
   - Objets moyens (chaises, caisses, tabourets).
+  - Seau (décision validée le 2026-11-11) : objet libre de catégorie moyenne (MEDIUM). Il peut être ramassé et déplacé avec les règles des objets moyens (pris en main ; toute autre prise refusée pendant le port). Il n'entre jamais dans la ceinture.
   - Gros objets (armoires, commodes, tables).
   - Objets fixes (radiateurs, installations, éléments muraux) : ne peuvent pas être déplacés.
 - Collisions : un placement qui chevauche est refusé, sauf l'empilement autorisé (voir Empilement).
@@ -109,6 +111,7 @@ Types de saleté et outils :
 - La progression principale suit un ordre défini, avec quelques embranchements.
 - Les pièces se débloquent progressivement ; la campagne reste guidée.
 - Une pièce doit atteindre **100 %** pour valider sa restauration et débloquer la suite prévue. Le 100 % couvre tout ce que la pièce permet de faire avec les mécaniques disponibles à ce stade : la pièce 1 ne compte que le nettoyage et le rangement, sans la réparation ; les pièces suivantes comptent la réparation lorsqu'elle est disponible. La définition technique exacte reste ouverte (§15).
+- Le seau est un outil exclu du calcul du 100 % d'une pièce (décision validée le 2026-11-11) : il peut rester au sol sans pénalité et n'est jamais « non rangé ».
 - Les clés, objets d'histoire et autres découvertes narratives ne sont pas obligatoires pour valider une pièce. Leur suivi est séparé de l'objectif de restauration. Exception : la clé du tutoriel est obligatoire, car la ceinture qu'elle ouvre est requise pour sortir de la pièce 1.
 - Les pièces déjà restaurées restent accessibles. Le joueur peut y revenir pour modifier leur organisation ou poursuivre l'entretien.
 - Les pièces sont initialement très sales et encombrées.
@@ -171,7 +174,7 @@ Types de saleté et outils :
   - Éponge : nettoyage courant.
   - Raclette : vitres et surfaces lisses.
   - Serpillière : sols.
-  - Seau : rincer les outils de nettoyage. Sans rinçage, leur efficacité baisse fortement ; un outil sale perd jusqu'à 90 % d'efficacité au maximum, jamais 100 %. Le rinçage est un geste court : le joueur tient l'outil sale et interagit avec le seau. Le seau est améliorable à l'atelier comme les autres outils, ce qui permet de rincer moins souvent.
+  - Seau : rincer les outils de nettoyage. Sans rinçage, leur efficacité baisse fortement ; un outil sale perd jusqu'à 90 % d'efficacité au maximum, jamais 100 %. Le rinçage ne demande pas de prendre le seau : le seau reste au sol. Le rinçage utilise une touche d'interaction distincte de la touche de prise (touche exacte : réglage technique, non décidée ici). Le geste est court : l'outil sale est en main et le joueur interagit avec le seau (décision validée le 2026-11-11). Le seau est améliorable à l'atelier comme les autres outils, ce qui permet de rincer moins souvent.
 - Outils de nettoyage trouvés progressivement dans la pièce 1 ; outils de réparation trouvés progressivement à l'atelier. Les améliorations se débloquent au fil de la progression.
 - Une pièce dédiée, l'atelier, est la deuxième pièce restaurée. Elle introduit la réparation et ses outils, puis permet d'améliorer les outils, ceinture comprise.
 - L'atelier ne fabrique jamais d'objets.
