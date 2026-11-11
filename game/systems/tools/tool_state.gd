@@ -41,6 +41,11 @@ func rinse() -> void:
 	_set_soil(0.0)
 
 
+## Chargement d'une sauvegarde : rétablit la salissure telle quelle (ni rinçage ni usage).
+func restore_soil(value: float) -> void:
+	_set_soil(value)
+
+
 func _set_soil(value: float) -> void:
 	var clamped: float = clampf(value, 0.0, 1.0)
 	if clamped != soil:

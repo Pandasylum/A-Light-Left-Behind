@@ -8,6 +8,9 @@ const SPONGE_SCENE: String = "res://tests/test_tools/sponge_test.tscn"
 const BUCKET_SCENE: String = "res://props/bucket.tscn"
 const ITEM_SCENE: String = "res://props/test_item.tscn"
 const FRAME: float = 1.0 / 60.0
+const SaveServiceScript: GDScript = preload("res://core/save_service.gd")
+const SAVE_DIR: String = "user://test_saves/"
+const SAVE_SLOT: String = "outils"
 
 var _failures: int = 0
 
@@ -29,6 +32,7 @@ func _run() -> void:
 	_test_tool_in_hand(spike, sponge)
 	_test_bucket(spike, sponge)
 	_test_camera_lock(spike, sponge)
+	_test_save(spike, sponge)
 	spike.free()
 
 	await _measure_tour(sponge)
@@ -425,6 +429,108 @@ func _test_camera_lock(spike: Node3D, sponge: ToolData) -> void:
 	_check(not player.camera_locked, "objet tenu change (dépôt) : verrou relâché")
 	item.free()
 	controller.slots.clear()
+
+
+
+# --- Sauvegarde des outils : section « outils » à côté de « nettoyage », aller-retour, ancien format ---
+
+## Écrit puis relit les données par le SaveService (fichier JSON réel) ; {} si l'un des deux échoue.
+func _through_file(service: Node, data: Dictionary) -> Dictionary:
+	var error: int = service.call("save_slot", SAVE_SLOT, data)
+	var loaded: Dictionary = service.call("load_slot", SAVE_SLOT)
+	_check(error == 0 and loaded["ok"], "sauvegarde : écriture et relecture par le SaveService")
+	return loaded["data"] as Dictionary
+
+
+func _same_slots(a: ToolSlots, b: ToolSlots) -> bool:
+	if a.count() != b.count() or a.held_index != b.held_index:
+		return false
+	for index: int in a.count():
+		if a.state_at(index).data != b.state_at(index).data or a.state_at(index).soil != b.state_at(index).soil:
+			return false
+	return true
+
+
+func _test_save(spike: Node3D, sponge: ToolData) -> void:
+	var service: Node = SaveServiceScript.new() as Node
+	service.set("save_dir", SAVE_DIR)
+	# Second outil générique (futur outil) : rien dans la sauvegarde n'est propre à l'éponge.
+	var squeegee: ToolData = sponge.duplicate() as ToolData
+	squeegee.id = &"raclette_test"
+	squeegee.soil_per_m2 = 1.0 / 3.0
+	var catalog: Array[ToolData] = [sponge, squeegee]
+	var face: CleanableFace = _largest_face(spike)
+	var center: Vector3 = _point(face, Vector2(0.5, 0.5))
+	face.ensure_fine_grid()
+	face.clean_stroke(center, center, 0.2, 1.0)
+	var cleaning: Dictionary = CleanableFace.export_room(spike)
+
+	# Aller-retour : un outil sale rangé, un outil sale en main.
+	var source: ToolSlots = ToolSlots.new()
+	source.add_tool(sponge)
+	source.add_tool(squeegee)
+	source.state_at(0).add_cleaned_area(0.337)
+	source.state_at(1).add_cleaned_area(0.7)
+	source.take_out(1)
+	var soils: Array[float] = [source.state_at(0).soil, source.state_at(1).soil]
+	var section: Dictionary = source.export_state()
+	_check(source.held_index == 1 and source.state_at(0).soil == soils[0] and source.state_at(1).soil == soils[1], "export : état des outils inchangé")
+	_check(section.get("version") == ToolSlots.SAVE_VERSION and (section["emplacements"] as Array).size() == 2, "export : version de format + une entrée par outil")
+	var loaded: Dictionary = _through_file(service, {"nettoyage": cleaning, ToolSlots.SAVE_KEY: section})
+	_check(loaded.get("nettoyage") == JSON.parse_string(JSON.stringify(cleaning)), "sauvegarde : section « nettoyage » intacte à côté des outils")
+	var restored: ToolSlots = ToolSlots.new()
+	_check(restored.import_state(loaded.get(ToolSlots.SAVE_KEY, {}) as Dictionary, catalog), "aller-retour : section « outils » acceptée")
+	_check(_same_slots(source, restored), "aller-retour : outils, emplacements, salissure exacte et outil en main rétablis")
+	_check(restored.held() != null and restored.held().data == squeegee and restored.state_at(0).data == sponge, "aller-retour : chaque ToolData retrouvé par son identifiant")
+	_check(restored.export_state() == section, "aller-retour : ré-export identique (ni rinçage ni salissure)")
+	_check(restored.stow() and restored.take_out(0) and restored.held().soil == soils[0], "aller-retour : emplacements utilisables après chargement")
+
+	# Tout rangé, dans le contrôleur du joueur : l'outil propre en main est remplacé par l'état sauvegardé.
+	var controller: ToolController = spike.get_node("Player/ToolController") as ToolController
+	source.stow()
+	loaded = _through_file(service, {"nettoyage": cleaning, ToolSlots.SAVE_KEY: source.export_state()})
+	_hold(controller, sponge)
+	_check(controller.import_tools(loaded.get(ToolSlots.SAVE_KEY, {}) as Dictionary, catalog), "contrôleur : chargement accepté")
+	_check(_same_slots(source, controller.slots) and controller.state == null, "contrôleur : outils rangés et sales comme à la sauvegarde")
+	_check(controller.export_tools() == source.export_state() and controller.debug_text() == "Outil : rangé", "contrôleur : ré-export identique, affichage à jour")
+	controller.take_out()
+	_check(controller.state != null and controller.state.soil == soils[0], "contrôleur : l'outil ressorti porte la salissure sauvegardée")
+
+	# Ancien format : aucune section « outils » -> chargement sans erreur, aucun outil.
+	loaded = _through_file(service, {"nettoyage": cleaning})
+	_check(not loaded.has(ToolSlots.SAVE_KEY) and CleanableFace.import_room(spike, loaded.get("nettoyage", {}) as Dictionary) == 0, "ancien format : nettoyage rechargé sans rejet")
+	_check(controller.import_tools(loaded.get(ToolSlots.SAVE_KEY, {}) as Dictionary, catalog), "ancien format : chargement sans erreur")
+	_check(controller.slots.count() == 0 and controller.state == null and controller.debug_text() == "", "ancien format : le joueur n'a aucun outil")
+	_check((controller.export_tools()["emplacements"] as Array).is_empty(), "sans outil : section exportée vide")
+
+	# Fichier non fiable : toute incohérence = aucun outil (avertissement attendu dans la sortie).
+	var valid: Dictionary = JSON.parse_string(JSON.stringify(section))
+	var cases: Dictionary = {
+		"version plus récente": func(d: Dictionary) -> void: d["version"] = ToolSlots.SAVE_VERSION + 1,
+		"version absente": func(d: Dictionary) -> void: d.erase("version"),
+		"liste absente": func(d: Dictionary) -> void: d["emplacements"] = "x",
+		"outil inconnu": func(d: Dictionary) -> void: ((d["emplacements"] as Array)[0] as Dictionary)["id"] = "inconnu",
+		"outil en double": func(d: Dictionary) -> void: ((d["emplacements"] as Array)[0] as Dictionary)["id"] = "raclette_test",
+		"emplacement en double": func(d: Dictionary) -> void: ((d["emplacements"] as Array)[0] as Dictionary)["emplacement"] = 1,
+		"emplacement hors bornes": func(d: Dictionary) -> void: ((d["emplacements"] as Array)[0] as Dictionary)["emplacement"] = 7,
+		"salissure hors bornes": func(d: Dictionary) -> void: ((d["emplacements"] as Array)[0] as Dictionary)["salissure"] = 1.5,
+		"deux outils en main": func(d: Dictionary) -> void: ((d["emplacements"] as Array)[0] as Dictionary)["en_main"] = true,
+		"champ manquant": func(d: Dictionary) -> void: ((d["emplacements"] as Array)[1] as Dictionary).erase("en_main"),
+	}
+	for label: String in cases:
+		var bad: Dictionary = valid.duplicate(true)
+		(cases[label] as Callable).call(bad)
+		_check(restored.import_state(valid, catalog) and restored.count() == 2, "sauvegarde : état valide rechargé avant le cas « %s »" % label)
+		_check(not restored.import_state(bad, catalog) and restored.count() == 0 and restored.held() == null, "sauvegarde : %s = aucun outil + avertissement" % label)
+
+	controller.slots.clear()
+	CleanableFace.import_room(spike, {})
+	var dir: DirAccess = DirAccess.open(SAVE_DIR)
+	if dir != null:
+		for file: String in dir.get_files():
+			if file.begins_with(SAVE_SLOT + "."):
+				dir.remove(file)
+	service.free()
 
 
 # --- Scène de vérification + mesures : coût par image du frottement dans le tour (188 faces) ---
