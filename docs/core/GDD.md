@@ -87,10 +87,10 @@ Types de saleté et outils :
   - Quand la main tient un objet moyen ou gros, toute prise d'objet est refusée, petits objets compris.
   - Un gros objet se porte à deux mains ; un seul à la fois.
   - Le joueur peut échanger l'objet en main avec un objet de la ceinture, sauf si la main tient un objet moyen ou gros.
-  - Outils de nettoyage (décision validée le 2026-11-11) : chaque outil de nettoyage a un emplacement dédié, distinct de la main et de la ceinture. Sortir un outil le place en main ; si le joueur prend un objet, l'outil retourne automatiquement dans son emplacement dédié. Le seau est l'exception : c'est un objet libre, sans emplacement dédié.
+  - Outils du joueur (décision validée le 2026-11-11) : chaque outil du joueur, de nettoyage comme de réparation (marteau, outil multifonction), a un emplacement dédié, distinct de la main et de la ceinture. Sortir un outil le place en main ; si le joueur prend un objet, l'outil retourne automatiquement dans son emplacement dédié. Hors seau, les outils du joueur ne sont pas des objets : ils échappent aux catégories petit, moyen et gros, et à la ceinture. Le seau est l'exception : c'est un objet libre, sans emplacement dédié. La trousse à outils (pièces de remplacement) reste distincte et n'est pas concernée.
 - Catégories d'objets :
-  - Petits objets (livres, outils, boîtes, vaisselle).
-  - Objets moyens (chaises, caisses, tabourets).
+  - Petits objets (livres, outils, boîtes, vaisselle). Le mot « outils » désigne ici des outils posés comme décor, par exemple un marteau oublié sur un établi (décision validée le 2026-11-11) ; les outils du joueur n'entrent pas dans cette catégorie.
+  - Objets moyens (chaises, caisses, tabourets, seau (décision validée le 2026-11-11)).
   - Seau (décision validée le 2026-11-11) : objet libre de catégorie moyenne (MEDIUM). Il peut être ramassé et déplacé avec les règles des objets moyens (pris en main ; toute autre prise refusée pendant le port). Il n'entre jamais dans la ceinture.
   - Gros objets (armoires, commodes, tables).
   - Objets fixes (radiateurs, installations, éléments muraux) : ne peuvent pas être déplacés.
