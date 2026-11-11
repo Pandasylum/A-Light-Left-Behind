@@ -84,7 +84,8 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Écarts du spike P2-N1 validés par le développeur (2026-11-11) : reste pondéré par l'aire (le compte de texels est aussi tenu) ; fondu de fin de geste purement visuel, état écrit propre immédiatement ; dose de clean_stroke répartie sur les tampons ; l'éponge nettoie les deux couches ensemble (GDD §4) ; l'aire sale fine remplace l'aire grossière au premier contact.
 - Poids par aire sale initiale 🟡 (proposition Direction, non validée) : mesure seulement, non branché au 100 %, non sauvegardé.
 - Provisoire 🟡 : échelles de texture (Art), profil du pinceau (playtest).
-- À corriger : projection des faces verticales sur le plan de la face et préchauffage de la grille fine (lot P2-N2) ; subdivision du dessus de marche et masques en Lossless (Art).
+- Préchauffage de la grille fine (lot P2-N2, 2026-11-11) : en arrière-plan, faces à moins de 4 m du joueur ; repli synchrone au contact d'une face non prête. Valeurs 🟡 provisoires : 4 m, 2 calculs simultanés, parcours toutes les 0,25 s, budget d'affectation 2 ms par image. Projection des faces verticales sur le plan de la face : faite.
+- À corriger : masques d'épaisseur en Lossless (Art, .import à pousser) ; sens de u sur le mur courbe vu de l'intérieur ; montée des marches non vérifiée (collision en rampe ou step-up à tester sur le joueur) ; subdivision du dessus de marche : faite.
 
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
