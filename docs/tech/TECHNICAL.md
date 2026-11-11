@@ -92,10 +92,18 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Efficacité effective = efficacité de base × (1 − salissure × perte maximale). Plancher de 10 % : invariant du code (GDD §7), pas un réglage.
 - Valeurs 🟡 provisoires de l'éponge : saleté et mousse, rayon 0,08 m, efficacité 4,0 dose/s, perte maximale 0,9, salissure 0,5 par m², portée 2,0 m.
 - Aire nettoyée = baisse de remaining_dirty_area() : la salissure arrive par à-coups. Validé par le développeur (2026-11-11), ainsi que le texte de debug.
-- Seau de rinçage : interagir avec lui en tenant l'outil remet la salissure à 0 ; il est sur la couche physique 3 seule.
+- Seau de rinçage : le rinçage remet la salissure à 0 (commande par clic gauche, voir décisions du 11/11/2026 ci-dessous) ; il est sur la couche physique 3 seule.
 - lock_camera ✅ : bascule (touche C), relâchée automatiquement quand l'outil n'est plus tenu ou que l'objet tenu change, et à la prise d'un objet (décision de Direction du 2026-11-10, précisée le 2026-11-11).
-- Seau (2026-11-11, validé) : ItemData MEDIUM, déplaçable, exclu du 100 %, rinçage du seau posé au sol avec une touche distincte de la prise.
+- Seau (2026-11-11, validé) : ItemData MEDIUM, ramassable, exclu du 100 %, non empilable (détail ci-dessous).
 - Outils du joueur (2026-11-11, validé) : emplacement dédié, hors ItemData et hors ceinture ; sortis en main, rangés automatiquement à la prise d'un objet.
+- Décisions du 11/11/2026 (Direction) :
+  - Input Map : `equip_tool` = F (touche physique, provisoire). L'action `rinse_tool` (R) est retirée.
+  - Rinçage : clic gauche sur le seau. Cette commande est distincte de la touche de ramassage.
+  - Sortir l'outil est refusé si la main porte un objet (« une main, un objet ») ; le joueur pose d'abord l'objet, avec un message d'indice (clé `tool.hand_occupied`).
+  - `cycle_item` range l'outil, comme la prise d'un objet : tout changement d'objet en main renvoie l'outil à son emplacement.
+  - La salissure reste attachée à l'outil rangé : ranger l'outil ne le nettoie pas.
+  - Seau : ItemData MEDIUM, ramassable, exclu du 100 %, non empilable (aucun objet ne peut être posé dessus) via le drapeau `ItemData.can_support_items` = false, ajouté par `fix/seau-non-empilable`.
+  - Valeurs 🟡 provisoires du seau : cylindre de 0,32 × 0,32 × 0,30 m ; anneau de marqueur blanc de 20 px, bord de 2 px.
 - Pas encore fait : le ToolController fixe l'outil par export (aucun lien avec l'emplacement dédié) ; seau fixe à rendre ramassable ; l'outil doit remplacer le curseur à l'écran.
 
 ## Hypothèses 🟡
