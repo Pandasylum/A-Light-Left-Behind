@@ -1,8 +1,8 @@
 class_name Bucket
 extends TestItem
 ## Seau de rinçage : objet libre MEDIUM (prise, port et pose : règles de TestItem), exclu du 100 %
-## (son ItemData ne suit aucun axe). Le rinçage passe par ToolController.rinse_at (action
-## rinse_tool, seau posé), jamais par la prise. Forme provisoire : cylindre aux dimensions de l'ItemData.
+## (son ItemData ne suit aucun axe). Le rinçage passe par ToolController.rinse_at (clic gauche
+## sur le seau posé, outil en main), jamais par la prise. Forme provisoire : cylindre aux dimensions de l'ItemData.
 
 
 func _ready() -> void:

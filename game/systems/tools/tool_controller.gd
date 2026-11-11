@@ -4,9 +4,11 @@ extends Node
 ## aucun par défaut. equip_tool sort/range l'outil ; toute prise d'objet le range. Tant que
 ## use_primary est maintenu avec un outil en main, tire un rayon depuis la caméra (centre de l'écran,
 ## ou curseur si la caméra est figée par lock_camera) et nettoie les CleanableFace touchées.
-## rinse_tool rince l'outil en main au seau visé. Texte de debug et marqueur provisoires.
+## Si le rayon touche d'abord un seau posé, le clic rince l'outil (une fois par appui) au lieu de nettoyer.
+## Texte de debug et marqueur provisoires.
 
 const WORLD_LAYER: int = 1
+const BUCKET_LAYER: int = 4 ## couche 3 (valeur de masque)
 const MARKER_SIZE: float = 20.0 ## px, marqueur de visée provisoire
 
 var slots: ToolSlots = ToolSlots.new()
@@ -18,6 +20,7 @@ var last_stroke_usec: int = 0 ## coût du dernier geste (mesure)
 var last_cleaned_area: float = 0.0 ## m² nettoyés par le dernier geste
 
 var _stroking: bool = false
+var _rinse_latched: bool = false ## rinçage déjà fait pour l'appui en cours
 var _last_point: Vector3 = Vector3.ZERO
 var _label: Label
 var _marker: Panel
@@ -53,8 +56,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed(&"equip_tool", false):
 		toggle_tool()
-	elif event.is_action_pressed(&"rinse_tool", false):
-		rinse_at(_sensor.target.get_parent() if _sensor != null and _sensor.target != null else null)
 
 
 func _process(_delta: float) -> void:
@@ -124,7 +125,7 @@ func rinse() -> bool:
 	return true
 
 
-## Action rinse_tool : rince l'outil en main au seau donné. Refusé (false) sans outil en main, si
+## Clic sur un seau : rince l'outil en main au seau donné. Refusé (false) sans outil en main, si
 ## le corps n'est pas un seau ou si le seau est porté (il doit être posé).
 func rinse_at(bucket: Node) -> bool:
 	if state == null or not (bucket is Bucket):
@@ -135,6 +136,8 @@ func rinse_at(bucket: Node) -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	if not Input.is_action_pressed(&"use_primary"):
+		_rinse_latched = false
 	if state == null or _camera == null or not _is_active():
 		_stroking = false
 		return
@@ -145,10 +148,22 @@ func _physics_process(delta: float) -> void:
 		from = _camera.project_ray_origin(cursor)
 		direction = _camera.project_ray_normal(cursor)
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
-			from, from + direction * state.data.reach_m, WORLD_LAYER)
+			from, from + direction * state.data.reach_m, WORLD_LAYER | BUCKET_LAYER)
 	var hit: Dictionary = _camera.get_world_3d().direct_space_state.intersect_ray(query)
+	apply_aim_hit(hit, delta)
+
+
+## Traite le premier objet touché par le rayon de visée (clic maintenu, outil en main) : un seau
+## posé rince une fois par appui et ne nettoie rien derrière lui ; tout autre objet nettoie.
+func apply_aim_hit(hit: Dictionary, delta: float) -> void:
 	if hit.is_empty():
 		_stroking = false
+		return
+	var collider: Object = hit.get("collider")
+	if collider is Bucket:
+		_stroking = false
+		if not _rinse_latched and rinse_at(collider as Bucket):
+			_rinse_latched = true
 		return
 	var point: Vector3 = hit["position"]
 	stroke(_last_point if _stroking else point, point, delta)
