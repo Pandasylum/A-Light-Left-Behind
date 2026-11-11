@@ -1,0 +1,75 @@
+[gd_scene format=3 uid="uid://4m4odvwkefmt"]
+
+[ext_resource type="Script" uid="uid://cy6e3t0lkp00y" path="res://tests/test_salete/test_salete.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://bogpgsnlmc7cf" path="res://tests/test_salete/salete.gdshader" id="2_shader"]
+[ext_resource type="Texture2D" uid="uid://bi0u4lmtkktbb" path="res://tests/test_salete/bois_albedo_propre.png" id="3_alp"]
+[ext_resource type="Texture2D" uid="uid://bxadu8mxfmftm" path="res://tests/test_salete/bois_normal.png" id="4_nor"]
+[ext_resource type="Texture2D" uid="uid://c28ug7jldkcb" path="res://tests/test_salete/bois_roughness_propre.png" id="5_rop"]
+[ext_resource type="Texture2D" uid="uid://3f8ddoq4gyb5" path="res://tests/test_salete/bois_albedo_sale.png" id="6_als"]
+[ext_resource type="Texture2D" uid="uid://c564qmpyepe8b" path="res://tests/test_salete/bois_roughness_sale.png" id="7_ros"]
+[ext_resource type="Texture2D" uid="uid://dj3wfoc0f2rb6" path="res://tests/test_salete/bois_masque_salete.png" id="8_msk"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1"]
+render_priority = 0
+shader = ExtResource("2_shader")
+shader_parameter/albedo_propre = ExtResource("3_alp")
+shader_parameter/normal_propre = ExtResource("4_nor")
+shader_parameter/roughness_propre = ExtResource("5_rop")
+shader_parameter/rugosite_propre = 1.0
+shader_parameter/force_normal = 1.0
+shader_parameter/metal = 0.0
+shader_parameter/albedo_sale = ExtResource("6_als")
+shader_parameter/roughness_sale = ExtResource("7_ros")
+shader_parameter/couleur_sale = Color(1, 1, 1, 1)
+shader_parameter/rugosite_sale = 1.0
+shader_parameter/masque_salete = ExtResource("8_msk")
+shader_parameter/douceur = 0.05
+shader_parameter/poussiere_quantite = 0.3
+shader_parameter/poussiere_couleur = Color(0.55, 0.52, 0.47, 1)
+shader_parameter/uv_echelle = Vector2(2, 2)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_1"]
+size = Vector2(3, 3)
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.08, 0.1, 0.13, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.5, 0.55, 0.65, 1)
+ambient_light_energy = 0.6
+
+[node name="TestSalete" type="Node3D" unique_id=1851182267]
+script = ExtResource("1_script")
+
+[node name="Plan" type="MeshInstance3D" parent="." unique_id=1495737604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.23375261, -0.17588711, 0.23719072)
+material_override = SubResource("ShaderMaterial_1")
+mesh = SubResource("PlaneMesh_1")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1309195987]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 3, 0)
+current = true
+
+[node name="Lumiere" type="DirectionalLight3D" parent="." unique_id=466716877]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 5, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=703065254]
+environment = SubResource("Environment_1")
+
+[node name="Interface" type="CanvasLayer" parent="." unique_id=1129066830]
+
+[node name="Panneau" type="VBoxContainer" parent="Interface" unique_id=946462090]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 424.0
+offset_bottom = 90.0
+
+[node name="Etiquette" type="Label" parent="Interface/Panneau" unique_id=1567896324]
+layout_mode = 2
+text = "proprete = 0.00"
+
+[node name="Curseur" type="HSlider" parent="Interface/Panneau" unique_id=1105306436]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+max_value = 1.0
+step = 0.01

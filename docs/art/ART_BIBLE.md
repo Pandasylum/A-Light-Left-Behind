@@ -80,8 +80,7 @@ Deuxième vague : carrelage / faïence, papier jauni, verre.
 
 2026-11-11 : test technique. Le shader sale/propre à masque (Godot 4.6, Forward+) fonctionne sur un plan avec textures synthétiques. Style non validé.
 
-### Points ouverts
-Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
+2026-11-11 — Règle d'export des modules du fût (PROPOSITION, non officielle)
 
 2026-11-10 : Protocole de test de style validé. Scène : coin d’atelier, une caméra, 3 matériaux (bois, pierre, métal rouillé), 3 objets. 4 captures : froid/chaud × propre/sale. Le style « peint + éclairage réaliste » reste NON OFFICIEL jusqu’au verdict.
 
@@ -93,3 +92,43 @@ Valeurs de palette, résolution des textures, représentation sale / propre (TEC
 #313B12 (moyenne mesurée sur la texture Moss002 étalonnée), à ajuster.
 
 2026-11-11 : Mousse sur pierre, test technique concluant. Couche séparée (albédo, rugosité et normale CC0 Moss002, niveau 2) pilotée par un masque d’épaisseur ; seuil par instance, les zones fines partent en premier. La pierre de base doit être sans mousse. La mousse est mate, la pierre sale est brillante (humide). Points ouverts : bords trop nets (à corriger dans le masque), relief et reflets photographiques sur la pierre sale, mousse contre traces et crasse non testée, mousse tenace non testée.
+
+### Points ouverts
+Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
+
+
+## 2026-11-11 — Modules du fût : règle d'export et tuilage (REMPLACE les deux entrées précédentes)
+
+Origine : demande Engineering (masque d'état par face en UV2, SurfaceMapping cylindre).
+Validé Direction : escalier central hélicoïdal ; marche 1,5 m ; 24 marches par tour. Validé développeur : tuilage N = 12.
+Statut : règle d'export validée pour les modules témoins. Style NON OFFICIEL (test bois non fait). Modules vérifiés dans les .glb par Engineering ; import Godot pas encore testé.
+
+### Valeurs
+- Rayon intérieur du fût R = 2,0 m. Noyau cylindrique R = 0,5 m. Largeur de marche 1,5 m.
+- Tronçons de 15° (360 / 24). Arc du mur ≈ 0,524 m.
+- PARAMÈTRES non figés (étage non décidé) : hauteur d'étage, marches par étage. Cible hauteur de marche 17–19 cm (0,18 m en test).
+- Hauteurs PROVISOIRES : étage 4,32 m, module mur/noyau 2,16 m. Tout changement impose un nouvel export et le test de correspondance Engineering.
+
+### Règle d'export
+1. Mur et noyau : tronçons de cylindre, rayon unique, axe vertical, origine sur l'axe, angle de 0 à θ. Aucune déformation par module.
+2. Marche : face de dessus plane (1 emplacement de matériau) + contremarche plane à l'angle 0 (1 emplacement). Marche k : rotation k·θ, hauteur k·h_marche.
+3. Relief par normal map, jamais par géométrie.
+4. Échelle : 1 unité = 1 m. Axe vertical : Z dans Blender, Y après export glTF.
+5. UV1 (texture, mètres) : mur/noyau = développée linéaire (u = rayon × angle, v = hauteur) ; marche = plan (x, y).
+6. UV2 (masque d'état) : un îlot 0..1 exact par face nettoyable, sans recouvrement. Mur : (angle/θ, hauteur/h). Marche dessus : (radial, angle/θ). Contremarche : (radial, hauteur/h). Faces non nettoyables : (0,0). Ne pas modifier les UV2.
+7. Inversion de v (v = 1 − hauteur) : produite par l'export glTF, déjà prise en compte dans le code Godot. Ne pas la corriger dans Blender.
+8. Un emplacement de matériau par face nettoyable ; le reste = « cache ». Ordre des primitives = ordre des emplacements.
+9. Export glTF (.glb) : UV1 = UV, UV2 = TEXCOORD_1 (UV2 dans Godot).
+
+### Tuilage (N = 12)
+- Pierre et masque d'épaisseur lus en projection cylindrique monde, tuile = circonférence / N entier. Pas de décalage de u par instance.
+- Mur (R = 2,0 m) : N = 12, tuile 1,047 m. Noyau (R = 0,5 m) : N/4 = 3, tuile 1,047 m. Même densité de texture.
+- Pierre et masque à produire tuilables à 1,047 m. Masque d'état basse résolution (≈ 64 px/m), bords adoucis par le shader (seuil + bruit tuilable).
+- Motif visible toutes les ~1 m : variations peintes dans la pierre pour casser la répétition.
+
+### Points ouverts
+- Hauteur d'étage (décide la hauteur de marche).
+- Entrée et sortie du fût : modules « seuil » et sol vers la sortie à définir. Gros bloc à l'entrée qui empiète sur les marches (non localisé).
+- Noyau en coque témoin (0,25 m) ; version finale pleine à décider.
+- Contact marche/mur : bord de marche à 4 segments d'arc, identique au mur.
+- Import Godot non testé (échelle, normales, UV).
