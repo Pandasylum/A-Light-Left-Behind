@@ -80,8 +80,7 @@ Deuxième vague : carrelage / faïence, papier jauni, verre.
 
 2026-11-11 : test technique. Le shader sale/propre à masque (Godot 4.6, Forward+) fonctionne sur un plan avec textures synthétiques. Style non validé.
 
-### Points ouverts
-Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
+2026-11-11 — Règle d'export des modules du fût (PROPOSITION, non officielle)
 
 2026-11-10 : Protocole de test de style validé. Scène : coin d’atelier, une caméra, 3 matériaux (bois, pierre, métal rouillé), 3 objets. 4 captures : froid/chaud × propre/sale. Le style « peint + éclairage réaliste » reste NON OFFICIEL jusqu’au verdict.
 
@@ -93,3 +92,34 @@ Valeurs de palette, résolution des textures, représentation sale / propre (TEC
 #313B12 (moyenne mesurée sur la texture Moss002 étalonnée), à ajuster.
 
 2026-11-11 : Mousse sur pierre, test technique concluant. Couche séparée (albédo, rugosité et normale CC0 Moss002, niveau 2) pilotée par un masque d’épaisseur ; seuil par instance, les zones fines partent en premier. La pierre de base doit être sans mousse. La mousse est mate, la pierre sale est brillante (humide). Points ouverts : bords trop nets (à corriger dans le masque), relief et reflets photographiques sur la pierre sale, mousse contre traces et crasse non testée, mousse tenace non testée.
+
+### Points ouverts
+Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
+
+
+### Origine : demande Engineering (masque d'état par face, UV2, SurfaceMapping cylindre). Validé Direction : escalier central hélicoïdal ; marche 1,5 m ; 24 marches par tour (valeurs de départ, ajustables).
+
+### Valeurs de départ
+
+Rayon intérieur du fût R = 2,0 m. Noyau cylindrique R = 0,5 m. Largeur de marche = 1,5 m.
+Angle d'un tronçon θ = 15° (360 / marches par tour). Arc du mur ≈ 0,524 m.
+Hauteur d'étage et marches par étage : PARAMÈTRES, non figés (étage non décidé). Cible hauteur de marche 17–19 cm (0,18 m en test).
+Hauteur d'un module mur/noyau : paramètre provisoire (2,16 m en test).
+
+### Règle
+
+Mur du fût et noyau : tronçons de cylindre, rayon unique, axe vertical (Z), origine sur l'axe, angle de 0 à θ. Aucune déformation par module.
+Marche : une face plane de dessus (1 emplacement de matériau) + une contremarche plane à l'angle 0 (1 emplacement). Marche k : rotation k·θ, hauteur k·h_marche.
+UV1 (texture, mètres) : mur/noyau = développée linéaire (u = rayon × angle, v = hauteur) ; marche = plan (x, y).
+UV2 (masque d'état) : un îlot 0..1 par face nettoyable, sans recouvrement. Mur : (angle/θ, hauteur/h). Marche dessus : (radial, angle/θ). Contremarche : (radial, hauteur/h). Faces non nettoyables : UV2 à (0,0).
+Un emplacement de matériau par face nettoyable ; tout le reste = emplacement « cache ».
+Relief par normal map, jamais par géométrie. Masque basse résolution (≈ 64 px/m) ; bords adoucis par le shader (seuil + bruit tuilable).
+Export glTF (.glb) : UV1 = UV, UV2 = TEXCOORD_1 (devient UV2 dans Godot). Échelle 1 unité = 1 m.
+
+### Points ouverts
+
+Joint de tuile UV1 : l'arc (0,524 m) n'est pas un multiple de la taille de tuile → raccord visible entre tronçons. Piste : décalage de u par instance (paramètre shader), à voir avec Engineering.
+Rayon, θ, hauteur de module : à figer avant la série, après décision de la hauteur d'étage.
+Contact marche/mur : bord de marche à N_SUB = 4 segments d'arc, identique au mur (pas de jour).
+Noyau en coque témoin (épaisseur 0,25 m) ; version finale pleine à décider.
+Non testé dans Blender/Godot : à vérifier (échelle, normales, UV, import).
