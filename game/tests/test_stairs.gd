@@ -49,6 +49,7 @@ func _run() -> void:
 	_check(reached >= 20, "le joueur monte au moins 20 des 24 marches (%d)" % reached)
 	tour.free()
 	await _test_blocks()
+	await _test_camera_smoothing()
 	quit(1 if _failures > 0 else 0)
 
 
@@ -80,6 +81,52 @@ func _test_blocks() -> void:
 		Input.action_release(&"move_forward")
 		var crossed: bool = player.global_position.z < -2.5
 		_check(crossed == case[1], "muret de %.2f m : franchi = %s (z %.2f, y %.3f)" % [case[0], crossed, player.global_position.z, player.global_position.y])
+		world.free()
+
+
+## Lissage de la tête : marche de 0,18 m montée puis descendue. Mesure l'écart vertical max de la caméra entre deux images.
+func _test_camera_smoothing() -> void:
+	for smooth: float in [0.0, 0.12]:
+		var world: Node3D = Node3D.new()
+		root.add_child(world)
+		_add_box(world, Vector3(20, 1, 20), Vector3(0, -0.5, 0))
+		_add_box(world, Vector3(4, 0.18, 0.5), Vector3(0, 0.09, -2.0))
+		var player: Player = (load("res://systems/player/player.tscn") as PackedScene).instantiate()
+		world.add_child(player)
+		player.global_position = Vector3.ZERO
+		player.step_smooth_time = smooth
+		player.head.rotation.x = 0.4
+		var cam: Camera3D = player.get_node("Head/Camera3D")
+		await _frames(10)
+		Input.action_press(&"move_forward")
+		var prev: float = cam.global_position.y
+		var max_jump: float = 0.0
+		var prev_body: float = player.global_position.y
+		var body_jump: float = 0.0
+		var max_offset: float = 0.0
+		var descent_jump: float = 0.0
+		for i: int in 150:
+			await physics_frame
+			var y: float = cam.global_position.y
+			var jump: float = absf(y - prev)
+			if player.global_position.z > -2.0:
+				max_jump = maxf(max_jump, jump) # montée
+			elif player.global_position.y < 0.1 and player.global_position.z < -2.5:
+				descent_jump = maxf(descent_jump, jump) # après la descente
+			prev = y
+			body_jump = maxf(body_jump, player.global_position.y - prev_body)
+			prev_body = player.global_position.y
+			max_offset = minf(max_offset, player.head.position.y - 1.6)
+		Input.action_release(&"move_forward")
+		print("MESURE lissage %.2f s : saut caméra max %.4f m, saut du corps %.4f m, décalage tête max %.3f m" % [smooth, max_jump, body_jump, max_offset])
+		_check(body_jump > 0.15, "le corps monte toujours instantanément (%.3f m)" % body_jump)
+		_check(is_equal_approx(player.head.rotation.x, 0.4), "le pitch n'est pas touché")
+		_check(is_zero_approx(player.head.position.y - 1.6), "la tête est revenue à 1,6 m")
+		if smooth > 0.0:
+			_check(max_jump < 0.05, "saut de caméra par image < 0,05 m (%.4f)" % max_jump)
+			_check(max_offset < -0.15, "décalage initial ~ hauteur de marche (%.3f)" % max_offset)
+		else:
+			_check(max_jump > 0.15, "sans lissage : saut brut (%.4f)" % max_jump)
 		world.free()
 
 
