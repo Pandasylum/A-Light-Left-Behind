@@ -18,6 +18,9 @@ const PITCH_LIMIT: float = deg_to_rad(89.0)
 @onready var sensor: InteractionSensor = $Head/InteractionSensor
 @onready var prompt: InteractionPrompt = $InteractionPrompt
 
+## Caméra figée (lock_camera maintenu) : le regard ne tourne plus, le curseur est libre dans la fenêtre.
+var camera_locked: bool = false
+
 var _start_position: Vector3
 var _slow_walk_on: bool = false ## état de bascule de la marche lente (jamais remis à zéro automatiquement)
 
@@ -31,14 +34,18 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		look_by((event as InputEventMouseMotion).relative)
+	elif event.is_action(&"lock_camera"):
+		if not event.is_echo():
+			set_camera_locked(event.is_pressed())
 	elif slow_walk_toggle and event.is_action_pressed(&"walk_slow", false):
 		_slow_walk_on = not _slow_walk_on
 	elif event.is_action_pressed(&"pause_menu"):
+		camera_locked = false
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	elif event is InputEventMouseButton:
 		var button: InputEventMouseButton = event
 		if button.pressed and button.button_index == MOUSE_BUTTON_LEFT \
-				and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+				and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED and not camera_locked:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
@@ -62,6 +69,15 @@ func check_fall() -> void:
 	if global_position.y < fall_limit_y:
 		global_position = _start_position
 		velocity = Vector3.ZERO
+
+
+## Fige ou libère la rotation de la caméra. Figée : curseur visible, confiné à la fenêtre
+## (les outils visent alors au curseur). Sans effet si la souris n'est pas capturée au départ.
+func set_camera_locked(locked: bool) -> void:
+	if locked == camera_locked or (locked and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED):
+		return
+	camera_locked = locked
+	Input.mouse_mode = Input.MOUSE_MODE_CONFINED if locked else Input.MOUSE_MODE_CAPTURED
 
 
 ## Applique une rotation souris (en pixels) : yaw sur Player, pitch sur Head.

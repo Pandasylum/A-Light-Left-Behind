@@ -55,11 +55,19 @@ Test : `tools/godot.sh --headless --path game --script res://tests/test_phase1_f
 `game/tests/test_cleaning/cleaning_tour.tscn` — spike NON OFFICIEL P2-N2 : scène héritée de cleaning_spike.tscn, tour complet (24 secteurs, 3 anneaux de mur et de noyau, 24 marches, ouvertures anneau 0 secteurs 22-23 et anneau 2 secteurs 0-1 ; 188 faces) — cleaning_spike.tscn
 `game/tests/test_cleaning.gd` — correspondances (aller-retour, UV2 des .glb), monotonie, compteur incrémental, fin de geste, sauvegarde (aller-retour, corruptions), défaut sale, poids, parité de projection, projection des faces verticales, préchauffage (identique au calcul synchrone), mesures du tour (initialisation, préchauffage, sauvegarde à 0 / 50 / 100 % via le SaveService) ; affiche les mesures — cleaning_spike.tscn, cleaning_tour.tscn, save_service.gd
 Test : `tools/godot.sh --headless --path game --script res://tests/test_cleaning.gd`
+`game/systems/tools/tool_state.gd` — ToolState (RefCounted) : état d'usage d'un outil tenu, logique pure ; salissure 0..1 (add_cleaned_area, monotone), efficacité effective = base × (1 − salissure × perte max), plancher 10 %, rinse(), signal soil_changed — ToolData
+`game/systems/tools/tool_controller.gd` — ToolController (enfant de Player, inactif sans outil) : equip/rinse, use_primary maintenu = rayon caméra (couche 1 ; au curseur si Player.camera_locked) puis stroke() sur les faces du groupe à portée (ensure_fine_grid, clean_stroke, aire nettoyée = baisse de remaining_dirty_area), texte de debug haut-droite (salissure, efficacité, coût du geste) — ToolState, CleanableFace, Player
+`Player.camera_locked` / `set_camera_locked()` — action lock_camera (C, maintenue) : regard figé, curseur visible confiné à la fenêtre, recapture au relâchement — Input Map
+`game/props/rinse_bucket.tscn` + `.gd` — RinseBucket (StaticBody3D, couche 3) : Interactable USE (interact.rinse) -> ToolController.rinse() du joueur — interactable.gd, tool_controller.gd
+`game/tests/test_tools/sponge_test.tscn` + `.gd` — scène de vérification NON OFFICIELLE : instancie cleaning_tour.tscn (pinceau du spike coupé par set_physics_process(false)), équipe l'éponge, seau posé au sol par rayon — cleaning_tour.tscn, rinse_bucket.tscn, sponge.tres
+`game/tests/test_tools.gd` — ToolData.validate, formule d'efficacité (bornes, plancher), salissure monotone, couches, rinçage (ToolState, seau), scène de vérification, coût du frottement dans le tour — tool_*.gd, cleaning_spike.tscn, sponge_test.tscn
+Test : `tools/godot.sh --headless --path game --script res://tests/test_tools.gd`
 
 ## Données et ressources
 `game/data/item_data.gd` — ItemData (Resource) : id, nom, catégorie, emprise, height (m, > 0), orientations, axes suivis, provides_support (meuble libre, MEDIUM/LARGE) ; validate() — aucune
 `game/data/zone_data.gd` — ZoneData (Resource) : id, catégories acceptées (règles d'un volume Area3D de rangement) ; validate() — ItemData
 `game/data/room_data.gd` — RoomData (Resource) : id, nom, pièce précédente, axes actifs ; validate() — aucune
+`game/data/tool_data.gd` + `game/data/tools/sponge.tres` — ToolData (Resource) : id, nom, couches nettoyées (masque saleté/mousse), rayon, efficacité de base, perte maximale (<= 0,9), salissure par m², portée (valeurs provisoires) ; validate() — aucune
 `game/data/placement_rules.gd` — PlacementRules (Resource) : pas de rotation, marge, couverture (valeurs provisoires) ; validate() — aucune
 `game/tests/data_validation_test.gd` — test de validate() des 4 classes de données — game/data/*
 Test : `tools/godot.sh --headless --path game --script res://tests/data_validation_test.gd`

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ToolData" format=3]
+
+[ext_resource type="Script" path="res://data/tool_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"sponge"
+name_key = "tool.sponge"
+layers = 3
+radius_m = 0.08
+base_efficiency = 4.0
+max_efficiency_loss = 0.9
+soil_per_m2 = 0.5
+reach_m = 2.0

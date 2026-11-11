@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/test_tools/sponge_test.gd" id="1_test"]
+[ext_resource type="PackedScene" path="res://tests/test_cleaning/cleaning_tour.tscn" id="2_tour"]
+[ext_resource type="PackedScene" path="res://props/rinse_bucket.tscn" id="3_bucket"]
+[ext_resource type="Resource" path="res://data/tools/sponge.tres" id="4_sponge"]
+
+[node name="SpongeTest" type="Node3D"]
+script = ExtResource("1_test")
+tool = ExtResource("4_sponge")
+
+[node name="Tour" parent="." instance=ExtResource("2_tour")]
+
+[node name="RinseBucket" parent="." instance=ExtResource("3_bucket")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.75, 0.5, 0.1)
