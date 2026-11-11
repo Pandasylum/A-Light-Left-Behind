@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://tests/test_cleaning/cleaning_spike.tscn" id="1_spike"]
+
+[node name="CleaningTour" instance=ExtResource("1_spike")]
+sectors = 24
+wall_rings = 3
+core_rings = 3
+steps = 24
+straight_wall = false
+wall_openings = Array[Vector2i]([Vector2i(0, 22), Vector2i(0, 23), Vector2i(2, 0), Vector2i(2, 1)])
+
+[node name="Player" parent="." index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.05, 0.32)

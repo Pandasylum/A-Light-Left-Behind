@@ -81,10 +81,10 @@ void fragment() {
 	if (proj_mode == 1) {
 		vec2 q = vec2(pos_monde.x - proj_axe_xz.x, -(pos_monde.z - proj_axe_xz.y));
 		float k = proj_rayon_ref / proj_tuile_m;
-		uv_monde = vec2(atan(q.y, q.x) * k, pos_monde.y / proj_tuile_m);
+		uv_monde = vec2(atan(q.y, q.x) * k, -pos_monde.y / proj_tuile_m); // v vers le bas, comme la texture
 		float r2 = max(dot(q, q), 1e-8);
-		dux = vec2((q.x * -dpx.z - q.y * dpx.x) / r2 * k, dpx.y / proj_tuile_m);
-		duy = vec2((q.x * -dpy.z - q.y * dpy.x) / r2 * k, dpy.y / proj_tuile_m);
+		dux = vec2((q.x * -dpx.z - q.y * dpx.x) / r2 * k, -dpx.y / proj_tuile_m);
+		duy = vec2((q.x * -dpy.z - q.y * dpy.x) / r2 * k, -dpy.y / proj_tuile_m);
 	} else {
 		uv_monde = vec2(dot(pos_monde, proj_axe_u), dot(pos_monde, proj_axe_v)) / proj_tuile_m;
 		dux = vec2(dot(dpx, proj_axe_u), dot(dpx, proj_axe_v)) / proj_tuile_m;

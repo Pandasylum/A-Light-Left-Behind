@@ -1,9 +1,11 @@
 extends SceneTree
-## Test du nettoyage localisé (spike P2-N1) + mesures chiffrées.
+## Test du nettoyage localisé (spikes P2-N1 / P2-N2) + mesures chiffrées.
 ## Lancer : tools/godot.sh --headless --path game --script res://tests/test_cleaning.gd
 
 const Spike := preload("res://tests/test_cleaning/cleaning_spike.gd")
 const SPIKE_SCENE: String = "res://tests/test_cleaning/cleaning_spike.tscn"
+const TOUR_SCENE: String = "res://tests/test_cleaning/cleaning_tour.tscn"
+const SaveServiceScript: GDScript = preload("res://core/save_service.gd")
 const RADIUS: float = 0.15
 
 var _failures: int = 0
@@ -34,11 +36,14 @@ func _run() -> void:
 
 	_test_default_dirty()
 	_test_parity()
+	_test_vertical_projection()
+	_test_prewarm()
 	_test_weights()
 	_test_strokes()
 	_test_finish()
 	_test_save()
 	_measure_save()
+	_measure_tour()
 
 	print("test_cleaning : ", "OK" if _failures == 0 else "%d échec(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -191,7 +196,7 @@ func _shader_uv_monde(material: ShaderMaterial, pos: Vector3) -> Vector2:
 		var axis: Vector2 = material.get_shader_parameter(&"proj_axe_xz")
 		var q: Vector2 = Vector2(pos.x - axis.x, -(pos.z - axis.y))
 		var k: float = float(material.get_shader_parameter(&"proj_rayon_ref")) / tile
-		return Vector2(atan2(q.y, q.x) * k, pos.y / tile)
+		return Vector2(atan2(q.y, q.x) * k, -pos.y / tile)
 	var axe_u: Vector3 = material.get_shader_parameter(&"proj_axe_u")
 	var axe_v: Vector3 = material.get_shader_parameter(&"proj_axe_v")
 	return Vector2(pos.dot(axe_u), pos.dot(axe_v)) / tile
@@ -216,13 +221,264 @@ func _test_parity() -> void:
 	_check(_face("Marche3/FaceDessus").world_projection().axe_v == Vector3.BACK, "dessus de marche : projection XZ monde")
 	var riser0: SurfaceMapping.WorldProjection = _face("Marche0/FaceContremarche").world_projection()
 	var riser5: SurfaceMapping.WorldProjection = _face("Marche5/FaceContremarche").world_projection()
-	_check(riser0.axe_u == Vector3.RIGHT and riser5.axe_u == Vector3.BACK, "contremarches : plan choisi par l'axe dominant de la normale")
+	_check(riser0.axe_u.is_equal_approx(Vector3.RIGHT) and riser5.axe_u.is_equal_approx(Basis(Vector3.UP, deg_to_rad(75.0)) * Vector3.RIGHT),
+			"contremarches : u = axe horizontal de la face, en coordonnées monde")
 	# Continuité entre modules voisins : même uv_monde sur l'arête commune.
 	var edge_a: Vector3 = _face("Mur0_0/FaceMur").global_transform * _face("Mur0_0/FaceMur").mapping.point_at(Vector2(1.0, 0.3))
 	var edge_b: Vector3 = _face("Mur0_1/FaceMur").global_transform * _face("Mur0_1/FaceMur").mapping.point_at(Vector2(0.0, 0.3))
 	_check(edge_a.distance_to(edge_b) < 1e-4, "assemblage : arête commune de deux tronçons de mur")
 	var seam: Vector2 = wall.uv_monde(edge_a) - _face("Mur0_1/FaceMur").world_projection().uv_monde(edge_b)
 	_check(seam.length() < 1e-4, "projection continue à la couture de deux tronçons de mur")
+
+
+# --- Projection des faces verticales : plan de la face, v orienté comme la texture ---
+
+func _test_vertical_projection() -> void:
+	# Plans verticaux (contremarches droite et obliques, mur droit) : isométrie, v vers le bas, pas de miroir.
+	for path: String in ["Marche0/FaceContremarche", "Marche2/FaceContremarche", "Marche5/FaceContremarche", "MurDroit/FaceMurDroit"]:
+		var face: CleanableFace = _face(path)
+		var proj: SurfaceMapping.WorldProjection = face.world_projection()
+		var xform: Transform3D = face.global_transform
+		var normal: Vector3 = (xform.basis * face.mapping.normal_at(Vector2(0.5, 0.5))).normalized()
+		_check(proj.mode == SurfaceMapping.Mode.PLAN and proj.axe_v.is_equal_approx(Vector3.DOWN), path + " : v de la projection vers le bas (texture à l'endroit)")
+		_check(absf(proj.axe_u.dot(normal)) < 1e-5 and absf(proj.axe_u.y) < 1e-5 and is_equal_approx(proj.axe_u.length(), 1.0),
+				path + " : u horizontal, dans le plan de la face")
+		# Vu de face (normale vers l'observateur, haut = Y) : u vers la droite, donc pas de miroir.
+		_check(proj.axe_u.cross(Vector3.UP).is_equal_approx(normal), path + " : texture non inversée en miroir")
+		var worst: float = 0.0
+		for n: int in 32:
+			var a: Vector3 = xform * face.mapping.point_at(Vector2(_rng.randf(), _rng.randf()))
+			var b: Vector3 = xform * face.mapping.point_at(Vector2(_rng.randf(), _rng.randf()))
+			var d_uv: float = (proj.uv_monde(a) - proj.uv_monde(b)).length() * proj.tuile_m
+			worst = maxf(worst, absf(d_uv - a.distance_to(b)))
+		_check(worst < 1e-5, "%s : aucun étirement (écart max %.7f m)" % [path, worst])
+		# u et v de la projection suivent l'UV2 de la face (mêmes sens).
+		var o: Vector2 = proj.uv_monde(xform * face.mapping.point_at(Vector2(0.2, 0.2)))
+		_check(proj.uv_monde(xform * face.mapping.point_at(Vector2(0.8, 0.2))).x > o.x
+				and proj.uv_monde(xform * face.mapping.point_at(Vector2(0.2, 0.8))).y > o.y, path + " : u et v dans le sens de la face")
+	# Mur courbe et noyau : v vers le bas aussi, hauteur non étirée.
+	for path: String in ["Mur0_3/FaceMur", "Mur1_3/FaceMur", "Noyau3/FaceNoyau"]:
+		var face: CleanableFace = _face(path)
+		var proj: SurfaceMapping.WorldProjection = face.world_projection()
+		var top: Vector3 = face.global_transform * face.mapping.point_at(Vector2(0.5, 0.0))
+		var bottom: Vector3 = face.global_transform * face.mapping.point_at(Vector2(0.5, 1.0))
+		var dv: float = proj.uv_monde(bottom).y - proj.uv_monde(top).y
+		_check(top.y > bottom.y and dv > 0.0, path + " : v de la projection vers le bas (texture à l'endroit)")
+		_check(absf(dv * proj.tuile_m - (top.y - bottom.y)) < 1e-5, path + " : hauteur non étirée")
+	# Continuité verticale entre deux anneaux de mur.
+	var low: CleanableFace = _face("Mur0_2/FaceMur")
+	var high: CleanableFace = _face("Mur1_2/FaceMur")
+	var seam: Vector2 = low.world_projection().uv_monde(low.global_transform * low.mapping.point_at(Vector2(0.4, 0.0))) \
+			- high.world_projection().uv_monde(high.global_transform * high.mapping.point_at(Vector2(0.4, 1.0)))
+	_check(seam.length() < 1e-4, "projection continue entre deux anneaux de mur")
+
+
+# --- Préchauffage asynchrone de la grille fine ---
+
+func _grid_equal(a: CleanableFace.GridJob, b: CleanableFace.GridJob) -> bool:
+	return a.positions == b.positions and a.areas == b.areas and a.thickness == b.thickness \
+			and a.initial_area == b.initial_area and a.initial_texels == b.initial_texels
+
+
+func _test_prewarm() -> void:
+	var prewarmer: CleaningPrewarmer = _spike.get("prewarmer")
+	_check(prewarmer != null and prewarmer.radius_m == 4.0, "préchauffage : nœud présent, rayon de 4 m par défaut")
+	if prewarmer == null:
+		return
+	var cold: Array[CleanableFace] = []
+	for face: CleanableFace in _faces:
+		if not face.has_fine_grid():
+			cold.append(face)
+	_check(cold.size() >= 20, "préchauffage : faces encore sans grille (%d)" % cold.size())
+	# Hors de portée : rien n'est mis en file.
+	prewarmer.tick(Vector3(100.0, 0.0, 100.0))
+	_check(prewarmer.is_idle(), "préchauffage : aucune face à plus de 4 m, file vide")
+	# Rayon réduit : seules les faces proches sont prises, les plus proches d'abord.
+	var origin: Vector3 = Vector3(1.25, 1.0, -0.3)
+	prewarmer.radius_m = 1.0
+	var near: Array[CleanableFace] = []
+	for face: CleanableFace in cold:
+		if face.distance_to_bounds(origin) < 1.0:
+			near.append(face)
+	_check(near.size() > 0 and near.size() < cold.size(), "préchauffage : %d faces à moins de 1 m sur %d" % [near.size(), cold.size()])
+	prewarmer.tick(origin, 1.0) # delta > scan_interval : nouveau parcours
+	_check(prewarmer.running_count() == mini(prewarmer.max_tasks, near.size())
+			and prewarmer.queue_size() == near.size() - prewarmer.running_count(), "préchauffage : file = faces proches, max_tasks calculs lancés")
+	# Repli synchrone pendant qu'un calcul est en file : le résultat du fil est ignoré, pas d'écrasement.
+	var touched: CleanableFace = near[0]
+	touched.ensure_fine_grid()
+	_check(touched.has_fine_grid() and not touched.prewarmed, "repli synchrone : face touchée avant d'être prête")
+	_random_stroke(touched, 2.0)
+	var bytes_before: PackedByteArray = touched.state_bytes().duplicate()
+	prewarmer.flush()
+	_check(prewarmer.is_idle(), "préchauffage : file vidée")
+	_check(touched.state_bytes() == bytes_before and not touched.prewarmed, "repli synchrone : état conservé à l'arrivée du résultat du fil")
+	_check_counters(touched, "repli synchrone")
+	var warmed: int = 0
+	for face: CleanableFace in near:
+		if face.prewarmed:
+			warmed += 1
+	# La face touchée : résultat ignoré si son calcul était lancé, jamais lancé si elle était en file.
+	_check(warmed == near.size() - 1 and prewarmer.prewarmed_count == warmed and prewarmer.discarded_count <= 1,
+			"préchauffage : %d grilles affectées (%d ignorée) pour %d faces proches" % [warmed, prewarmer.discarded_count, near.size()])
+	for face: CleanableFace in cold:
+		if not near.has(face):
+			_check(not face.has_fine_grid(), "préchauffage : face lointaine non calculée (%s)" % face.get_path())
+	# Résultat du fil identique au calcul synchrone, face par face.
+	var identical: bool = true
+	for face: CleanableFace in near:
+		var reference: CleanableFace.GridJob = face.make_grid_job()
+		reference.run()
+		var threaded: CleanableFace.GridJob = face.make_grid_job()
+		var task: int = WorkerThreadPool.add_task(threaded.run_threaded)
+		WorkerThreadPool.wait_for_task_completion(task)
+		identical = identical and threaded.threaded and not reference.threaded and _grid_equal(reference, threaded)
+		if face.prewarmed:
+			identical = identical and _is_dirty(face) and face.remaining_texels(0) == reference.initial_texels[0] \
+					and is_equal_approx(face.initial_dirty_area(), reference.initial_area[0] + reference.initial_area[1])
+			_check(face.face_material().get_shader_parameter(&"etat") is ImageTexture, "préchauffage : masque d'état créé sur le fil principal")
+	_check(identical, "préchauffage : grille du fil identique au calcul synchrone (positions, aires, épaisseurs, aires sales)")
+	# Une face préchauffée se nettoie comme une autre.
+	for face: CleanableFace in near:
+		if face.prewarmed:
+			_check(_random_stroke(face, 2.0), "préchauffage : geste sur une face préchauffée")
+			_check_counters(face, "face préchauffée")
+			break
+	print("Préchauffage (spike) : %d faces, pire affectation sur le fil principal %.3f ms, pire étape %.3f ms" % [
+			warmed, prewarmer.worst_apply_usec / 1000.0, prewarmer.worst_tick_usec / 1000.0])
+	prewarmer.radius_m = 4.0
+
+
+# --- Mesures sur le tour complet (P2-N2) ---
+
+func _tour_save(service: Node, tour: Node3D, label: String) -> void:
+	var t0: int = Time.get_ticks_usec()
+	var data: Dictionary = {"nettoyage": CleanableFace.export_room(tour)}
+	var export_usec: int = Time.get_ticks_usec() - t0
+	t0 = Time.get_ticks_usec()
+	var error: int = service.call("save_slot", "tour", data)
+	var write_usec: int = Time.get_ticks_usec() - t0
+	_check(error == 0, "tour %s : écriture par le SaveService (erreur %d)" % [label, error])
+	var size: int = FileAccess.get_file_as_bytes(String(service.get("save_dir")) + "tour.json").size()
+	t0 = Time.get_ticks_usec()
+	var loaded: Dictionary = service.call("load_slot", "tour")
+	var read_usec: int = Time.get_ticks_usec() - t0
+	_check(loaded["ok"], "tour %s : relecture par le SaveService" % label)
+	var before: Dictionary = {}
+	for face: CleanableFace in tour.get("faces"):
+		before[face] = [face.state_bytes().duplicate(), face.is_finished()]
+	t0 = Time.get_ticks_usec()
+	var rejected: int = CleanableFace.import_room(tour, (loaded["data"] as Dictionary).get("nettoyage", {}))
+	var import_usec: int = Time.get_ticks_usec() - t0
+	var same: bool = rejected == 0
+	for face: CleanableFace in tour.get("faces"):
+		same = same and face.is_finished() == before[face][1] and (face.state_bytes() == before[face][0] or face.is_finished())
+	_check(same, "tour %s : état identique après relecture (%d rejet(s))" % [label, rejected])
+	print("  %-22s fichier %7d o (%d faces écrites) ; export %.1f ms ; écriture SaveService %.1f ms ; relecture SaveService %.1f ms ; import %.1f ms" % [
+			label, size, (data["nettoyage"] as Dictionary).size(), export_usec / 1000.0, write_usec / 1000.0, read_usec / 1000.0, import_usec / 1000.0])
+
+
+func _measure_tour() -> void:
+	var t0: int = Time.get_ticks_usec()
+	var tour: Node3D = (load(TOUR_SCENE) as PackedScene).instantiate() as Node3D
+	var instantiate_usec: int = Time.get_ticks_usec() - t0
+	t0 = Time.get_ticks_usec()
+	root.add_child(tour)
+	var ready_usec: int = Time.get_ticks_usec() - t0
+	var faces: Array[CleanableFace] = []
+	faces.assign(tour.get("faces"))
+	var kinds: Dictionary = {}
+	var texels: int = 0
+	var coarse_usec: int = 0
+	for face: CleanableFace in faces:
+		kinds[face.name] = int(kinds.get(face.name, 0)) + 1
+		texels += face.grid_size().x * face.grid_size().y
+		coarse_usec += face.coarse_init_usec
+	print("Tour complet : %d faces %s, %d texels d'état" % [faces.size(), kinds, texels])
+	_check(faces.size() == 188, "tour : 188 faces (68 murs, 72 noyaux, 24 dessus, 24 contremarches ; trouvé %d)" % faces.size())
+	_check(int(kinds.get(&"FaceMur", 0)) == 68 and int(kinds.get(&"FaceNoyau", 0)) == 72, "tour : 3 anneaux de mur (4 ouvertures) et de noyau")
+	for path: String in ["Mur0_22", "Mur0_23", "Mur2_0", "Mur2_1"]:
+		_check(not tour.has_node("Assemblage/" + path), "tour : ouverture " + path)
+	_check(tour.has_node("Assemblage/Mur1_22") and tour.has_node("Assemblage/Mur0_0") and tour.has_node("Assemblage/Mur2_23"), "tour : mur présent hors des ouvertures")
+	_check((tour.get("notes") as PackedStringArray).is_empty(), "tour : conventions des modules")
+	print("  Initialisation : instanciation %.1f ms + entrée dans l'arbre %.1f ms (assemblage %.1f ms, dont poids grossiers %.1f ms)" % [
+			instantiate_usec / 1000.0, ready_usec / 1000.0, int(tour.get("init_usec")) / 1000.0, coarse_usec / 1000.0])
+
+	# Préchauffage de tout le tour depuis le pied de l'escalier (rayon élargi pour la mesure).
+	var prewarmer: CleaningPrewarmer = tour.get("prewarmer")
+	var in_range: int = 0
+	for face: CleanableFace in faces:
+		if face.distance_to_bounds(Vector3(1.2, 1.0, 0.32)) < prewarmer.radius_m:
+			in_range += 1
+	prewarmer.radius_m = 100.0
+	t0 = Time.get_ticks_usec()
+	prewarmer.tick(Vector3(1.2, 1.0, 0.32), 1.0)
+	var first_tick_usec: int = Time.get_ticks_usec() - t0
+	prewarmer.flush()
+	var prewarm_usec: int = Time.get_ticks_usec() - t0
+	var cpu_usec: int = 0
+	var worst_by_kind: Dictionary = {}
+	for face: CleanableFace in faces:
+		cpu_usec += face.fine_grid_usec
+		worst_by_kind[face.name] = maxi(int(worst_by_kind.get(face.name, 0)), face.fine_grid_usec)
+	_check(prewarmer.prewarmed_count == faces.size(), "tour : toutes les grilles préchauffées (%d / %d)" % [prewarmer.prewarmed_count, faces.size()])
+	print("  Préchauffage : %d faces à moins de 4 m du départ ; tour entier (%d faces, %d fils) en %.0f ms d'horloge, %.0f ms de calcul cumulé" % [
+			in_range, faces.size(), prewarmer.max_tasks, prewarm_usec / 1000.0, cpu_usec / 1000.0])
+	print("  Fil principal : première étape (parcours + lancement) %.3f ms ; pire affectation d'une grille %.3f ms" % [
+			first_tick_usec / 1000.0, prewarmer.worst_apply_usec / 1000.0])
+	var fallback: PackedStringArray = PackedStringArray()
+	for key: StringName in worst_by_kind:
+		fallback.append("%s %.1f ms" % [key, int(worst_by_kind[key]) / 1000.0])
+	print("  Calcul d'une grille (= coût d'un repli synchrone, mesuré ici sur un fil) : pire cas " + ", ".join(fallback))
+
+	# Un tampon du pinceau envoyé aux 188 faces (comme le pinceau de test).
+	var wall: CleanableFace = tour.get_node("Assemblage/Mur0_3/FaceMur") as CleanableFace
+	var hit: Vector3 = wall.global_transform * wall.mapping.point_at(Vector2(0.5, 0.5))
+	var stamps: int = 50
+	t0 = Time.get_ticks_usec()
+	for n: int in stamps:
+		for face: CleanableFace in faces:
+			face.clean_stroke(hit, hit, RADIUS, 0.001)
+	CleanableFace.import_room(tour, {}) # remise à l'état sale
+	print("  clean_stroke : %.3f ms par tampon envoyé aux %d faces" % [(Time.get_ticks_usec() - t0) / 1000.0 / stamps, faces.size()])
+
+	var service: Node = SaveServiceScript.new() as Node
+	service.set("save_dir", "user://test_saves/")
+	print("Sauvegarde du tour (fichier du SaveService, enveloppe comprise) :")
+	_check(CleanableFace.export_room(tour).is_empty(), "tour : faces préchauffées mais intactes absentes de la sauvegarde")
+	_tour_save(service, tour, "0 % (tout sale)")
+	# 50 % : traits pseudo-aléatoires sur chaque face jusqu'à la moitié de sa propreté.
+	t0 = Time.get_ticks_usec()
+	var strokes: int = 0
+	for face: CleanableFace in faces:
+		var guard: int = 0
+		while face.cleanliness() < 0.5 and guard < 400:
+			_random_stroke(face, _rng.randf_range(0.3, 2.0), 0.5)
+			guard += 1
+		strokes += guard
+	var mean: float = 0.0
+	var area: float = 0.0
+	for face: CleanableFace in faces:
+		mean += face.cleanliness() * face.initial_dirty_area()
+		area += face.initial_dirty_area()
+	mean /= area
+	_check(mean > 0.45 and mean < 0.65, "tour : propreté moyenne proche de 50 %% (%.1f %%)" % (mean * 100.0))
+	print("  (%d traits en %.0f ms, propreté moyenne pondérée %.1f %%)" % [strokes, (Time.get_ticks_usec() - t0) / 1000.0, mean * 100.0])
+	_tour_save(service, tour, "50 % (traits)")
+	# 100 % : un tampon couvrant chaque face.
+	var all_finished: bool = true
+	for face: CleanableFace in faces:
+		face.clean_stroke(face.global_transform * face.mapping.point_at(Vector2(0.5, 0.5)),
+				face.global_transform * face.mapping.point_at(Vector2(0.5, 0.5)), 6.0, 1.0)
+		all_finished = all_finished and face.is_finished()
+	_check(all_finished, "tour : toutes les faces finies après le nettoyage complet")
+	_tour_save(service, tour, "100 % (tout propre)")
+	var dir: DirAccess = DirAccess.open("user://test_saves/")
+	if dir != null:
+		for file: String in dir.get_files():
+			if file.begins_with("tour."):
+				dir.remove(file)
+	service.free()
 
 
 # --- Poids (mesure) ---
@@ -450,6 +706,13 @@ func _test_save() -> void:
 		_check(not face.import_state(bad) and _is_dirty(face), "sauvegarde : %s = face sale + avertissement" % label)
 	# Pièce entière : aller-retour par id, clé absente = sale, entrée d'une autre taille rejetée.
 	_check(face.import_state(parsed), "sauvegarde : état valide rechargé")
+	var untouched: int = 0
+	for other: CleanableFace in _faces:
+		if other.export_state(_spike).is_empty(): # grille créée (mesure, préchauffage) mais aucun texel modifié
+			untouched += 1
+			while not _random_stroke(other, 1.0):
+				pass
+	_check(untouched > 0, "sauvegarde : faces intactes (avec ou sans grille) absentes de la sauvegarde (%d)" % untouched)
 	var room: Dictionary = CleanableFace.export_room(_spike)
 	_check(room.size() == _faces.size(), "sauvegarde de la pièce : une entrée par face touchée (%d)" % room.size())
 	var snapshots: Dictionary = {}
