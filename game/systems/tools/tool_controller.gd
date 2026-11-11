@@ -1,24 +1,32 @@
 class_name ToolController
 extends Node
-## Outil tenu par le joueur (enfant de Player). Tant que use_primary est maintenu, tire un rayon
-## depuis la caméra (centre de l'écran, ou curseur si la caméra est figée par lock_camera) et
-## nettoie les CleanableFace touchées. Inactif sans outil. Texte de debug provisoire (pas d'UI finale).
+## Outils du joueur (enfant de Player) : emplacements dédiés (ToolSlots), au plus un outil en main,
+## aucun par défaut. equip_tool sort/range l'outil ; toute prise d'objet le range. Tant que
+## use_primary est maintenu avec un outil en main, tire un rayon depuis la caméra (centre de l'écran,
+## ou curseur si la caméra est figée par lock_camera) et nettoie les CleanableFace touchées.
+## rinse_tool rince l'outil en main au seau visé. Texte de debug et marqueur provisoires.
 
 const WORLD_LAYER: int = 1
+const MARKER_SIZE: float = 20.0 ## px, marqueur de visée provisoire
 
-## Outil équipé au départ (null = aucun). equip() en change à l'exécution.
-@export var tool: ToolData
-
-var state: ToolState ## null sans outil
+var slots: ToolSlots = ToolSlots.new()
+## État de l'outil en main (null si aucun outil en main).
+var state: ToolState:
+	get:
+		return slots.held()
 var last_stroke_usec: int = 0 ## coût du dernier geste (mesure)
 var last_cleaned_area: float = 0.0 ## m² nettoyés par le dernier geste
 
 var _stroking: bool = false
 var _last_point: Vector3 = Vector3.ZERO
 var _label: Label
+var _marker: Panel
 
 @onready var _player: Player = get_parent() as Player
 @onready var _camera: Camera3D = get_node_or_null(^"../Head/Camera3D") as Camera3D
+@onready var _carry: CarryController = get_node_or_null(^"../CarryController") as CarryController
+@onready var _sensor: InteractionSensor = get_node_or_null(^"../Head/InteractionSensor") as InteractionSensor
+@onready var _prompt: InteractionPrompt = get_node_or_null(^"../InteractionPrompt") as InteractionPrompt
 
 
 func _ready() -> void:
@@ -32,10 +40,27 @@ func _ready() -> void:
 	_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	_label.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_label.position += Vector2(-16.0, 16.0)
-	var carry: Node = _player.get_node_or_null(^"CarryController") if _player != null else null
-	if carry != null and carry.has_signal(&"held_changed"):
-		carry.connect(&"held_changed", on_held_item_changed)
-	equip(tool)
+	_marker = _build_marker()
+	layer.add_child(_marker)
+	slots.held_changed.connect(_on_tool_held_changed)
+	if _carry != null:
+		_carry.held_changed.connect(on_held_item_changed)
+	_refresh_label()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not _accepts_input():
+		return
+	if event.is_action_pressed(&"equip_tool", false):
+		toggle_tool()
+	elif event.is_action_pressed(&"rinse_tool", false):
+		rinse_at(_sensor.target.get_parent() if _sensor != null and _sensor.target != null else null)
+
+
+func _process(_delta: float) -> void:
+	_marker.visible = _player != null and _player.camera_locked
+	if _marker.visible:
+		_marker.position = _marker.get_viewport().get_mouse_position() - _marker.size * 0.5
 
 
 ## Point unique de relâchement : l'outil n'est plus tenu -> le verrou caméra est relâché.
@@ -44,27 +69,69 @@ func set_tool_held(held: bool) -> void:
 		_player.set_camera_locked(false)
 
 
-## L'objet tenu a changé (prise = rangement de l'outil, changement, dépôt) : verrou relâché.
+## L'objet tenu a changé (prise réussie, changement, dépôt) : l'outil en main retourne dans son
+## emplacement et le verrou est relâché. Une prise refusée n'émet rien : l'outil reste en main.
 func on_held_item_changed() -> void:
+	stow_tool()
 	set_tool_held(false)
 
 
-## Équipe un outil propre (null = retire l'outil).
-func equip(tool_data: ToolData) -> void:
-	tool = tool_data
-	state = ToolState.new(tool_data) if tool_data != null else null
-	_stroking = false
-	set_tool_held(tool_data != null)
+## Ajoute un emplacement pour cet outil (rangé) et renvoie son index.
+func add_tool(tool_data: ToolData) -> int:
+	var index: int = slots.add_tool(tool_data)
 	_refresh_label()
+	return index
 
 
-## Rince l'outil tenu. Renvoie false sans outil.
+## Outil en main (null si aucun).
+func held_tool() -> ToolData:
+	return state.data if state != null else null
+
+
+## Sort l'outil de l'emplacement donné (par défaut : l'emplacement sélectionné) et le place en main.
+## Refusé si l'emplacement n'existe pas ou si la main porte un objet (tool.hand_occupied).
+func take_out(index: int = ToolSlots.NONE) -> bool:
+	if index == ToolSlots.NONE:
+		index = slots.selected_index
+	if slots.state_at(index) == null:
+		return false
+	if _carry != null and _carry.held_data() != null:
+		if _prompt != null:
+			_prompt.show_message("tool.hand_occupied")
+		return false
+	return slots.take_out(index)
+
+
+## Range l'outil en main dans son emplacement (sans effet si aucun).
+func stow_tool() -> void:
+	slots.stow()
+
+
+## Action equip_tool : range l'outil en main, sinon sort l'outil sélectionné.
+func toggle_tool() -> void:
+	if state != null:
+		stow_tool()
+	else:
+		take_out()
+
+
+## Rince l'outil en main. Renvoie false sans outil en main.
 func rinse() -> bool:
 	if state == null:
 		return false
 	state.rinse()
 	_refresh_label()
 	return true
+
+
+## Action rinse_tool : rince l'outil en main au seau donné. Refusé (false) sans outil en main, si
+## le corps n'est pas un seau ou si le seau est porté (il doit être posé).
+func rinse_at(bucket: Node) -> bool:
+	if state == null or not (bucket is Bucket):
+		return false
+	if _carry != null and _carry.held_body() == bucket:
+		return false
+	return rinse()
 
 
 func _physics_process(delta: float) -> void:
@@ -78,7 +145,7 @@ func _physics_process(delta: float) -> void:
 		from = _camera.project_ray_origin(cursor)
 		direction = _camera.project_ray_normal(cursor)
 	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
-			from, from + direction * tool.reach_m, WORLD_LAYER)
+			from, from + direction * state.data.reach_m, WORLD_LAYER)
 	var hit: Dictionary = _camera.get_world_3d().direct_space_state.intersect_ray(query)
 	if hit.is_empty():
 		_stroking = false
@@ -94,6 +161,7 @@ func _physics_process(delta: float) -> void:
 func stroke(from: Vector3, to: Vector3, delta: float) -> float:
 	if state == null or delta <= 0.0:
 		return 0.0
+	var tool: ToolData = state.data
 	var t0: int = Time.get_ticks_usec()
 	var amount: float = state.effective_efficiency() * delta
 	var reach_box: AABB = AABB(from, Vector3.ZERO).expand(to).grow(tool.radius_m)
@@ -114,22 +182,48 @@ func stroke(from: Vector3, to: Vector3, delta: float) -> float:
 	return cleaned
 
 
-## Texte de debug : salissure et efficacité effective ("" sans outil).
+## Texte de debug : salissure et efficacité effective de l'outil en main ; "Outil : rangé" si
+## aucun n'est en main ; "" sans emplacement.
 func debug_text() -> String:
 	if state == null:
-		return ""
+		return "Outil : rangé" if slots.count() > 0 else ""
 	return "Outil : %s\nSalissure : %d %%\nEfficacité : %.2f (%d %%)\nDernier geste : %.2f ms" % [
-		tool.id, roundi(state.soil * 100.0), state.effective_efficiency(),
+		state.data.id, roundi(state.soil * 100.0), state.effective_efficiency(),
 		roundi(state.efficiency_factor() * 100.0), last_stroke_usec / 1000.0]
 
 
 func _is_active() -> bool:
-	if not Input.is_action_pressed(&"use_primary"):
-		return false
+	return Input.is_action_pressed(&"use_primary") and _accepts_input()
+
+
+func _accepts_input() -> bool:
 	return Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or (_player != null and _player.camera_locked)
+
+
+func _on_tool_held_changed() -> void:
+	_stroking = false
+	set_tool_held(state != null)
+	_refresh_label()
 
 
 func _refresh_label() -> void:
 	if _label != null:
 		_label.text = debug_text()
-		_label.visible = state != null
+		_label.visible = _label.text != ""
+
+
+## Marqueur de visée provisoire (anneau, sans asset) : remplace le curseur système masqué pendant
+## le verrouillage de caméra.
+func _build_marker() -> Panel:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(1.0, 1.0, 1.0, 0.0)
+	style.border_color = Color(1.0, 1.0, 1.0, 0.9)
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(roundi(MARKER_SIZE * 0.5))
+	var marker: Panel = Panel.new()
+	marker.name = "AimMarker"
+	marker.size = Vector2(MARKER_SIZE, MARKER_SIZE)
+	marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	marker.add_theme_stylebox_override(&"panel", style)
+	marker.visible = false
+	return marker

@@ -1,11 +1,12 @@
 extends SceneTree
-## Test des outils de nettoyage (ToolData, ToolState, ToolController, RinseBucket) + mesures.
+## Test des outils de nettoyage (ToolData, ToolState, ToolSlots, ToolController, Bucket) + mesures.
 ## Lancer : tools/godot.sh --headless --path game --script res://tests/test_tools.gd
 
 const SPONGE: String = "res://data/tools/sponge.tres"
 const SPIKE_SCENE: String = "res://tests/test_cleaning/cleaning_spike.tscn"
 const SPONGE_SCENE: String = "res://tests/test_tools/sponge_test.tscn"
-const BUCKET_SCENE: String = "res://props/rinse_bucket.tscn"
+const BUCKET_SCENE: String = "res://props/bucket.tscn"
+const ITEM_SCENE: String = "res://props/test_item.tscn"
 const FRAME: float = 1.0 / 60.0
 
 var _failures: int = 0
@@ -24,11 +25,13 @@ func _run() -> void:
 	var spike: Node3D = (load(SPIKE_SCENE) as PackedScene).instantiate() as Node3D
 	root.add_child(spike)
 	_test_controller(spike, sponge)
+	_test_slots(sponge)
+	_test_tool_in_hand(spike, sponge)
 	_test_bucket(spike, sponge)
 	_test_camera_lock(spike, sponge)
 	spike.free()
 
-	_measure_tour(sponge)
+	await _measure_tour(sponge)
 
 	print("test_tools : ", "OK" if _failures == 0 else "%d échec(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -139,7 +142,7 @@ func _test_controller(spike: Node3D, sponge: ToolData) -> void:
 	# Couche saleté seule : la mousse n'est pas touchée (la liste des couches est un paramètre).
 	var dirt_only: ToolData = sponge.duplicate() as ToolData
 	dirt_only.layers = ToolData.LAYER_DIRT
-	controller.equip(dirt_only)
+	_hold(controller, dirt_only)
 	face.ensure_fine_grid()
 	var moss_before: float = face.remaining_area(1)
 	var dirt_before: float = face.remaining_area(0)
@@ -153,8 +156,8 @@ func _test_controller(spike: Node3D, sponge: ToolData) -> void:
 	_check(controller.stroke(far, far, 1.0) == 0.0 and controller.state.soil == soil, "geste hors des faces : ni nettoyage ni salissure")
 
 	# Frottement le long de la face : salissure monotone, efficacité décroissante, reste décroissant.
-	controller.equip(sponge)
-	_check(controller.state.soil == 0.0, "outil équipé : propre")
+	_hold(controller, sponge)
+	_check(controller.state.soil == 0.0, "nouvel emplacement : outil propre")
 	var monotone: bool = true
 	var last_point: Vector3 = _point(face, Vector2(0.2, 0.3))
 	var total: float = 0.0
@@ -177,25 +180,184 @@ func _test_controller(spike: Node3D, sponge: ToolData) -> void:
 		total, controller.state.soil * 100.0, controller.state.effective_efficiency()])
 
 
-# --- Seau de rinçage ---
+# --- Emplacements d'outils (logique pure) ---
+
+func _test_slots(sponge: ToolData) -> void:
+	var slots: ToolSlots = ToolSlots.new()
+	var changes: Array[int] = [0]
+	slots.held_changed.connect(func() -> void: changes[0] += 1)
+	_check(slots.count() == 0 and slots.held() == null and slots.held_index == ToolSlots.NONE, "emplacements : vides au départ")
+	_check(not slots.toggle() and not slots.stow() and not slots.take_out(0), "emplacements vides : sortir/ranger sans effet")
+	_check(slots.add_tool(null) == ToolSlots.NONE and slots.count() == 0, "emplacements : outil nul refusé")
+	_check(slots.add_tool(sponge) == 0 and slots.count() == 1, "emplacements : l'éponge reçoit l'emplacement 0")
+	_check(slots.held() == null and changes[0] == 0, "emplacements : aucun outil en main par défaut")
+	_check(slots.add_tool(sponge) == 0 and slots.count() == 1, "emplacements : un seul emplacement par outil")
+	_check(slots.take_out(0) and slots.held() != null and slots.held().data == sponge and changes[0] == 1, "sortir : l'outil est en main")
+	_check(slots.take_out(0) and changes[0] == 1, "sortir l'outil déjà en main : sans changement")
+	slots.held().add_cleaned_area(1.0)
+	var soil: float = slots.held().soil
+	_check(slots.stow() and slots.held() == null and changes[0] == 2, "ranger : plus d'outil en main")
+	_check(soil > 0.0 and slots.state_at(0).soil == soil, "ranger : la salissure reste dans l'emplacement")
+	_check(slots.toggle() and slots.held_index == 0 and slots.held().soil == soil, "bascule : ressort l'outil sélectionné, tel qu'il a été rangé")
+	_check(slots.toggle() and slots.held() == null, "bascule : range l'outil en main")
+	# Plusieurs outils : l'API prend un index (la sélection par le joueur n'est pas implémentée).
+	var other: ToolData = sponge.duplicate() as ToolData
+	_check(slots.add_tool(other) == 1 and slots.take_out(1) and slots.held().data == other, "second outil : son propre emplacement")
+	_check(not slots.take_out(5) and slots.held_index == 1, "emplacement inexistant : refusé, outil en main inchangé")
+	_check(slots.take_out(0) and slots.held().data == sponge and slots.state_at(1).data == other, "sortir un autre outil : le précédent retourne dans son emplacement")
+	slots.clear()
+	_check(slots.count() == 0 and slots.held() == null, "clear : plus d'emplacement, plus d'outil en main")
+
+
+# --- Outil en main : action equip_tool, rangement à la prise, prise refusée, marqueur ---
+
+func _make_item(category: ItemData.Category, id: StringName) -> TestItem:
+	var item: TestItem = (load(ITEM_SCENE) as PackedScene).instantiate() as TestItem
+	var data: ItemData = ItemData.new()
+	data.id = id
+	data.category = category
+	data.footprint = Vector2(0.1, 0.1)
+	data.height = 0.1
+	item.item_data = data
+	root.add_child(item)
+	return item
+
+
+func _press(node: Node, action: StringName) -> void:
+	var ev: InputEventAction = InputEventAction.new()
+	ev.action = action
+	ev.pressed = true
+	node._unhandled_input(ev)
+
+
+## Headless : la souris n'est jamais CAPTURED ; les actions du ToolController ne passent donc que
+## caméra verrouillée (état posé directement, comme dans _test_camera_lock).
+func _test_tool_in_hand(spike: Node3D, sponge: ToolData) -> void:
+	var player: Player = spike.get_node("Player") as Player
+	var controller: ToolController = player.get_node("ToolController") as ToolController
+	var carry: CarryController = player.get_node("CarryController") as CarryController
+	controller.slots.clear()
+	_check(InputMap.has_action(&"equip_tool") and InputMap.has_action(&"rinse_tool"), "Input Map : equip_tool et rinse_tool")
+	_check(controller.add_tool(sponge) == 0 and controller.state == null and controller.held_tool() == null, "éponge ajoutée : rangée, aucun outil en main")
+	var face: CleanableFace = _largest_face(spike)
+	var center: Vector3 = _point(face, Vector2(0.8, 0.8))
+	_check(controller.stroke(center, center, 1.0) == 0.0, "outil rangé : geste sans effet")
+	_check(not controller.rinse(), "outil rangé : rinçage refusé")
+	_press(controller, &"equip_tool")
+	_check(controller.state == null, "equip_tool : sans effet si la souris n'est pas capturée (headless)")
+	player.camera_locked = true
+	_press(controller, &"equip_tool")
+	_check(controller.held_tool() == sponge and player.camera_locked, "equip_tool : sort l'éponge (le verrou reste)")
+	_check(controller.stroke(center, center, 1.0) > 0.0, "outil en main : le geste nettoie")
+	var soil: float = controller.state.soil
+	_press(controller, &"equip_tool")
+	_check(controller.state == null and not player.camera_locked, "equip_tool : range l'éponge (verrou relâché)")
+	controller.toggle_tool()
+	_check(soil > 0.0 and controller.state.soil == soil, "ressortir l'outil : salissure conservée")
+
+	# Prise refusée (objet FIXED, objet qui porte une charge) : l'outil reste en main.
+	var fixed: TestItem = _make_item(ItemData.Category.FIXED, &"slot_fixed")
+	carry.pick_up(fixed.get_node("Interactable") as Interactable)
+	_check(carry.held_data() == null and controller.held_tool() == sponge, "prise refusée (FIXED) : l'outil reste en main")
+	var loaded: TestItem = _make_item(ItemData.Category.SMALL, &"slot_loaded")
+	loaded.loads.append(fixed)
+	carry.pick_up(loaded.get_node("Interactable") as Interactable)
+	_check(carry.held_data() == null and controller.held_tool() == sponge, "prise refusée (objet chargé) : l'outil reste en main")
+	loaded.loads.clear()
+
+	# Prise réussie : l'outil retourne dans son emplacement, avec sa salissure.
+	var small: TestItem = _make_item(ItemData.Category.SMALL, &"slot_small")
+	player.camera_locked = true
+	carry.pick_up(small.get_node("Interactable") as Interactable)
+	_check(carry.held_data() == small.item_data, "objet pris")
+	_check(controller.state == null and not player.camera_locked, "prise réussie : outil rangé, verrou relâché")
+	_check(controller.slots.state_at(0).soil == soil, "prise réussie : l'outil rangé garde sa salissure")
+	_check(not controller.take_out() and controller.state == null, "main occupée par un objet : sortir l'outil est refusé")
+	carry.release_held()
+	_check(controller.take_out() and controller.held_tool() == sponge, "main libre : l'outil ressort")
+
+	# Marqueur de visée : visible seulement caméra verrouillée.
+	var marker: Control = controller.get_node("ToolDebug/AimMarker") as Control
+	controller._process(0.0)
+	_check(not marker.visible, "marqueur : masqué hors verrouillage")
+	player.camera_locked = true
+	controller._process(0.0)
+	_check(marker.visible, "marqueur : visible pendant le verrouillage")
+	player.camera_locked = false
+	controller._process(0.0)
+	_check(not marker.visible, "marqueur : masqué au déverrouillage")
+	for item: TestItem in [fixed, loaded, small]:
+		item.free()
+	controller.slots.clear()
+
+
+# --- Seau : objet libre MEDIUM, rinçage par rinse_tool ---
 
 func _test_bucket(spike: Node3D, sponge: ToolData) -> void:
-	var player: Node = spike.get_node("Player")
+	var player: Player = spike.get_node("Player") as Player
 	var controller: ToolController = player.get_node("ToolController") as ToolController
-	var bucket: RinseBucket = (load(BUCKET_SCENE) as PackedScene).instantiate() as RinseBucket
+	var carry: CarryController = player.get_node("CarryController") as CarryController
+	var sensor: InteractionSensor = player.get_node("Head/InteractionSensor") as InteractionSensor
+	var bucket: Bucket = (load(BUCKET_SCENE) as PackedScene).instantiate() as Bucket
 	root.add_child(bucket)
 	var interactable: Interactable = bucket.get_node("Interactable") as Interactable
-	_check(bucket.collision_layer == 4 and interactable.action == Interactable.Action.USE, "seau : couche 3, action USE")
-	controller.equip(sponge)
+	var data: ItemData = bucket.item_data
+	_check(bucket.collision_layer == 4 and interactable.action == Interactable.Action.PICK_UP, "seau : couche 3, action PICK_UP")
+	_check(data != null and data.validate().is_empty(), "seau : ItemData valide")
+	_check(data.category == ItemData.Category.MEDIUM and not data.provides_support, "seau : objet libre MEDIUM")
+	_check(not data.tracks_cleaning and not data.tracks_repair and not data.tracks_storing, "seau : aucun axe suivi (exclu du 100 %)")
+	_check(carry.inventory.add_to_belt(data) == CarryInventory.Result.NOT_STOWABLE, "seau : jamais en ceinture")
+
+	_hold(controller, sponge)
 	controller.state.add_cleaned_area(1.0)
-	_check(controller.state.soil > 0.0, "éponge salie avant rinçage")
-	interactable.interact(player)
-	_check(controller.state.soil == 0.0, "interaction avec le seau : salissure remise à 0")
-	controller.equip(null)
-	interactable.interact(player)
-	interactable.interact(bucket)
-	_check(controller.state == null, "seau sans outil tenu ou sans joueur : sans effet, sans erreur")
+	var soil: float = controller.state.soil
+	_check(soil > 0.0, "éponge salie avant rinçage")
+	var other: TestItem = _make_item(ItemData.Category.SMALL, &"not_a_bucket")
+	_check(not controller.rinse_at(null) and not controller.rinse_at(other) and controller.state.soil == soil, "rinçage sans seau visé : refusé")
+	_check(controller.rinse_at(bucket) and controller.state.soil == 0.0, "rinçage au seau posé, outil en main : salissure remise à 0")
+
+	# Outil rangé : pas de rinçage.
+	controller.state.add_cleaned_area(1.0)
+	controller.stow_tool()
+	_check(not controller.rinse_at(bucket) and controller.slots.state_at(0).soil == soil, "rinçage outil rangé : refusé")
+
+	# Seau porté : la prise range l'outil ; même outil en main (état forcé), le seau porté ne rince pas.
+	controller.take_out()
+	carry.pick_up(interactable)
+	_check(carry.held_body() == bucket and controller.state == null, "seau pris en main : outil rangé")
+	_check(not controller.rinse_at(bucket), "seau porté, outil rangé : rinçage refusé")
+	controller.slots.take_out(0)
+	_check(controller.state != null and not controller.rinse_at(bucket) and controller.state.soil == soil, "seau porté, outil en main : rinçage refusé")
+	carry.pick_up(other.get_node("Interactable") as Interactable)
+	_check(carry.held_body() == bucket and controller.state != null, "seau porté : toute autre prise refusée (sans ranger l'outil)")
+	carry.release_held()
+	controller.take_out()
+
+	# Action rinse_tool sur le seau visé (reposé) ; la touche de prise ne rince pas.
+	sensor.set_target(interactable)
+	_press(controller, &"rinse_tool")
+	_check(controller.state.soil == soil, "rinse_tool : sans effet si la souris n'est pas capturée (headless)")
+	player.camera_locked = true
+	_press(controller, &"rinse_tool")
+	_check(controller.state.soil == 0.0, "rinse_tool sur le seau visé : salissure remise à 0")
+	controller.state.add_cleaned_area(1.0)
+	sensor.set_target(other.get_node("Interactable") as Interactable)
+	_press(controller, &"rinse_tool")
+	_check(controller.state.soil == soil, "rinse_tool sur un autre objet : sans effet")
+	sensor.set_target(null)
+	_press(controller, &"rinse_tool")
+	_check(controller.state.soil == soil, "rinse_tool sans cible : sans effet")
+	player.camera_locked = false
+	other.free()
 	bucket.free()
+	controller.slots.clear()
+
+
+## Met l'outil en main dans un emplacement neuf (outil propre).
+func _hold(controller: ToolController, data: ToolData) -> void:
+	controller.slots.clear()
+	controller.add_tool(data)
+	controller.take_out()
 
 
 func _lock_press(player: Player) -> void:
@@ -215,7 +377,7 @@ func _test_camera_lock(spike: Node3D, sponge: ToolData) -> void:
 	var player: Player = spike.get_node("Player") as Player
 	var controller: ToolController = player.get_node("ToolController") as ToolController
 	var carry: CarryController = player.get_node("CarryController") as CarryController
-	controller.equip(sponge)
+	_hold(controller, sponge)
 	_lock_press(player)
 	_check(not player.camera_locked, "lock_camera : refusé si la souris n'est pas capturée (headless)")
 	player.camera_locked = true
@@ -224,12 +386,12 @@ func _test_camera_lock(spike: Node3D, sponge: ToolData) -> void:
 	player.camera_locked = true
 	controller.set_tool_held(true)
 	_check(player.camera_locked, "set_tool_held(true) : le verrou reste")
-	controller.equip(null)
+	controller.stow_tool()
 	_check(not player.camera_locked, "outil plus tenu : verrou relâché")
-	controller.equip(sponge)
+	controller.take_out()
 	player.camera_locked = true
-	controller.equip(sponge)
-	_check(player.camera_locked, "rééquiper l'outil tenu : le verrou reste")
+	controller.take_out()
+	_check(player.camera_locked, "ressortir l'outil déjà en main : le verrou reste")
 	# Prise d'un objet : l'objet tenu change (outil rangé) -> verrou relâché.
 	var item: TestItem = (load("res://props/test_item.tscn") as PackedScene).instantiate() as TestItem
 	var data: ItemData = ItemData.new()
@@ -246,7 +408,7 @@ func _test_camera_lock(spike: Node3D, sponge: ToolData) -> void:
 	carry.release_held()
 	_check(not player.camera_locked, "objet tenu change (dépôt) : verrou relâché")
 	item.free()
-	controller.equip(null)
+	controller.slots.clear()
 
 
 # --- Scène de vérification + mesures : coût par image du frottement dans le tour (188 faces) ---
@@ -257,9 +419,18 @@ func _measure_tour(sponge: ToolData) -> void:
 	var tour: Node3D = scene.get_node("Tour") as Node3D
 	var faces: Array = tour.get("faces")
 	var controller: ToolController = tour.get_node("Player/ToolController") as ToolController
-	_check(controller.tool == sponge and controller.state != null, "scène de vérification : joueur équipé de l'éponge")
+	_check(controller.slots.count() == 1 and controller.state == null, "scène de vérification : éponge dans son emplacement, aucun outil en main")
 	_check(not tour.is_physics_processing(), "scène de vérification : pinceau du spike coupé")
-	_check(scene.get_node_or_null("RinseBucket") is RinseBucket, "scène de vérification : seau présent")
+	var bucket: Bucket = scene.get_node_or_null("Bucket") as Bucket
+	var item: TestItem = scene.get_node_or_null("TestItem") as TestItem
+	_check(bucket != null and item != null and not (item is Bucket), "scène de vérification : seau ramassable et objet de test présents")
+	await physics_frame
+	await physics_frame
+	for body: TestItem in [bucket, item]:
+		_check(body != null and body.support_surface != null and body.support_surface.is_floor
+				and is_equal_approx(body.global_position.y, body.item_data.height * 0.5),
+				"scène de vérification : %s posé sur le sol" % (body.name if body != null else &"?"))
+	_check(controller.take_out() and controller.held_tool() == sponge, "scène de vérification : l'éponge sort de son emplacement")
 	var face: CleanableFace = _largest_face(tour)
 	var last_point: Vector3 = _point(face, Vector2(0.2, 0.2))
 	controller.stroke(last_point, last_point, FRAME)
