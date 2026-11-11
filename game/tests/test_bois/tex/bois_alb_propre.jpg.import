@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://36hiuxkkc8af"
-path="res://.godot/imported/bois_albedo.jpg-bdeac9dd6f16f5c98f7327084169b364.ctex"
+uid="uid://l4rxb188jx5y"
+path="res://.godot/imported/bois_alb_propre.jpg-3c4e789b1d4d8c7ad89a1ba161842f3c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://tests/test_bois/tex/bois_albedo.jpg"
-dest_files=["res://.godot/imported/bois_albedo.jpg-bdeac9dd6f16f5c98f7327084169b364.ctex"]
+source_file="res://tests/test_bois/tex/bois_alb_propre.jpg"
+dest_files=["res://.godot/imported/bois_alb_propre.jpg-3c4e789b1d4d8c7ad89a1ba161842f3c.ctex"]
 
 [params]
 
