@@ -85,7 +85,18 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Poids par aire sale initiale 🟡 (proposition Direction, non validée) : mesure seulement, non branché au 100 %, non sauvegardé.
 - Provisoire 🟡 : échelles de texture (Art), profil du pinceau (playtest).
 - Préchauffage de la grille fine (lot P2-N2, 2026-11-11) : en arrière-plan, faces à moins de 4 m du joueur ; repli synchrone au contact d'une face non prête. Valeurs 🟡 provisoires : 4 m, 2 calculs simultanés, parcours toutes les 0,25 s, budget d'affectation 2 ms par image. Projection des faces verticales sur le plan de la face : faite.
-- À corriger : masques d'épaisseur en Lossless (Art, .import à pousser) ; sens de u sur le mur courbe vu de l'intérieur ; montée des marches non vérifiée (collision en rampe ou step-up à tester sur le joueur) ; subdivision du dessus de marche : faite.
+- Corrigé (2026-11-11) : masques d'épaisseur en Lossless (.import poussés, compress/mode=0) ; sens de u sur le mur courbe vu de l'intérieur ; montée des marches par step-up dans le joueur (max_step_height 0,3 m 🟡 provisoire) avec lissage de la tête après le step-up (step_smooth_time 0,12 s 🟡 provisoire). Subdivision du dessus de marche : faite.
+
+## Outil éponge ✅ (2026-11-11)
+- ToolData : ressource de données (couches nettoyées, rayon, efficacité, perte maximale, salissure par m², portée). Instance de l'éponge : game/data/tools/sponge.tres.
+- Efficacité effective = efficacité de base × (1 − salissure × perte maximale). Plancher de 10 % : invariant du code (GDD §7), pas un réglage.
+- Valeurs 🟡 provisoires de l'éponge : saleté et mousse, rayon 0,08 m, efficacité 4,0 dose/s, perte maximale 0,9, salissure 0,5 par m², portée 2,0 m.
+- Aire nettoyée = baisse de remaining_dirty_area() : la salissure arrive par à-coups. Validé par le développeur (2026-11-11), ainsi que le texte de debug.
+- Seau de rinçage : interagir avec lui en tenant l'outil remet la salissure à 0 ; il est sur la couche physique 3 seule.
+- lock_camera ✅ : bascule (touche C), relâchée automatiquement quand l'outil n'est plus tenu ou que l'objet tenu change, et à la prise d'un objet (décision de Direction du 2026-11-10, précisée le 2026-11-11).
+- Seau (2026-11-11, validé) : ItemData MEDIUM, déplaçable, exclu du 100 %, rinçage du seau posé au sol avec une touche distincte de la prise.
+- Outils du joueur (2026-11-11, validé) : emplacement dédié, hors ItemData et hors ceinture ; sortis en main, rangés automatiquement à la prise d'un objet.
+- Pas encore fait : le ToolController fixe l'outil par export (aucun lien avec l'emplacement dédié) ; seau fixe à rendre ramassable ; l'outil doit remplacer le curseur à l'écran.
 
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
