@@ -15,7 +15,11 @@ Test : `tools/godot.sh --headless --path game --script res://tests/save_roundtri
 ## Scènes
 `game/core/main.tscn` — scène principale (Node3D), instancie la scène grise — greybox.tscn
 `game/rooms/test/greybox.tscn` — pièce grise de test : sol 10x10, lumière, environnement, caméra fixe (current=false), bordures 1 m (couche 1), sol = PlacementSurface is_floor, PlacedObjects, 3 supports de test (table, palette, plot ; PlacementSurface is_floor = false), 11 objets de test ramassables (TestItems, dont 2 meubles libres au sol, z = 3,4), instancie Player — player.tscn, test_item.tscn
-`game/systems/player/player.gd` + `player.tscn` — Player (CharacterBody3D, classe Player) : marche/marche lente (bascule par walk_slow, export slow_walk_toggle ; maintenu si false), regard souris (yaw Player, pitch Head), Échap libère la souris, clic gauche la recapture, capteur + indice d'interaction, remise au départ sous fall_limit_y ; couche 2, masque 1 — Input Map
+`game/systems/player/player.gd` + `player.tscn` — Player (CharacterBody3D, classe Player) : marche/marche lente (bascule par walk_slow, export slow_walk_toggle ; maintenu si false), regard souris (yaw Player, pitch Head), Échap libère la souris, clic gauche la recapture, capteur + indice d'interaction, remise au départ sous fall_limit_y, step-up (try_step_up : marche <= max_step_height, 0,3 m provisoire, gravité suspendue le temps de passer le bord) ; couche 2, masque 1 — Input Map
+`game/tests/test_stairs.gd` — mesure de la montée de l'escalier de cleaning_tour.tscn + murets 0,25 m franchi / 0,5 m non — player.gd
+Test : `tools/godot.sh --headless --path game --script res://tests/test_stairs.gd`
+`game/tests/test_curved_wall.gd` — parité mapping analytique / UV2 et sens de u de la projection (mur vu de l'intérieur, noyau vu de l'extérieur) — cylinder_mapping.gd
+Test : `tools/godot.sh --headless --path game --script res://tests/test_curved_wall.gd`
 `game/systems/interaction/interactable.gd` — Interactable (Node, class_name) : enfant d'un corps sur la couche 3 ; prompt_key, action (PICK_UP/USE/PLACE/OPEN), signal interacted, interact() — aucune
 `game/systems/interaction/interaction_sensor.gd` — InteractionSensor (enfant de Head) : raycast physique 2 m (couches 1+3), target_changed, action interact ; inactif si souris non capturée — Interactable
 `game/ui/hud/interaction_prompt.tscn` + `.gd` — viseur central + indice tr(prompt_key) visible si cible — Interactable

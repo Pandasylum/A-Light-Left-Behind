@@ -49,6 +49,9 @@ func projection(module_xform: Transform3D) -> SurfaceMapping.WorldProjection:
 	var p: SurfaceMapping.WorldProjection = SurfaceMapping.WorldProjection.new()
 	p.mode = SurfaceMapping.Mode.CYLINDRE
 	p.axe_xz = Vector2(module_xform.origin.x, module_xform.origin.z)
-	p.rayon_ref = rayon
+	# Vu de l'intérieur (mur), u = angle court vers la gauche : texture en miroir. Le signe de rayon_ref
+	# inverse u de la projection seule (shader et CPU l'utilisent comme simple facteur) ; l'UV2 d'état, cuite
+	# dans les .glb, ne change pas, et le côté extérieur (noyau) non plus.
+	p.rayon_ref = -rayon if vers_interieur else rayon
 	p.tuile_m = tuile_m()
 	return p
