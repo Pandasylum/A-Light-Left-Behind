@@ -26,7 +26,7 @@ class WorldProjection extends RefCounted:
 	func uv_monde(p: Vector3) -> Vector2:
 		if mode == SurfaceMapping.Mode.CYLINDRE:
 			var angle: float = atan2(-(p.z - axe_xz.y), p.x - axe_xz.x)
-			return Vector2(angle * rayon_ref / tuile_m, p.y / tuile_m)
+			return Vector2(angle * rayon_ref / tuile_m, -p.y / tuile_m) # v vers le bas, comme la texture
 		return Vector2(p.dot(axe_u), p.dot(axe_v)) / tuile_m
 
 	func apply_to(material: ShaderMaterial) -> void:
@@ -91,8 +91,11 @@ func grid_size(texels_per_m: float) -> Vector2i:
 	return Vector2i(maxi(1, ceili(s.x * texels_per_m - 0.0001)), maxi(1, ceili(s.y * texels_per_m - 0.0001)))
 
 
-## Projection plane : face horizontale -> XZ monde ; verticale -> plan de l'axe dominant de la normale.
-static func plane_projection(world_normal: Vector3, tile_m: float) -> WorldProjection:
+## Projection plane, en coordonnées monde. Face horizontale -> XZ monde. Face verticale ou oblique ->
+## plan de la face : face_u = direction monde de u, face_v = direction monde de v (vers le bas, comme
+## la texture). Deux faces coplanaires de mêmes axes restent continues ; aucun étirement.
+static func plane_projection(world_normal: Vector3, tile_m: float, face_u: Vector3 = Vector3.RIGHT,
+		face_v: Vector3 = Vector3.BACK) -> WorldProjection:
 	var p: WorldProjection = WorldProjection.new()
 	p.mode = Mode.PLAN
 	p.tuile_m = tile_m
@@ -100,10 +103,7 @@ static func plane_projection(world_normal: Vector3, tile_m: float) -> WorldProje
 	if n.y >= n.x and n.y >= n.z:
 		p.axe_u = Vector3.RIGHT
 		p.axe_v = Vector3.BACK
-	elif n.z >= n.x:
-		p.axe_u = Vector3.RIGHT
-		p.axe_v = Vector3.UP
 	else:
-		p.axe_u = Vector3.BACK
-		p.axe_v = Vector3.UP
+		p.axe_u = face_u.normalized()
+		p.axe_v = face_v.normalized()
 	return p

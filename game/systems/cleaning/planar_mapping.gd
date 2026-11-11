@@ -32,4 +32,5 @@ func size_m() -> Vector2:
 
 
 func projection(module_xform: Transform3D) -> SurfaceMapping.WorldProjection:
-	return SurfaceMapping.plane_projection(module_xform.basis * normal_at(Vector2.ZERO), tuile_m)
+	var basis: Basis = module_xform.basis
+	return SurfaceMapping.plane_projection(basis * normal_at(Vector2.ZERO), tuile_m, basis * axe_u, basis * -axe_v)

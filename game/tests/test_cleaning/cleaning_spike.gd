@@ -1,6 +1,8 @@
 extends Node3D
-## Spike P2-N1 : mini-assemblée de 90° (6 tronçons de mur × 2 anneaux, 6 tronçons de noyau,
-## 6 marches, un mur droit) + pinceau de test (use_primary maintenu, souris capturée) + HUD.
+## Spikes P2-N1 / P2-N2 : assemblage paramétrable des modules témoins. Par défaut, mini-assemblée
+## de 90° (6 tronçons de mur × 2 anneaux, 6 tronçons de noyau, 6 marches, un mur droit) ;
+## cleaning_tour.tscn règle les mêmes paramètres pour un tour complet. Pinceau de test (use_primary
+## maintenu, souris capturée), préchauffage des grilles fines (CleaningPrewarmer) et HUD de mesures.
 ## Scène de test NON OFFICIELLE. Valeurs provisoires. Les modules viennent des .glb de
 ## assets/modules_temoins/ ; s'ils sont absents, les faces nettoyables sont générées par code.
 
@@ -8,15 +10,23 @@ const MODULES_DIR: String = "res://assets/modules_temoins/"
 const THETA: float = deg_to_rad(15.0)
 const STEP_HEIGHT: float = 0.18
 const RING_HEIGHT: float = 2.16 # PROVISOIRE
-const SEGMENTS: int = 6
-const RINGS: int = 2
 const BRUSH_RADIUS: float = 0.15 # m
 const BRUSH_REACH: float = 3.0 # m
 const BRUSH_RATE: float = 4.0 # dose par seconde, PROVISOIRE
 const WORLD_LAYER: int = 1
+const FRAME_WINDOW: float = 5.0 # s, fenêtre de la pire image affichée
 
 @export var stone_material: ShaderMaterial
 @export var force_generated_modules: bool = false
+## Assemblage (défauts = mini-assemblée de 90° du spike P2-N1 ; cleaning_tour.tscn = tour complet).
+@export var sectors: int = 6 ## secteurs de 15° (24 = tour complet)
+@export var wall_rings: int = 2
+@export var core_rings: int = 1
+@export var steps: int = 6
+@export var straight_wall: bool = true
+## Ouvertures du mur courbe : (anneau, secteur) sans tronçon de mur.
+@export var wall_openings: Array[Vector2i] = []
+@export var prewarm_radius: float = 4.0 ## m ; <= 0 : pas de préchauffage. PROVISOIRE
 
 var faces: Array[CleanableFace] = []
 var init_usec: int = 0 ## construction de l'assemblage, poids grossiers compris
@@ -29,6 +39,11 @@ var _aimed: CleanableFace
 var _brushing: bool = false
 var _last_point: Vector3 = Vector3.ZERO
 var _stroke_usec: int = 0
+var _worst_frame_usec: int = 0 # pire image de la fenêtre en cours
+var _worst_frame_shown: int = 0 # pire image de la fenêtre précédente
+var _window_left: float = FRAME_WINDOW
+
+var prewarmer: CleaningPrewarmer
 
 @onready var _camera: Camera3D = $Player/Head/Camera3D
 @onready var _label: Label = $HUD/Infos
@@ -103,13 +118,26 @@ func _ready() -> void:
 	var assembly: Node3D = Node3D.new()
 	assembly.name = "Assemblage"
 	add_child(assembly)
-	for k: int in SEGMENTS:
+	for k: int in steps:
 		_add_module(assembly, defs, "marche", "Marche%d" % k, k * THETA, Vector3(0.0, k * STEP_HEIGHT, 0.0))
-		_add_module(assembly, defs, "noyau", "Noyau%d" % k, k * THETA, Vector3.ZERO)
-		for j: int in RINGS:
-			_add_module(assembly, defs, "mur", "Mur%d_%d" % [j, k], k * THETA, Vector3(0.0, j * RING_HEIGHT, 0.0))
-	_add_module(assembly, defs, "mur_droit", "MurDroit", 0.0, Vector3(-2.5, 0.0, 0.0))
+	for k: int in sectors:
+		for j: int in core_rings:
+			# Un seul anneau : noms du spike P2-N1 (Noyau<k>) conservés.
+			var core_name: String = "Noyau%d" % k if core_rings == 1 else "Noyau%d_%d" % [j, k]
+			_add_module(assembly, defs, "noyau", core_name, k * THETA, Vector3(0.0, j * RING_HEIGHT, 0.0))
+		for j: int in wall_rings:
+			if not wall_openings.has(Vector2i(j, k)):
+				_add_module(assembly, defs, "mur", "Mur%d_%d" % [j, k], k * THETA, Vector3(0.0, j * RING_HEIGHT, 0.0))
+	if straight_wall:
+		_add_module(assembly, defs, "mur_droit", "MurDroit", 0.0, Vector3(-2.5, 0.0, 0.0))
 	init_usec = Time.get_ticks_usec() - t0
+	if prewarm_radius > 0.0:
+		prewarmer = CleaningPrewarmer.new()
+		prewarmer.name = "Prechauffage"
+		prewarmer.radius_m = prewarm_radius
+		prewarmer.faces = faces
+		prewarmer.target = get_node_or_null("Player") as Node3D
+		add_child(prewarmer)
 	if not generated.is_empty():
 		push_warning("cleaning_spike : .glb absents, modules générés par code : %s" % ", ".join(generated))
 	for note: String in notes:
@@ -220,20 +248,47 @@ func _face_at(point: Vector3) -> CleanableFace:
 	return best
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	# Pire image sur une fenêtre glissante (objectif : aucun à-coup > 8 ms dû au nettoyage).
+	_worst_frame_usec = maxi(_worst_frame_usec, int(delta * 1000000.0))
+	_window_left -= delta
+	if _window_left <= 0.0:
+		_window_left = FRAME_WINDOW
+		_worst_frame_shown = _worst_frame_usec
+		_worst_frame_usec = 0
 	var coarse_usec: int = 0
+	var ready_count: int = 0
+	var worst_sync_usec: int = 0
 	for face: CleanableFace in faces:
 		coarse_usec += face.coarse_init_usec
+		if face.has_fine_grid():
+			ready_count += 1
+			if not face.prewarmed:
+				worst_sync_usec = maxi(worst_sync_usec, face.fine_grid_usec + face.grid_apply_usec)
 	var aimed: String = "aucune"
 	if _aimed != null:
 		aimed = "%s/%s — propreté %.1f %% — %s" % [_aimed.get_parent().name, _aimed.name,
 				_aimed.cleanliness() * 100.0, "finie" if _aimed.is_finished() else "en cours"]
+	var prewarm: String = "désactivé"
+	var queue: String = "—"
+	if prewarmer != null:
+		prewarm = "%d préchauffées, %d en repli synchrone (pire repli %.1f ms), %d résultats ignorés" % [
+				prewarmer.prewarmed_count, ready_count - prewarmer.prewarmed_count, worst_sync_usec / 1000.0, prewarmer.discarded_count]
+		queue = "%d en attente, %d en calcul, %d à affecter — pire affectation %.2f ms, pire étape %.2f ms" % [
+				prewarmer.queue_size(), prewarmer.running_count(), prewarmer.pending_apply_count(),
+				prewarmer.worst_apply_usec / 1000.0, prewarmer.worst_tick_usec / 1000.0]
 	_label.text = "\n".join(PackedStringArray([
-		"Face visée : " + aimed,
+		"FPS : %d — pire image (fenêtre de %.0f s) : %.1f ms" % [
+				int(Engine.get_frames_per_second()), FRAME_WINDOW, _worst_frame_shown / 1000.0],
+		"Appels de dessin : %d — mémoire vidéo : %.1f Mo (textures %.1f Mo)" % [
+				int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
+				Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0,
+				Performance.get_monitor(Performance.RENDER_TEXTURE_MEM_USED) / 1048576.0],
+		"Grilles fines : %d / %d faces — %s" % [ready_count, faces.size(), prewarm],
+		"File de préchauffage (rayon %.1f m) : %s" % [prewarm_radius, queue],
 		"Dernier clean_stroke (toutes faces) : %.2f ms" % (_stroke_usec / 1000.0),
+		"Face visée : " + aimed,
 		"Initialisation : %.1f ms (dont poids grossiers %.1f ms, %d faces)" % [init_usec / 1000.0, coarse_usec / 1000.0, faces.size()],
-		"Appels de dessin : %d — FPS : %d" % [
-				int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)), int(Engine.get_frames_per_second())],
 		"Modules : " + ("GÉNÉRÉS PAR CODE (%s)" % ", ".join(generated) if not generated.is_empty() else ".glb"),
 		"Clic gauche maintenu : nettoyer (rayon %.2f m, portée %.0f m)" % [BRUSH_RADIUS, BRUSH_REACH],
 	]))

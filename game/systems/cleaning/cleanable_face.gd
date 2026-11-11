@@ -1,10 +1,13 @@
 class_name CleanableFace
 extends Node3D
-## Face nettoyable (spike P2-N1) : unité technique d'état, de sauvegarde et de fin de geste.
+## Face nettoyable (spikes P2-N1 / P2-N2) : unité technique d'état, de sauvegarde et de fin de geste.
 ## Enfant du module, transformation identité. Porte un masque d'état à 1 ou 2 couches
 ## (R = proprete_salete, G = proprete_mousse ; 0 = sale, 1 = propre) :
 ## tampons flottants CPU (source de vérité) + copie GPU (R8 / RG8), sans aucune relecture GPU.
 ## Le poids (aires) est mesuré seulement : aucun branchement au 100 % de la pièce.
+## Grille fine : calculée par un GridJob (sans effet de bord, exécutable sur un fil du
+## WorkerThreadPool via CleaningPrewarmer), puis affectée sur le fil principal par apply_grid ;
+## au contact d'une face non prête, ensure_fine_grid la calcule en synchrone (repli).
 
 signal finished ## fin de geste déclenchée (reste <= tau) ; l'état est déjà écrit propre
 
@@ -24,12 +27,78 @@ const THICKNESS_UNIFORMS: Array[StringName] = [&"masque_salete", &"masque_mousse
 
 ## Mesures du spike (µs).
 var coarse_init_usec: int = 0
-var fine_grid_usec: int = 0
+var fine_grid_usec: int = 0 ## calcul de la grille fine (sur un fil si préchauffée)
+var grid_apply_usec: int = 0 ## affectation de la grille sur le fil principal
+var prewarmed: bool = false ## grille calculée hors du fil principal
+
+
+## Calcul de la grille fine. Ne lit que sa propre copie des entrées (prise sur le fil principal par
+## make_grid_job) et n'écrit que ses propres champs : aucun tampon de la face n'est touché.
+class GridJob extends RefCounted:
+	var mapping: SurfaceMapping
+	var projection: SurfaceMapping.WorldProjection
+	var xform: Transform3D
+	var w: int = 0
+	var h: int = 0
+	var channels: int = 0
+	var epsilon: float = 0.0
+	var thickness_scale: Vector2 = Vector2.ONE
+	var sources: Array = []
+	# Résultat.
+	var positions: PackedVector3Array = PackedVector3Array()
+	var areas: PackedFloat64Array = PackedFloat64Array()
+	var thickness: Array[PackedFloat32Array] = []
+	var initial_area: PackedFloat64Array = PackedFloat64Array()
+	var initial_texels: PackedInt32Array = PackedInt32Array()
+	var usec: int = 0
+	var threaded: bool = false
+
+	func run() -> void:
+		var t0: int = Time.get_ticks_usec()
+		var n: int = w * h
+		positions.resize(n)
+		areas.resize(n)
+		var thick_r: PackedFloat32Array = PackedFloat32Array()
+		var thick_g: PackedFloat32Array = PackedFloat32Array()
+		thick_r.resize(n)
+		thick_g.resize(n if channels > 1 else 0)
+		initial_area.resize(channels)
+		initial_area.fill(0.0)
+		initial_texels.resize(channels)
+		initial_texels.fill(0)
+		for y: int in h:
+			var v: float = (float(y) + 0.5) / float(h)
+			for x: int in w:
+				var i: int = y * w + x
+				var local: Vector3 = mapping.point_at(Vector2((float(x) + 0.5) / float(w), v))
+				var area: float = mapping.texel_area(x, y, w, h)
+				positions[i] = local
+				areas[i] = area
+				var uv: Vector2 = projection.uv_monde(xform * local) * thickness_scale
+				for c: int in channels:
+					var e: float = CleanableFace._sample_thickness(sources[c], c, uv)
+					if c == 0:
+						thick_r[i] = e
+					else:
+						thick_g[i] = e
+					if e > epsilon:
+						initial_area[c] += area
+						initial_texels[c] += 1
+		thickness.append(thick_r)
+		if channels > 1:
+			thickness.append(thick_g)
+		usec = Time.get_ticks_usec() - t0
+
+	## Point d'entrée du WorkerThreadPool.
+	func run_threaded() -> void:
+		threaded = true
+		run()
 
 var _material: ShaderMaterial
 var _projection: SurfaceMapping.WorldProjection
 var _xform: Transform3D
 var _xform_inv: Transform3D
+var _bounds: AABB = AABB() # boîte monde de la face (rejet rapide, distance de préchauffage)
 var _thickness_scale: Vector2 = Vector2.ONE
 var _sources: Array = [] # par couche : [PackedByteArray, largeur, hauteur] ou [] (constante)
 
@@ -51,6 +120,7 @@ var _remaining_area: PackedFloat64Array = PackedFloat64Array() # reste incrémen
 var _remaining_texels: PackedInt32Array = PackedInt32Array()
 
 var _finished: bool = false
+var _touched: bool = false # au moins un texel modifié depuis l'état sale (sinon : absente de la sauvegarde)
 var _fade: float = -1.0 # < 0 : aucun fondu en cours ; sinon avancement 0..1
 
 static var _source_cache: Dictionary = {} # Texture2D -> [octets R8 niveau 0, largeur, hauteur]
@@ -73,6 +143,11 @@ func _ready() -> void:
 		mesh_instance.set_surface_override_material(surface_index, _material)
 	# Une seule source : la projection de la correspondance alimente le shader et le CPU.
 	_projection = mapping.projection(_xform)
+	_bounds = AABB(_xform * mapping.point_at(Vector2(0.5, 0.5)), Vector3.ZERO)
+	for j: int in 3:
+		for i: int in 3:
+			_bounds = _bounds.expand(_xform * mapping.point_at(Vector2(i * 0.5, j * 0.5)))
+	_bounds = _bounds.grow(0.02) # flèche d'un arc de 15° échantillonné en 3 points : < 5 mm
 	_projection.apply_to(_material)
 	_material.set_shader_parameter(&"epsilon", params.epsilon)
 	_material.set_shader_parameter(&"fondu", 0.0)
@@ -92,6 +167,14 @@ func _process(delta: float) -> void:
 	advance_fade(delta)
 
 
+func _notification(what: int) -> void:
+	# À la suppression de la face, l'emplacement de matériau du maillage est rendu : aucune
+	# instance ne garde le matériau de la face après elle.
+	if what == NOTIFICATION_PREDELETE and is_instance_valid(mesh_instance) \
+			and mesh_instance.get_surface_override_material(surface_index) == _material:
+		mesh_instance.set_surface_override_material(surface_index, null)
+
+
 # --- Nettoyage ---
 
 ## Nettoie le long du segment monde from -> to : tampons sphériques de rayon radius_m, espacés de
@@ -100,6 +183,9 @@ func _process(delta: float) -> void:
 ## Renvoie true si au moins un texel a changé.
 func clean_stroke(from: Vector3, to: Vector3, radius_m: float, amount: float, layers: int = 0b11) -> bool:
 	if _finished or radius_m <= 0.0 or amount <= 0.0:
+		return false
+	# Rejet rapide : le geste (segment + rayon) ne touche pas la boîte de la face.
+	if not AABB(from, Vector3.ZERO).expand(to).grow(radius_m).intersects(_bounds):
 		return false
 	var a: Vector3 = _xform_inv * from
 	var b: Vector3 = _xform_inv * to
@@ -110,6 +196,7 @@ func clean_stroke(from: Vector3, to: Vector3, radius_m: float, amount: float, la
 		if _stamp(a.lerp(b, float(i) / float(steps)), radius_m, dose, layers):
 			changed = true
 	if changed:
+		_touched = true
 		_upload()
 		if remaining_ratio() <= params.tau:
 			_finish(true)
@@ -196,6 +283,17 @@ func face_area() -> float:
 
 func has_fine_grid() -> bool:
 	return _grid_ready
+
+
+## Boîte monde de la face.
+func world_bounds() -> AABB:
+	return _bounds
+
+
+## Distance (m) d'un point monde à la boîte de la face (0 à l'intérieur).
+func distance_to_bounds(world_point: Vector3) -> float:
+	var nearest: Vector3 = world_point.clamp(_bounds.position, _bounds.end)
+	return nearest.distance_to(world_point)
 
 
 ## Aire sale initiale par échantillonnage grossier (somme des couches), calculée au _ready.
@@ -289,10 +387,10 @@ func surface_distance(world_point: Vector3) -> float:
 
 # --- Sauvegarde ---
 
-## Entrée pour le SaveService ; {} si la face n'a jamais été touchée (clé absente = sale).
+## Entrée pour le SaveService ; {} si la face est intacte, même préchauffée (clé absente = sale).
 ## id = chemin du nœud depuis la racine de la pièce. Le poids n'est pas sauvegardé.
 func export_state(room_root: Node) -> Dictionary:
-	if not _grid_ready:
+	if not _grid_ready or not _touched:
 		return {}
 	return {
 		"id": String(room_root.get_path_to(self)),
@@ -327,6 +425,7 @@ func import_state(entry: Dictionary) -> bool:
 	if raw.size() != expected:
 		return _reject("%d octets au lieu de %d" % [raw.size(), expected])
 	ensure_fine_grid()
+	_touched = true
 	_bytes = raw
 	for c: int in channels:
 		var state: PackedFloat32Array = _state[c]
@@ -367,45 +466,42 @@ static func import_room(room_root: Node, data: Dictionary) -> int:
 
 # --- Interne ---
 
-## Crée la grille fine (positions, aires, épaisseurs, état sale, copie GPU). Idempotent.
+## Crée la grille fine en synchrone (repli au contact d'une face non préchauffée). Idempotent.
 func ensure_fine_grid() -> void:
 	if _grid_ready:
 		return
+	var job: GridJob = make_grid_job()
+	job.run()
+	apply_grid(job)
+
+
+## Copie des entrées du calcul de la grille fine. À appeler sur le fil principal.
+func make_grid_job() -> GridJob:
+	var job: GridJob = GridJob.new()
+	job.mapping = mapping
+	job.projection = _projection
+	job.xform = _xform
+	job.w = _w
+	job.h = _h
+	job.channels = channels
+	job.epsilon = params.epsilon
+	job.thickness_scale = _thickness_scale
+	job.sources = _sources
+	return job
+
+
+## Affecte une grille calculée (positions, aires, épaisseurs), crée l'état sale et la copie GPU.
+## Fil principal seulement. Sans effet (false) si la face a déjà sa grille.
+func apply_grid(job: GridJob) -> bool:
+	if _grid_ready or job.w != _w or job.h != _h or job.channels != channels or job.thickness.size() != channels:
+		return false
 	var t0: int = Time.get_ticks_usec()
 	var n: int = _w * _h
-	_positions.resize(n)
-	_areas.resize(n)
-	var thick_r: PackedFloat32Array = PackedFloat32Array()
-	var thick_g: PackedFloat32Array = PackedFloat32Array()
-	thick_r.resize(n)
-	thick_g.resize(n if channels > 1 else 0)
-	var eps: float = params.epsilon
-	_initial_area.resize(channels)
-	_initial_area.fill(0.0)
-	_initial_texels.resize(channels)
-	_initial_texels.fill(0)
-	for y: int in _h:
-		var v: float = (float(y) + 0.5) / float(_h)
-		for x: int in _w:
-			var i: int = y * _w + x
-			var local: Vector3 = mapping.point_at(Vector2((float(x) + 0.5) / float(_w), v))
-			var area: float = mapping.texel_area(x, y, _w, _h)
-			_positions[i] = local
-			_areas[i] = area
-			var uv: Vector2 = _projection.uv_monde(_xform * local) * _thickness_scale
-			for c: int in channels:
-				var e: float = _read_thickness(c, uv)
-				if c == 0:
-					thick_r[i] = e
-				else:
-					thick_g[i] = e
-				if e > eps:
-					_initial_area[c] += area
-					_initial_texels[c] += 1
-	_thickness.clear()
-	_thickness.append(thick_r)
-	if channels > 1:
-		_thickness.append(thick_g)
+	_positions = job.positions
+	_areas = job.areas
+	_thickness = job.thickness
+	_initial_area = job.initial_area
+	_initial_texels = job.initial_texels
 	_state.clear()
 	for c: int in channels:
 		var buffer: PackedFloat32Array = PackedFloat32Array()
@@ -420,7 +516,10 @@ func ensure_fine_grid() -> void:
 	_material.set_shader_parameter(&"etat", _texture)
 	_grid_ready = true
 	_finished = _sum(_initial_area) <= 0.0
-	fine_grid_usec = Time.get_ticks_usec() - t0
+	prewarmed = job.threaded
+	fine_grid_usec = job.usec
+	grid_apply_usec = Time.get_ticks_usec() - t0
+	return true
 
 
 ## Aire sale initiale par couche, à la densité grossière (aucun tampon conservé).
@@ -435,13 +534,13 @@ func _measure_coarse() -> void:
 			var local: Vector3 = mapping.point_at(Vector2((float(x) + 0.5) / float(size.x), v))
 			var uv: Vector2 = _projection.uv_monde(_xform * local) * _thickness_scale
 			for c: int in channels:
-				if _read_thickness(c, uv) > eps:
+				if _sample_thickness(_sources[c], c, uv) > eps:
 					_coarse_area[c] += mapping.texel_area(x, y, size.x, size.y)
 
 
 ## Épaisseur de la couche en uv : bilinéaire, répétition, niveau 0 (comme le shader).
-func _read_thickness(layer: int, uv: Vector2) -> float:
-	var source: Array = _sources[layer]
+## Statique et sans effet de bord : appelable depuis un fil.
+static func _sample_thickness(source: Array, layer: int, uv: Vector2) -> float:
 	if source.is_empty():
 		return DEFAULT_THICKNESS[layer]
 	var data: PackedByteArray = source[0]
@@ -499,6 +598,7 @@ func _upload() -> void:
 ## se fondent via l'uniform fondu, puis la texture propre est envoyée à la fin du fondu.
 func _finish(with_fade: bool) -> void:
 	_finished = true
+	_touched = true
 	for c: int in channels:
 		var state: PackedFloat32Array = _state[c]
 		state.fill(1.0)
@@ -517,6 +617,7 @@ func _finish(with_fade: bool) -> void:
 
 
 func _reset_dirty() -> void:
+	_touched = false
 	_fade = -1.0
 	set_process(false)
 	_material.set_shader_parameter(&"fondu", 0.0)
