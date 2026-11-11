@@ -74,7 +74,7 @@ Types de saleté et outils :
 
 - Une surface à nettoyer est une zone d'un objet ou du décor reconnaissable par le joueur (plateau, pan de mur, dalle, marche). Elle regroupe plusieurs faces de nettoyage.
 - Les grandes surfaces (sol, grands murs) sont découpées en plusieurs surfaces à nettoyer.
-- Une surface est terminée quand il ne reste que quelques faces sales : seuil absolu, valeur de départ 3 faces, à régler après essai (§15). Le reste se finit automatiquement.
+- Une surface est terminée quand il ne reste que quelques faces sales : au plus 3 faces ET au plus environ 10 % des faces de la surface (valeurs de départ, à régler après essai). Le reste se finit automatiquement. Une petite surface exige donc toutes ses faces.
 - Ne pas confondre « surface à nettoyer » (nettoyage) et « surface de pose » (rangement, §5).
 - À la fin de chaque surface : petit retour visuel et sonore discret. Plusieurs variantes sonores, de hauteur légèrement différente, évitent la saturation. La production de ce retour relève d'Art (visuel) et de Sound Design (son).
 
@@ -264,6 +264,7 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 - Pause en jeu : Reprendre, Options, Retour au menu principal, Quitter.
 - Options : identiques à l'écran-titre et en pause. Contenu : mapping des touches, affichage, volumes, puis Recommencer (en rouge).
 - Recommencer : alerte de validation dont le choix par défaut est « Annuler ». Efface la sauvegarde sans modifier les réglages, puis ramène à l'écran-titre, qui affiche alors Nouvelle partie.
+- Si la sauvegarde est illisible, l'écran-titre l'indique (« sauvegarde endommagée ») ; Nouvelle partie reste disponible avec confirmation, la sauvegarde endommagée étant mise de côté sans être effacée.
 - Pas de réinitialisation des réglages pour l'instant.
 - Retour au menu principal et Quitter sauvegardent la partie. Si une action d'outil est en cours, elle se termine ou s'annule proprement avant.
 
@@ -379,8 +380,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 27. Pièces où la rouille apparaît.
 28. ~~Catalogue des améliorations (l'éponge abrasive en est le premier exemple).~~ Fusionné au point 5.
 29. Mousse tenace : outil et moment de déblocage à définir (piste non validée : face abrasive de l'éponge, comme la rouille).
-30. Taille maximale d'une surface à nettoyer (§4) : à fixer avec Art et Engineering.
-31. Valeur exacte du seuil de fin de surface (§4) : 3 faces sales en valeur de départ, à régler après essai.
+30. Taille minimale (piste : environ dix faces) et maximale d'une surface à nettoyer (§4), à fixer avec Art et Engineering ; valeurs du seuil de fin de surface à régler après essai.
 
 ---
 
