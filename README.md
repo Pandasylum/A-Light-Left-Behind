@@ -2,7 +2,7 @@
 
 Jeu solo contemplatif à la première personne : nettoyer, réparer, ranger et restaurer un ancien phare abandonné sur un rocher isolé, et découvrir pourquoi le précédent gardien est parti.
 
-- Moteur : Godot 4.6
+- Moteur : Godot 4.7.2
 - Cible : PC uniquement
 - Statut : préproduction (voir `ROADMAP.md`)
 
