@@ -17,7 +17,19 @@ Légende : ✅ décision validée · 🟡 à décider en Phase 0
 1. ✅ 2026-11-10 — Rendu : Forward+.
 2. ✅ 2026-11-10 — Langage : GDScript seul (pas de C#), typage statique encouragé.
 3. ✅ 2026-11-10 — Dossiers : projet Godot dans `game/` (`core`, `systems`, `data`, `rooms/test`, `props`, `ui`, `assets`, `tests`) ; docs et CLAUDE.md hors du moteur. Nommage : fichiers en snake_case, classes en PascalCase.
-4. 🟡 Représentation de la saleté (masque ou zones), à tester en Phase 2.
+Nettoyage localisé — ✅ VALIDÉ 2026-11-11
+- L'état de saleté est un masque par surface (R8, 0 = sale, 1 = propre). Aucun scalaire d'instance.
+- Périmètre : mousse sur pierre architecturale. Verrière, rambardes et mobilier : décisions séparées.
+- Correspondance point visé / UV analytique, via SurfaceMapping : plan (murs droits, marches, contremarches), cylindre (fût, noyau). Maillages quelconques non retenus.
+- Épaisseur en coordonnées monde, projection plane ou cylindrique. Mêmes paramètres pour le shader et le CPU.
+- Matériau propre à chaque face ; UV2 = développée linéaire, sans recouvrement.
+- Unité du 100 % : la surface. Nettoyée quand le reste de texels couverts (épaisseur - propreté > epsilon) est <= tau.
+- Valeurs de départ, provisoires, à régler en playtest : epsilon = 0,05 ; tau = 0,02 (fraction des texels couverts). Constantes uniques, exposées.
+- Fin de geste : une fois tau atteint, les résidus s'effacent automatiquement (fondu ~0,5 s) et la surface passe à « nettoyée ».
+- Le shader rend la mousse invisible à epsilon, pour que le comptage CPU corresponde au rendu.
+- Réserve : si tau = 2 % est trop visible sur la plus grande surface, un plafond en m² sera rediscuté. Non implémenté.
+- Sauvegarde : JSON du SaveService, R8 compressé puis base64, id = chemin depuis la racine de la pièce. Taille attendue dérivée de la scène. Clé absente = sale.
+- Noms : proprete_mousse, epaisseur_mousse, proprete_surface ; plus tard proprete_mousse_tenace et epaisseur_mousse_tenace.
 5. ✅ 2026-11-10 — Architecture : trois autoloads maximum (sauvegarde, progression, réglages) ; physique par requêtes uniquement (raycast, shape query), aucun RigidBody persistant. Sauvegarde : JSON versionné dans `user://`, écriture atomique, jamais de .tres/ResourceSaver.
 6. ✅ 2026-11-10 — Objets = ressource `ItemData` ; emplacements de rangement = volumes (Area3D) dans les scènes de pièce + ressource `ZoneData` pour les règles.
 
