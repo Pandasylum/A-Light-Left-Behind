@@ -237,7 +237,7 @@ func _test_tool_in_hand(spike: Node3D, sponge: ToolData) -> void:
 	var controller: ToolController = player.get_node("ToolController") as ToolController
 	var carry: CarryController = player.get_node("CarryController") as CarryController
 	controller.slots.clear()
-	_check(InputMap.has_action(&"equip_tool") and InputMap.has_action(&"rinse_tool"), "Input Map : equip_tool et rinse_tool")
+	_check(InputMap.has_action(&"equip_tool") and not InputMap.has_action(&"rinse_tool"), "Input Map : equip_tool, plus de rinse_tool")
 	_check(controller.add_tool(sponge) == 0 and controller.state == null and controller.held_tool() == null, "éponge ajoutée : rangée, aucun outil en main")
 	var face: CleanableFace = _largest_face(spike)
 	var center: Vector3 = _point(face, Vector2(0.8, 0.8))
@@ -291,13 +291,12 @@ func _test_tool_in_hand(spike: Node3D, sponge: ToolData) -> void:
 	controller.slots.clear()
 
 
-# --- Seau : objet libre MEDIUM, rinçage par rinse_tool ---
+# --- Seau : objet libre MEDIUM, rinçage par clic ---
 
 func _test_bucket(spike: Node3D, sponge: ToolData) -> void:
 	var player: Player = spike.get_node("Player") as Player
 	var controller: ToolController = player.get_node("ToolController") as ToolController
 	var carry: CarryController = player.get_node("CarryController") as CarryController
-	var sensor: InteractionSensor = player.get_node("Head/InteractionSensor") as InteractionSensor
 	var bucket: Bucket = (load(BUCKET_SCENE) as PackedScene).instantiate() as Bucket
 	root.add_child(bucket)
 	var interactable: Interactable = bucket.get_node("Interactable") as Interactable
@@ -333,20 +332,37 @@ func _test_bucket(spike: Node3D, sponge: ToolData) -> void:
 	carry.release_held()
 	controller.take_out()
 
-	# Action rinse_tool sur le seau visé (reposé) ; la touche de prise ne rince pas.
-	sensor.set_target(interactable)
-	_press(controller, &"rinse_tool")
-	_check(controller.state.soil == soil, "rinse_tool : sans effet si la souris n'est pas capturée (headless)")
-	player.camera_locked = true
-	_press(controller, &"rinse_tool")
-	_check(controller.state.soil == 0.0, "rinse_tool sur le seau visé : salissure remise à 0")
+	# Clic maintenu sur le seau posé (rayon de visée) : rince une fois par appui, rien nettoyé derrière.
+	var face: CleanableFace = _largest_face(spike)
+	var behind: Vector3 = _point(face, Vector2(0.8, 0.8))
+	var bucket_hit: Dictionary = {"collider": bucket, "position": behind}
+	var floor_hit: Dictionary = {"collider": face, "position": behind}
 	controller.state.add_cleaned_area(1.0)
-	sensor.set_target(other.get_node("Interactable") as Interactable)
-	_press(controller, &"rinse_tool")
-	_check(controller.state.soil == soil, "rinse_tool sur un autre objet : sans effet")
-	sensor.set_target(null)
-	_press(controller, &"rinse_tool")
-	_check(controller.state.soil == soil, "rinse_tool sans cible : sans effet")
+	var dirty: float = face.remaining_dirty_area()
+	controller.apply_aim_hit(bucket_hit, 0.1)
+	_check(controller.state.soil == 0.0, "clic sur le seau posé : outil rincé")
+	_check(face.remaining_dirty_area() == dirty, "clic sur le seau : rien nettoyé derrière")
+	controller.state.add_cleaned_area(1.0)
+	controller.apply_aim_hit(bucket_hit, 0.1)
+	_check(controller.state.soil == soil, "même appui : un seul rinçage")
+	controller.apply_aim_hit(floor_hit, 0.1)
+	_check(controller.state.soil >= soil and controller.last_cleaned_area >= 0.0, "hors seau : nettoyage habituel")
+	controller._rinse_latched = false
+	controller.state.add_cleaned_area(1.0)
+	var soil2: float = controller.state.soil
+	controller.apply_aim_hit({"collider": other, "position": behind}, 0.1)
+	_check(controller.state.soil >= soil2, "autre objet : pas de rinçage")
+	controller.stow_tool()
+	controller.apply_aim_hit(bucket_hit, 0.1)
+	_check(controller.slots.state_at(0).soil >= soil2, "sans outil en main : pas de rinçage")
+	controller.take_out()
+	controller._rinse_latched = false
+	carry.pick_up(interactable)
+	controller.slots.take_out(0)
+	controller.apply_aim_hit(bucket_hit, 0.1)
+	_check(controller.state.soil >= soil2, "seau porté : pas de rinçage par clic")
+	carry.release_held()
+	controller.take_out()
 	player.camera_locked = false
 	other.free()
 	bucket.free()
