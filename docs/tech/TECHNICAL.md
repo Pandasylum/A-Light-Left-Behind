@@ -23,9 +23,9 @@ Nettoyage localisé — ✅ VALIDÉ 2026-11-11
 - Correspondance point visé / UV analytique, via SurfaceMapping : plan (murs droits, marches, contremarches), cylindre (fût, noyau). Maillages quelconques non retenus.
 - Épaisseur en coordonnées monde, projection plane ou cylindrique. Mêmes paramètres pour le shader et le CPU.
 - Matériau propre à chaque face ; UV2 = développée linéaire, sans recouvrement.
-- Unité du 100 % : la surface. Nettoyée quand le reste de texels couverts (épaisseur - propreté > epsilon) est <= tau.
+- Unité du 100 % : la surface. Fin de surface : voir « Surfaces à nettoyer » (décision du 2026-11-12, remplace le critère tau au niveau de la surface). Le reste de texels couverts (épaisseur - propreté > epsilon) sert au critère tau par face.
 - Valeurs de départ, provisoires, à régler en playtest : epsilon = 0,05 ; tau = 0,02 (fraction des texels couverts). Constantes uniques, exposées.
-- Fin de geste : une fois tau atteint, les résidus s'effacent automatiquement (fondu ~0,5 s) et la surface passe à « nettoyée ».
+- Fin de geste : une fois tau atteint pour une face, ses résidus s'effacent automatiquement (fondu ~0,5 s). Le passage de la surface à « nettoyée » suit la règle « Surfaces à nettoyer ».
 - Le shader rend la mousse invisible à epsilon, pour que le comptage CPU corresponde au rendu.
 - Réserve : si tau = 2 % est trop visible sur la plus grande surface, un plafond en m² sera rediscuté. Non implémenté.
 - Sauvegarde : JSON du SaveService, R8 compressé puis base64, id = chemin depuis la racine de la pièce. Taille attendue dérivée de la scène. Clé absente = sale.
@@ -37,7 +37,7 @@ Nettoyage localisé — ✅ VALIDÉ 2026-11-11
 ## Input Map (provisoire) 🟡
 Actions définies dans `game/project.godot` (clavier/souris, touches provisoires, codes physiques ; aucune manette). Le regard à la souris est lu directement, hors Input Map. Les actions `ui_*` par défaut sont conservées.
 - Déplacement : `move_forward`, `move_back`, `move_left`, `move_right`, `walk_slow`
-- Interaction : `interact`, `use_primary`, `use_secondary`, `drop_object`, `rotate_left`, `rotate_right`, `cycle_item`
+- Interaction : `interact`, `use_primary`, `use_secondary`, `drop_object`, `rotate_left`, `rotate_right`, `cycle_item`, `equip_tool` (F, provisoire ; `rinse_tool` retirée, décision du 2026-11-11)
 - Interface : `inventory_open`, `journal_open`, `pause_menu`
 
 Vérification automatique : `tools/check_project.sh` (Godot headless Linux, version épinglée à 4.7.2).
@@ -50,6 +50,18 @@ Vérification automatique : `tools/check_project.sh` (Godot headless Linux, vers
 
 Couches de collision (2026-11-10). Couche 1 : monde (sol, murs, meubles). Couche 2 : joueur (masque 1). Les couches suivantes seront ajoutées ici au fur et à mesure.
 Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (masque 4). Le raycast d’interaction lit les couches 1 et 3, portée 2,0 m (provisoire).
+
+## Autosave (décidé le 2026-11-12) 🟡 — décidé, non implémenté
+- Sauvegarde sur événements plus sortie. Aucun intervalle fixe, aucune sauvegarde manuelle, un seul emplacement.
+- Rangement d'un outil : l'outil remis à son emplacement déclenche une sauvegarde, avec son état. Implémentable maintenant.
+- Sortie : quitter ou revenir au menu principal déclenche une sauvegarde, après la fin ou l'annulation propre de l'action d'outil en cours. Implémentable maintenant.
+- Changement de pièce : le passage d'une pièce à une autre déclenche une sauvegarde. Implémentable quand le système de pièces existe.
+- Fin de surface : la fin d'une surface à nettoyer déclenche une sauvegarde. Implémentable après la Phase 3.
+- Un déclencheur reçu pendant une action d'outil est mis en attente et exécuté à la fin de l'action. Les déclencheurs rapprochés sont fusionnés en une seule écriture.
+- Écriture atomique : fichier temporaire, puis remplacement, avec l'ancienne version conservée en `.bak`. Le chargement lit le `.bak` si le fichier principal est illisible.
+- À mesurer : le coût d'une écriture (188 faces + outils). Si elle pèse sur les 60 FPS, elle passe dans un thread, sans changer les déclencheurs.
+- Menu : « Continuer » remplace « Nouvelle partie » si une sauvegarde existe. « Recommencer » (Options) supprime le fichier principal et le `.bak`, ne touche pas aux réglages, puis ramène à l'écran-titre, après une alerte avec « Annuler » par défaut. À implémenter.
+- Sauvegardes illisibles (principal et `.bak`) : jamais traitées comme une absence de sauvegarde. L'écran-titre affiche « sauvegarde endommagée ». Les fichiers sont renommés (par exemple `.corrompu`), jamais supprimés ni écrasés. « Nouvelle partie » reste disponible avec confirmation, qui précise que la sauvegarde endommagée sera mise de côté. L'entrée dans le journal est conservée.
 
 ## Décisions de Direction ✅ (source : Direction 2026-11-10)
 - Verrou du 100 % : booléen « restaurée » par pièce, posé au premier passage à 100 %, sauvegardé, jamais retiré. Le pourcentage affiché reflète l'état réel ; un axe ajouté plus tard ne retire pas le statut.
@@ -77,7 +89,7 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Correspondance point visé / UV analytique via SurfaceMapping : plan (murs droits, contremarches), cylindre (fût, noyau), secteur polaire (dessus de marche). Maillages quelconques non retenus.
 - Épaisseur et textures de pierre et de mousse en projection monde (plane ou cylindrique), mêmes paramètres pour le shader et le CPU ; échantillonneurs d'épaisseur sans mipmap (parité CPU/GPU). L'état est lu par l'UV2 de la face (îlot 0..1, v inversée par l'export glTF). Matériau propre à chaque face.
 - Unité du 100 % : non fixée (GDD §15 pt 2). La face nettoyable (cellule du masque) est une unité technique : état, sauvegarde, fin de geste à tau. Reste = texels couverts (épaisseur − propreté > epsilon) / texels couverts initiaux ; face finie quand reste ≤ tau.
-- Fin de geste ✅ (Direction, 2026-11-11) : à tau, les résidus s'effacent (fondu ≈ 0,5 s) et la surface est nettoyée. Le shader rend la mousse invisible à epsilon.
+- Fin de geste ✅ (Direction, 2026-11-11) : à tau, les résidus de la face s'effacent (fondu ≈ 0,5 s). Le passage de la surface à « nettoyée » suit la règle « Surfaces à nettoyer » (décision du 2026-11-12). Le shader rend la mousse invisible à epsilon.
 - Valeurs 🟡 provisoires, à régler en playtest, constantes uniques : epsilon = 0,05 ; tau = 0,02. Réserve : plafond en m² à rediscuter si 2 % est trop visible sur la plus grande surface.
 - Sauvegarde : JSON du SaveService, RG8 compressé sans perte puis base64, id = chemin du nœud depuis la racine de la pièce, taille attendue dérivée de la scène, clé absente = sale. Faces intactes absentes. Le poids n'est pas sauvegardé.
 - Noms : proprete_salete et proprete_mousse (états) ; masque_salete et masque_mousse (épaisseurs, vocabulaire d'Art) ; proprete_surface ; plus tard proprete_mousse_tenace et masque_mousse_tenace.
@@ -86,6 +98,12 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Provisoire 🟡 : échelles de texture (Art), profil du pinceau (playtest).
 - Préchauffage de la grille fine (lot P2-N2, 2026-11-11) : en arrière-plan, faces à moins de 4 m du joueur ; repli synchrone au contact d'une face non prête. Valeurs 🟡 provisoires : 4 m, 2 calculs simultanés, parcours toutes les 0,25 s, budget d'affectation 2 ms par image. Projection des faces verticales sur le plan de la face : faite.
 - Corrigé (2026-11-11) : masques d'épaisseur en Lossless (.import poussés, compress/mode=0) ; sens de u sur le mur courbe vu de l'intérieur ; montée des marches par step-up dans le joueur (max_step_height 0,3 m 🟡 provisoire) avec lissage de la tête après le step-up (step_smooth_time 0,12 s 🟡 provisoire). Subdivision du dessus de marche : faite.
+
+## Surfaces à nettoyer (décision de Direction, 2026-11-12, Phase 3)
+- Une surface est une zone reconnaissable d'un objet ou du décor, regroupant plusieurs faces. Les grandes surfaces sont découpées. À ne pas confondre avec les surfaces de pose.
+- Fin automatique d'une surface : le seuil de faces sales restantes est min(3, partie entière de 10 % du nombre de faces de la surface). Décision de Direction du 2026-11-12. Exemples : 4 et 9 faces → seuil 0 (toutes les faces exigées) ; 10 à 19 → 1 ; 20 à 29 → 2 ; 30 et plus → 3. Les valeurs 3 et 10 % sont de départ, à régler après essai.
+- Le reste se finit automatiquement.
+- Points ouverts : taille minimale et maximale d'une surface, à fixer par Direction et Art à partir des chiffres fournis par Engineering. Piste de départ : minimum d'environ dix faces, à confirmer.
 
 ## Outil éponge ✅ (2026-11-11)
 - ToolData : ressource de données (couches nettoyées, rayon, efficacité, perte maximale, salissure par m², portée). Instance de l'éponge : game/data/tools/sponge.tres.
