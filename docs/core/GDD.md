@@ -43,6 +43,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 ## 4. Nettoyage et réparation ✅
 
 - Le joueur nettoie directement les surfaces et les objets avec les outils adaptés.
+- Le nettoyage est local : la saleté disparaît sous l'outil, pas par surface entière.
 - Les outils de nettoyage et de rangement de base sont trouvés dans la première pièce servant de tutoriel.
 - Outils de nettoyage trouvés progressivement dans la pièce 1 ; outils de réparation trouvés progressivement à l'atelier. La réparation est introduite à l'atelier, et les améliorations se débloquent progressivement.
 - Le nettoyage précède la réparation : une surface ou un objet doit être nettoyé avant d'être réparé.
