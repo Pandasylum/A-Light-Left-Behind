@@ -97,29 +97,38 @@ Deuxième vague : carrelage / faïence, papier jauni, verre.
 Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
 
 
-### Origine : demande Engineering (masque d'état par face, UV2, SurfaceMapping cylindre). Validé Direction : escalier central hélicoïdal ; marche 1,5 m ; 24 marches par tour (valeurs de départ, ajustables).
+## 2026-11-11 — Modules du fût : règle d'export et tuilage (REMPLACE les deux entrées précédentes)
 
-### Valeurs de départ
+Origine : demande Engineering (masque d'état par face en UV2, SurfaceMapping cylindre).
+Validé Direction : escalier central hélicoïdal ; marche 1,5 m ; 24 marches par tour. Validé développeur : tuilage N = 12.
+Statut : règle d'export validée pour les modules témoins. Style NON OFFICIEL (test bois non fait). Modules vérifiés dans les .glb par Engineering ; import Godot pas encore testé.
 
-Rayon intérieur du fût R = 2,0 m. Noyau cylindrique R = 0,5 m. Largeur de marche = 1,5 m.
-Angle d'un tronçon θ = 15° (360 / marches par tour). Arc du mur ≈ 0,524 m.
-Hauteur d'étage et marches par étage : PARAMÈTRES, non figés (étage non décidé). Cible hauteur de marche 17–19 cm (0,18 m en test).
-Hauteur d'un module mur/noyau : paramètre provisoire (2,16 m en test).
+### Valeurs
+- Rayon intérieur du fût R = 2,0 m. Noyau cylindrique R = 0,5 m. Largeur de marche 1,5 m.
+- Tronçons de 15° (360 / 24). Arc du mur ≈ 0,524 m.
+- PARAMÈTRES non figés (étage non décidé) : hauteur d'étage, marches par étage. Cible hauteur de marche 17–19 cm (0,18 m en test).
+- Hauteurs PROVISOIRES : étage 4,32 m, module mur/noyau 2,16 m. Tout changement impose un nouvel export et le test de correspondance Engineering.
 
-### Règle
+### Règle d'export
+1. Mur et noyau : tronçons de cylindre, rayon unique, axe vertical, origine sur l'axe, angle de 0 à θ. Aucune déformation par module.
+2. Marche : face de dessus plane (1 emplacement de matériau) + contremarche plane à l'angle 0 (1 emplacement). Marche k : rotation k·θ, hauteur k·h_marche.
+3. Relief par normal map, jamais par géométrie.
+4. Échelle : 1 unité = 1 m. Axe vertical : Z dans Blender, Y après export glTF.
+5. UV1 (texture, mètres) : mur/noyau = développée linéaire (u = rayon × angle, v = hauteur) ; marche = plan (x, y).
+6. UV2 (masque d'état) : un îlot 0..1 exact par face nettoyable, sans recouvrement. Mur : (angle/θ, hauteur/h). Marche dessus : (radial, angle/θ). Contremarche : (radial, hauteur/h). Faces non nettoyables : (0,0). Ne pas modifier les UV2.
+7. Inversion de v (v = 1 − hauteur) : produite par l'export glTF, déjà prise en compte dans le code Godot. Ne pas la corriger dans Blender.
+8. Un emplacement de matériau par face nettoyable ; le reste = « cache ». Ordre des primitives = ordre des emplacements.
+9. Export glTF (.glb) : UV1 = UV, UV2 = TEXCOORD_1 (UV2 dans Godot).
 
-Mur du fût et noyau : tronçons de cylindre, rayon unique, axe vertical (Z), origine sur l'axe, angle de 0 à θ. Aucune déformation par module.
-Marche : une face plane de dessus (1 emplacement de matériau) + une contremarche plane à l'angle 0 (1 emplacement). Marche k : rotation k·θ, hauteur k·h_marche.
-UV1 (texture, mètres) : mur/noyau = développée linéaire (u = rayon × angle, v = hauteur) ; marche = plan (x, y).
-UV2 (masque d'état) : un îlot 0..1 par face nettoyable, sans recouvrement. Mur : (angle/θ, hauteur/h). Marche dessus : (radial, angle/θ). Contremarche : (radial, hauteur/h). Faces non nettoyables : UV2 à (0,0).
-Un emplacement de matériau par face nettoyable ; tout le reste = emplacement « cache ».
-Relief par normal map, jamais par géométrie. Masque basse résolution (≈ 64 px/m) ; bords adoucis par le shader (seuil + bruit tuilable).
-Export glTF (.glb) : UV1 = UV, UV2 = TEXCOORD_1 (devient UV2 dans Godot). Échelle 1 unité = 1 m.
+### Tuilage (N = 12)
+- Pierre et masque d'épaisseur lus en projection cylindrique monde, tuile = circonférence / N entier. Pas de décalage de u par instance.
+- Mur (R = 2,0 m) : N = 12, tuile 1,047 m. Noyau (R = 0,5 m) : N/4 = 3, tuile 1,047 m. Même densité de texture.
+- Pierre et masque à produire tuilables à 1,047 m. Masque d'état basse résolution (≈ 64 px/m), bords adoucis par le shader (seuil + bruit tuilable).
+- Motif visible toutes les ~1 m : variations peintes dans la pierre pour casser la répétition.
 
 ### Points ouverts
-
-Joint de tuile UV1 : l'arc (0,524 m) n'est pas un multiple de la taille de tuile → raccord visible entre tronçons. Piste : décalage de u par instance (paramètre shader), à voir avec Engineering.
-Rayon, θ, hauteur de module : à figer avant la série, après décision de la hauteur d'étage.
-Contact marche/mur : bord de marche à N_SUB = 4 segments d'arc, identique au mur (pas de jour).
-Noyau en coque témoin (épaisseur 0,25 m) ; version finale pleine à décider.
-Non testé dans Blender/Godot : à vérifier (échelle, normales, UV, import).
+- Hauteur d'étage (décide la hauteur de marche).
+- Entrée et sortie du fût : modules « seuil » et sol vers la sortie à définir. Gros bloc à l'entrée qui empiète sur les marches (non localisé).
+- Noyau en coque témoin (0,25 m) ; version finale pleine à décider.
+- Contact marche/mur : bord de marche à 4 segments d'arc, identique au mur.
+- Import Godot non testé (échelle, normales, UV).
