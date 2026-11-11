@@ -1,6 +1,6 @@
 # TECHNICAL — A Light Left Behind
 
-Propriétaire : projet Godot Engineering. Dernière mise à jour : 2026-11-10.
+Propriétaire : projet Godot Engineering. Dernière mise à jour : 2026-11-11.
 Légende : ✅ décision validée · 🟡 à décider en Phase 0
 
 ## Contraintes validées ✅
@@ -17,7 +17,7 @@ Légende : ✅ décision validée · 🟡 à décider en Phase 0
 1. ✅ 2026-11-10 — Rendu : Forward+.
 2. ✅ 2026-11-10 — Langage : GDScript seul (pas de C#), typage statique encouragé.
 3. ✅ 2026-11-10 — Dossiers : projet Godot dans `game/` (`core`, `systems`, `data`, `rooms/test`, `props`, `ui`, `assets`, `tests`) ; docs et CLAUDE.md hors du moteur. Nommage : fichiers en snake_case, classes en PascalCase.
-4. 🟡 Représentation de la saleté (masque ou zones), à tester en Phase 2.
+4. ✅ 2026-11-11 — Représentation de la saleté : masque d'état par surface (voir « Nettoyage localisé »).
 5. ✅ 2026-11-10 — Architecture : trois autoloads maximum (sauvegarde, progression, réglages) ; physique par requêtes uniquement (raycast, shape query), aucun RigidBody persistant. Sauvegarde : JSON versionné dans `user://`, écriture atomique, jamais de .tres/ResourceSaver.
 6. ✅ 2026-11-10 — Objets = ressource `ItemData` ; emplacements de rangement = volumes (Area3D) dans les scènes de pièce + ressource `ZoneData` pour les règles.
 
@@ -57,6 +57,17 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Marche lente 🟡 (2026-11-10). Bascule par l'action walk_slow, à confirmer en jeu ; option d'inspecteur pour revenir au maintenu.
 - Valeurs de placement 🟡 (2026-11-10). Marge au bord, couverture minimale et pas de rotation sont des réglages de départ, modifiables dans une ressource exportée par le contrôleur. Orientation permissive. Mode de rotation fin optionnel, non implémenté.
 - Contraintes techniques 🟡 (2026-11-10, propositions pour les lots P1-F2 et P1-F3). (a) Une posture change l'emprise et la hauteur : PlacementCheck et PlacementLanding recevront une forme de pose (emprise, hauteur) ; ItemData.footprint et height restent la posture « à plat ». (b) La posture imposée par la zone suppose un lien PlacementSurface vers la zone, à créer avec le lot de rangement. (c) Atteignabilité du point de chute : anneau d'échantillons autour du point où une capsule joueur tient, avec ligne de vue vers l'objet, appliqué aux chutes seulement.
+
+## Nettoyage localisé ✅ (2026-11-11)
+- Masque d'état par surface (R8, 0 = sale, 1 = propre). Aucun scalaire d'instance. Remplace le point 4 de la Phase 0.
+- Périmètre : mousse sur pierre architecturale. Verrière, rambardes et mobilier : décisions séparées.
+- Correspondance point visé / UV analytique via SurfaceMapping : plan (murs droits, marches, contremarches), cylindre (fût, noyau). Maillages quelconques non retenus.
+- Épaisseur en coordonnées monde (projection plane ou cylindrique), mêmes paramètres pour le shader et le CPU. Matériau propre à chaque face ; UV2 = développée linéaire, sans recouvrement.
+- Unité du 100 % : la surface. Reste = texels couverts (épaisseur − propreté > epsilon) / texels couverts initiaux ; nettoyée quand reste ≤ tau.
+- Fin de geste ✅ (Direction, 2026-11-11) : à tau, les résidus s'effacent (fondu ≈ 0,5 s) et la surface est nettoyée. Le shader rend la mousse invisible à epsilon.
+- Valeurs 🟡 provisoires, à régler en playtest, constantes uniques : epsilon = 0,05 ; tau = 0,02. Réserve : plafond en m² à rediscuter si 2 % est trop visible sur la plus grande surface.
+- Sauvegarde : JSON du SaveService, R8 compressé puis base64, id = chemin du nœud depuis la racine de la pièce, taille attendue dérivée de la scène, clé absente = sale.
+- Noms : proprete_mousse, epaisseur_mousse, proprete_surface ; plus tard proprete_mousse_tenace et epaisseur_mousse_tenace.
 
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
