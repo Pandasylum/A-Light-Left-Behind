@@ -25,6 +25,7 @@ func _run() -> void:
 	root.add_child(spike)
 	_test_controller(spike, sponge)
 	_test_bucket(spike, sponge)
+	_test_camera_lock(spike, sponge)
 	spike.free()
 
 	_measure_tour(sponge)
@@ -195,6 +196,57 @@ func _test_bucket(spike: Node3D, sponge: ToolData) -> void:
 	interactable.interact(bucket)
 	_check(controller.state == null, "seau sans outil tenu ou sans joueur : sans effet, sans erreur")
 	bucket.free()
+
+
+func _lock_press(player: Player) -> void:
+	var ev: InputEventAction = InputEventAction.new()
+	ev.action = &"lock_camera"
+	ev.pressed = true
+	player._unhandled_input(ev)
+	ev = InputEventAction.new()
+	ev.action = &"lock_camera"
+	ev.pressed = false
+	player._unhandled_input(ev) ## le relâchement ne change rien (bascule)
+
+
+## Headless : Input.mouse_mode reste VISIBLE (jamais CAPTURED), donc le verrouillage réel est refusé
+## par set_camera_locked ; l'état verrouillé est posé directement, le mode souris n'est pas vérifié.
+func _test_camera_lock(spike: Node3D, sponge: ToolData) -> void:
+	var player: Player = spike.get_node("Player") as Player
+	var controller: ToolController = player.get_node("ToolController") as ToolController
+	var carry: CarryController = player.get_node("CarryController") as CarryController
+	controller.equip(sponge)
+	_lock_press(player)
+	_check(not player.camera_locked, "lock_camera : refusé si la souris n'est pas capturée (headless)")
+	player.camera_locked = true
+	_lock_press(player)
+	_check(not player.camera_locked, "lock_camera : appui sur verrouillé = bascule off (relâchement de touche sans effet)")
+	player.camera_locked = true
+	controller.set_tool_held(true)
+	_check(player.camera_locked, "set_tool_held(true) : le verrou reste")
+	controller.equip(null)
+	_check(not player.camera_locked, "outil plus tenu : verrou relâché")
+	controller.equip(sponge)
+	player.camera_locked = true
+	controller.equip(sponge)
+	_check(player.camera_locked, "rééquiper l'outil tenu : le verrou reste")
+	# Prise d'un objet : l'objet tenu change (outil rangé) -> verrou relâché.
+	var item: TestItem = (load("res://props/test_item.tscn") as PackedScene).instantiate() as TestItem
+	var data: ItemData = ItemData.new()
+	data.id = &"lock_test"
+	data.category = ItemData.Category.SMALL
+	data.footprint = Vector2(0.1, 0.1)
+	data.height = 0.1
+	item.item_data = data
+	root.add_child(item)
+	carry.pick_up(item.get_node("Interactable") as Interactable)
+	_check(carry.held_data() == data, "objet pris")
+	_check(not player.camera_locked, "prise d'objet : verrou relâché")
+	player.camera_locked = true
+	carry.release_held()
+	_check(not player.camera_locked, "objet tenu change (dépôt) : verrou relâché")
+	item.free()
+	controller.equip(null)
 
 
 # --- Scène de vérification + mesures : coût par image du frottement dans le tour (188 faces) ---

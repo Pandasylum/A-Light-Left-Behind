@@ -3,6 +3,9 @@ extends Node
 ## Enfant de Player. Relie CarryInventory au monde : prise (Interactable PICK_UP ciblé), changement
 ## d'objet (cycle_item), dépôt (drop_object) délégué au PlacementController.
 
+## Émis quand l'objet en main change (prise, changement, dépôt).
+signal held_changed
+
 const HAND_OFFSET: Vector3 = Vector3(0.3, -0.25, -0.6)
 const LARGE_EXTRA_OFFSET: Vector3 = Vector3(-0.3, 0.05, -0.3) ## LARGE : plus centré
 
@@ -87,6 +90,7 @@ func release_held() -> Node3D:
 	var body: Node3D = held_body()
 	if body == null or inventory.drop_object() == null:
 		return null
+	held_changed.emit()
 	return body
 
 
@@ -107,6 +111,7 @@ func _on_interacted(_player: Node, interactable: Interactable) -> void:
 ## automatiquement (main -> ceinture avant une prise) est traité par la boucle de ceinture :
 ## masqué, collision désactivée.
 func _refresh_visuals() -> void:
+	held_changed.emit()
 	var held: Node3D = inventory.held_ref() as Node3D
 	if held != null:
 		_attach(held)
