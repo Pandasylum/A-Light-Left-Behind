@@ -22,6 +22,8 @@ enum Category { SMALL, MEDIUM, LARGE, FIXED }
 @export var tracks_storing: bool = false
 ## Meuble libre : l'objet porte une surface de pose déclarée (MEDIUM ou LARGE uniquement).
 @export var provides_support: bool = false
+## Le dessus de l'objet peut servir de support à un autre objet (faux : rien ne peut être posé dessus, ex. seau).
+@export var can_support_items: bool = true
 
 
 ## Renvoie la liste des erreurs de validation (vide si valide).

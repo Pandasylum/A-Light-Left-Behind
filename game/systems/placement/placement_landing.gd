@@ -117,7 +117,7 @@ static func carrier_data(surface: PlacementSurface) -> ItemData:
 static func evaluate_pose(space: PhysicsDirectSpaceState3D, check: PlacementCheck, data: ItemData, yaw: float,
 		center: Vector3, surface: PlacementSurface, exclude: Array[RID] = []) -> Verdict:
 	var below: ItemData = carrier_data(surface)
-	if below != null and not PlacementCheck.can_stack(data.category, below.category):
+	if below != null and (not below.can_support_items or not PlacementCheck.can_stack(data.category, below.category)):
 		return Verdict.CANNOT_STACK
 	if is_blocked(space, data, yaw, center, exclude):
 		return Verdict.BLOCKED
