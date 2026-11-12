@@ -68,6 +68,15 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Menu : « Continuer » remplace « Nouvelle partie » si une sauvegarde existe. « Recommencer » (Options) supprime le fichier principal et le `.bak`, ne touche pas aux réglages, puis ramène à l'écran-titre, après une alerte avec « Annuler » par défaut. À implémenter.
 - Sauvegardes illisibles (principal et `.bak`) : jamais traitées comme une absence de sauvegarde. L'écran-titre affiche « sauvegarde endommagée ». Les fichiers sont renommés (par exemple `.corrompu`), jamais supprimés ni écrasés. « Nouvelle partie » reste disponible avec confirmation, qui précise que la sauvegarde endommagée sera mise de côté. L'entrée dans le journal est conservée.
 
+## Menu (écran-titre et pause) ✅ (12/11/2026)
+- L'écran-titre est la scène principale du projet.
+- La pause s'ouvre par l'action d'Input Map `pause_menu` (touche Échap).
+- Le menu Options est vide pour l'instant (lot Options à venir).
+- « Retour au menu » et « Quitter » appellent `save_and_wait()` avant de sortir de la partie.
+- `Player.restore_mouse_mode()` rétablit le mode de la souris à la sortie de la pause.
+- Provisoire : la scène de jeu lancée depuis le titre est `sponge_test.tscn`, à remplacer par la vraie scène de jeu.
+- À faire (non fait, ne pas présenter comme acquis) : table de traduction (les boutons affichent encore des clés brutes, ex. `menu.new_game`) ; lot Options.
+
 ## Décisions de Direction ✅ (source : Direction 2026-11-10)
 - Verrou du 100 % : booléen « restaurée » par pièce, posé au premier passage à 100 %, sauvegardé, jamais retiré. Le pourcentage affiché reflète l'état réel ; un axe ajouté plus tard ne retire pas le statut.
 - Rangement : zones souples par catégorie. Un objet est rangé s'il est posé (ni tenu, ni au sol) dans une zone qui accepte sa catégorie.
