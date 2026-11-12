@@ -8,7 +8,7 @@ render_mode blend_add, unshaded, cull_back, depth_draw_never, shadows_disabled;
 
 uniform float progress : hint_range(0.0, 1.0) = 0.0;
 uniform vec3  tint : source_color = vec3(0.72, 0.86, 1.0); // froid, dans la palette de la pièce
-uniform float peak = 0.07;          // intensité max (additif, linéaire). 0,05 discret ; 0,12 net
+uniform float peak = 0.12;          // intensité max (additif, linéaire). Retenu 0,12 (Direction, 2026-11-12, provisoire) ; 0,05 = très discret
 uniform float band_width = 0.22;    // largeur du voile (fraction de la hauteur UV)
 uniform float edge_boost = 0.6;     // renfort léger sur les joints (via normal map), 0 = aucun
 uniform sampler2D normal_tex : hint_normal, filter_linear_mipmap, repeat_enable;
