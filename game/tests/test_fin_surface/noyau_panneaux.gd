@@ -4,7 +4,7 @@ extends "res://tests/test_cleaning/cleaning_spike.gd"
 ## Valeurs provisoires. Aucune rainure en géométrie : limites de panneau et joints sont dans les textures.
 
 const Spike := preload("res://tests/test_cleaning/cleaning_spike.gd")
-const TEX_DIR: String = "res://tests/test_noyau/tex_vram/" # réglage de production : VRAM standard
+const TEX_DIR: String = "res://tests/test_fin_surface/tex/" # VRAM standard (réglage de production)
 const CORE_RADIUS: float = 0.5 # m
 const PANELS_PER_RING: int = 4
 const RINGS: int = 3
