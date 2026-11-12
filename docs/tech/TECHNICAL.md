@@ -135,5 +135,12 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
   - Valeurs 🟡 provisoires du seau : cylindre de 0,32 × 0,32 × 0,30 m ; anneau de marqueur blanc de 20 px, bord de 2 px.
 - Pas encore fait : le ToolController fixe l'outil par export (aucun lien avec l'emplacement dédié) ; seau fixe à rendre ramassable ; l'outil doit remplacer le curseur à l'écran.
 
+## Textures du noyau ✅ (décision de Direction, 2026-11-12)
+- Noyau (R = 0,5 m) : tuile d'Art = 1 tour × 1 module, soit 3,1416 × 2,16 m (N = 1), au lieu de N/4 = 3 (1,047 m). Raison : les 4 panneaux de 90° (6 faces de 15° chacun, 24 faces par anneau) ne tiennent pas dans 3 répétitions. Mur : inchangé (N = 12).
+- Convention de la tuile : u = angle/360 (0 = limite de panneau), v = hauteur/2,16 depuis le bas de l'anneau.
+- Lecture : projection cylindrique monde, déjà décidée pour la pierre et les masques (angle absolu), et non UV1 d'instance : l'UV1 du module (15° dans le .glb témoin) repart à u = 0 à chaque instance, donc ne parcourt que le début de la tuile. L'origine de l'angle monde est fixée par Engineering à la première intégration du noyau, alignée sur les limites de panneau géométriques du maillage (Direction, 2026-11-12) ; la couture de la texture d'Art tombe déjà sur une limite de panneau. À vérifier à cette occasion 🟡 : projection cylindrique monde et variante UV1.
+- Si lecture par UV1 (non retenue) 🟡 non testée dans Godot : échelle UV (1/3,1416 ; 1/2,16), et décalage de v de 1 − 1/2,16 (≈ 0,537) à cause de l'inversion v = 1 − hauteur de l'export glTF.
+- 24 pans par anneau : provisoire 🟡 (Direction, 2026-11-12).
+
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
