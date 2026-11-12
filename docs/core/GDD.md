@@ -78,6 +78,17 @@ Types de saleté et outils :
 - Ne pas confondre « surface à nettoyer » (nettoyage) et « surface de pose » (rangement, §5).
 - À la fin de chaque surface : petit retour visuel et sonore discret. Plusieurs variantes sonores, de hauteur légèrement différente, évitent la saturation. La production de ce retour relève d'Art (visuel) et de Sound Design (son).
 
+#### Surface maximale par action de nettoyage (🟡 provisoire)
+
+- Décision : maximum de 2 m² par surface. Valeur de départ 🟡, provisoire, à réajuster après test en jeu.
+- Base de calcul (mesure du développeur, un seul essai, sur le dessus d'une marche de 0,49 m²) : éponge propre ≈ 20 s/m² ; éponge saturée à 90 % ≈ 60 à 80 s/m².
+- Salissure : 0,5 par m². L'éponge est saturée vers 2 m², ce qui fixe le maximum.
+- Durée estimée d'une surface de 2 m², éponge propre au départ : environ 95 à 105 s (hypothèse de dégradation linéaire de la vitesse, non mesurée).
+- Règle : au-delà de la capacité de l'éponge (éponge déjà sale au départ, ou surface plus sale que la normale), un rinçage au seau est obligatoire en cours de surface.
+- Les grandes zones (sols, murs) sont découpées en surfaces de 2 m² au plus.
+- Les deux faces d'une marche partagent l'état de fin.
+- Note : des améliorations de vitesse de nettoyage sont envisagées plus tard. Elles ne sont ni définies ni validées et ne modifient pas ce maximum.
+
 ## 5. Manipulation, transport et rangement ✅
 
 - Le joueur peut prendre, déplacer et placer les objets libres.
