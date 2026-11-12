@@ -11,6 +11,7 @@ const FRAME: float = 1.0 / 60.0
 const SaveServiceScript: GDScript = preload("res://core/save_service.gd")
 const SAVE_DIR: String = "user://test_saves/"
 const SAVE_SLOT: String = "outils"
+const AUTO_SLOT: String = "autosave_test"
 
 var _failures: int = 0
 
@@ -33,6 +34,7 @@ func _run() -> void:
 	_test_bucket(spike, sponge)
 	_test_camera_lock(spike, sponge)
 	_test_save(spike, sponge)
+	_test_autosave(spike, sponge)
 	spike.free()
 
 	await _measure_tour(sponge)
@@ -529,6 +531,179 @@ func _test_save(spike: Node3D, sponge: ToolData) -> void:
 	if dir != null:
 		for file: String in dir.get_files():
 			if file.begins_with(SAVE_SLOT + "."):
+				dir.remove(file)
+	service.free()
+
+
+# --- Sauvegarde automatique : déclencheurs, fusion, attente pendant une action, export étalé, sortie ---
+
+## Fait avancer l'Autosave image par image jusqu'à la mise en file de l'écriture ; renvoie le nombre d'images.
+func _drain(autosave: Autosave) -> int:
+	var frames: int = 0
+	while autosave.is_busy() and frames < 1000:
+		autosave.advance()
+		frames += 1
+	return frames
+
+
+## Section « nettoyage » relue dans le fichier de l'Autosave (attend la fin de l'écriture en file).
+func _saved(service: Node) -> Dictionary:
+	var loaded: Dictionary = service.call("load_slot", AUTO_SLOT)
+	return loaded["data"] as Dictionary if loaded["ok"] else {}
+
+
+func _same_cleaning(saved: Dictionary, expected: Dictionary) -> bool:
+	if saved.size() != expected.size():
+		return false
+	for id: String in expected:
+		if not saved.has(id) or saved[id]["donnees"] != expected[id]["donnees"]:
+			return false
+	return true
+
+
+func _test_autosave(spike: Node3D, sponge: ToolData) -> void:
+	var service: Node = SaveServiceScript.new() as Node
+	service.set("save_dir", SAVE_DIR)
+	var controller: ToolController = spike.get_node("Player/ToolController") as ToolController
+	var idle: Autosave = Autosave.new()
+	_check(idle.save_and_wait() == Autosave.NOT_CONFIGURED and not idle.is_busy(), "autosave : sans setup, rien n'est écrit")
+	idle.free()
+	var autosave: Autosave = Autosave.new()
+	autosave.handle_quit = false
+	autosave.slot_id = AUTO_SLOT
+	autosave.export_budget_usec = 0 # une face par image : export étalé déterministe
+	root.add_child(autosave)
+	autosave.setup(spike, controller, service)
+	var results: Array[int] = []
+	autosave.save_completed.connect(func(error: int) -> void: results.append(error))
+	var faces: Array[Node] = spike.find_children("*", "CleanableFace", true, false)
+	var first: CleanableFace = faces[0] as CleanableFace
+	var last: CleanableFace = faces[faces.size() - 1] as CleanableFace
+	var middle: CleanableFace = faces[faces.size() >> 1] as CleanableFace
+	var first_hit: Dictionary = {"position": _point(first, Vector2(0.5, 0.5))}
+	_hold(controller, sponge)
+	for face: CleanableFace in [first, middle, last]:
+		controller.stroke(_point(face, Vector2(0.3, 0.3)), _point(face, Vector2(0.3, 0.3)), 1.0)
+	var soil: float = controller.state.soil
+
+	# Déclencheur « rangement d'un outil » : une écriture, avec l'état de l'outil rangé.
+	_check(autosave.triggers_received == 0 and not autosave.is_busy(), "autosave : sortir un outil ne déclenche rien")
+	controller.stow_tool()
+	_check(autosave.triggers_received == 1 and autosave.is_busy() and autosave.writes_requested == 0,
+			"autosave : l'outil rangé déclenche une sauvegarde, sans rien écrire à l'appel")
+	controller.stow_tool()
+	_check(autosave.triggers_received == 1, "autosave : ranger sans outil en main ne déclenche rien")
+	var frames: int = _drain(autosave)
+	_check(frames == faces.size() and autosave.export_frames == frames and autosave.writes_requested == 1,
+			"autosave : export étalé sur %d images pour %d faces, une écriture" % [frames, faces.size()])
+	var data: Dictionary = _saved(service)
+	_check(results.size() == 1 and results[0] == 0 and autosave.last_error == 0, "autosave : résultat reçu par save_finished")
+	_check(_same_cleaning(data.get(Autosave.CLEANING_KEY, {}), CleanableFace.export_room(spike)),
+			"autosave : faces identiques à l'export d'un bloc")
+	var restored: ToolSlots = ToolSlots.new()
+	_check(restored.import_state(data.get(ToolSlots.SAVE_KEY, {}), [sponge]) and restored.count() == 1
+			and restored.held() == null and soil > 0.0 and is_equal_approx(restored.state_at(0).soil, soil),
+			"autosave : outil rangé sauvegardé avec sa salissure")
+
+	# Fusion : déclencheurs rapprochés (même image, puis pendant l'export) = une seule écriture.
+	var writes: int = autosave.writes_requested
+	for i: int in 3:
+		autosave.request_save()
+	autosave.advance()
+	autosave.advance()
+	# La première face, déjà exportée, change avant le déclencheur suivant : elle ne doit pas être perdue.
+	controller.take_out()
+	controller.stroke(first_hit["position"], first_hit["position"], 1.0)
+	autosave.request_save()
+	_check(_drain(autosave) == faces.size() and autosave.writes_requested == writes + 1,
+			"autosave : déclencheurs rapprochés fusionnés en une seule écriture")
+	_check(_saved(service)[Autosave.CLEANING_KEY][String(spike.get_path_to(first))]["donnees"] == first.export_state(spike)["donnees"],
+			"autosave : déclencheur pendant l'export = export repris, face déjà exportée à jour")
+
+	# Attente : un déclencheur reçu pendant une action d'outil est exécuté à sa fin.
+	writes = autosave.writes_requested
+	controller.apply_aim_hit(first_hit, 1.0)
+	_check(controller.is_action_active(), "autosave : geste en cours = action d'outil active")
+	autosave.request_save()
+	autosave.request_save()
+	for i: int in 5:
+		autosave.advance()
+	_check(autosave.is_busy() and autosave.writes_requested == writes and autosave.export_frames == frames,
+			"autosave : déclencheur en attente pendant l'action, aucun export")
+	controller.apply_aim_hit(first_hit, 1.0)
+	controller.apply_aim_hit({}, FRAME)
+	_check(not controller.is_action_active(), "autosave : surface quittée = fin de l'action")
+	_drain(autosave)
+	_check(autosave.writes_requested == writes + 1, "autosave : déclencheurs en attente exécutés une fois à la fin de l'action")
+	_check(_same_cleaning(_saved(service)[Autosave.CLEANING_KEY], CleanableFace.export_room(spike)),
+			"autosave : l'écriture différée contient l'action terminée")
+	# Une action commencée pendant l'export le suspend ; ranger l'outil y met fin et relance.
+	autosave.request_save()
+	autosave.advance()
+	controller.apply_aim_hit(first_hit, 1.0)
+	autosave.advance()
+	_check(autosave.export_frames == 1, "autosave : export suspendu pendant une action")
+	controller.stow_tool()
+	_check(not controller.is_action_active(), "autosave : ranger l'outil met fin à l'action")
+	_drain(autosave)
+	_check(autosave.writes_requested == writes + 2 and _same_cleaning(_saved(service)[Autosave.CLEANING_KEY], CleanableFace.export_room(spike)),
+			"autosave : action puis rangement pendant l'export = une écriture à jour")
+
+	# Sortie : action annulée, export en cours terminé d'un coup, écriture attendue.
+	writes = autosave.writes_requested
+	results.clear()
+	controller.take_out()
+	autosave.request_save()
+	autosave.advance()
+	controller.apply_aim_hit(first_hit, 1.0)
+	var stowed_before: int = autosave.triggers_received
+	_check(autosave.save_and_wait() == 0 and not controller.is_action_active() and not autosave.is_busy(),
+			"autosave : sortie = action annulée, export terminé, écriture réussie")
+	_check(results.size() == 1 and results[0] == 0 and autosave.writes_requested == writes + 1 and autosave.triggers_received == stowed_before,
+			"autosave : sortie = une seule écriture, résultat déjà reçu au retour")
+	data = _saved(service)
+	_check(_same_cleaning(data[Autosave.CLEANING_KEY], CleanableFace.export_room(spike))
+			and restored.import_state(data[ToolSlots.SAVE_KEY], [sponge]) and restored.held() != null
+			and is_equal_approx(restored.held().soil, controller.state.soil),
+			"autosave : sortie = faces modifiées pendant l'export et outil en main sauvegardés")
+	autosave.request_save()
+	autosave.advance()
+	autosave.advance()
+	_check(autosave.save_and_wait() == 0 and autosave.writes_requested == writes + 2 and autosave.export_frames == 2,
+			"autosave : sortie sans action = export en cours repris là où il en était")
+	_check(_same_cleaning(_saved(service)[Autosave.CLEANING_KEY], CleanableFace.export_room(spike)),
+			"autosave : sortie pendant l'export = sauvegarde complète")
+
+	# Face libérée ou sortie de la pièce pendant l'export : ignorée, sans erreur.
+	writes = autosave.writes_requested
+	var kept_id: String = String(spike.get_path_to(first))
+	var gone_ids: Array[String] = [String(spike.get_path_to(last)), String(spike.get_path_to(middle))]
+	autosave.request_save()
+	autosave.advance()
+	last.free()
+	middle.get_parent().remove_child(middle)
+	_drain(autosave)
+	var cleaning: Dictionary = _saved(service)[Autosave.CLEANING_KEY]
+	_check(autosave.skipped_faces == 2 and autosave.writes_requested == writes + 1 and autosave.last_error == 0,
+			"autosave : 2 faces disparues pendant l'export ignorées, écriture réussie")
+	_check(cleaning.has(kept_id) and not cleaning.has(gone_ids[0]) and not cleaning.has(gone_ids[1])
+			and _same_cleaning(cleaning, CleanableFace.export_room(spike)),
+			"autosave : faces restantes sauvegardées, faces disparues absentes")
+	middle.free()
+	# Pièce libérée pendant l'export : sauvegarde abandonnée, rien n'est écrit.
+	autosave.request_save()
+	autosave.advance()
+	autosave.room_root = null
+	autosave.advance()
+	_check(not autosave.is_busy() and autosave.writes_requested == writes + 1, "autosave : pièce indisponible = abandon sans écriture (avertissement)")
+
+	autosave.free()
+	controller.slots.clear()
+	service.call("flush")
+	var dir: DirAccess = DirAccess.open(SAVE_DIR)
+	if dir != null:
+		for file: String in dir.get_files():
+			if file.begins_with(AUTO_SLOT + "."):
 				dir.remove(file)
 	service.free()
 
