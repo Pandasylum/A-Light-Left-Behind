@@ -74,7 +74,7 @@ Types de saleté et outils :
 
 - Une surface à nettoyer est une zone d'un objet ou du décor reconnaissable par le joueur (plateau, pan de mur, dalle, marche). Elle regroupe plusieurs faces de nettoyage.
 - Les grandes surfaces (sol, grands murs) sont découpées en plusieurs surfaces à nettoyer.
-- Une surface est terminée quand l'aire sale restante passe sous min(~0,5 m², 10 % de l'aire géométrique de la surface), après avoir été au-dessus (valeurs de départ provisoires, à régler après essai). Le reste se finit automatiquement. Détail : §15, point 30.
+- Une surface est terminée quand l'aire sale restante passe sous min(~0,5 m², 10 % de l'aire géométrique de la surface), après avoir été au-dessus (décision validée le 2026-11-12 ; 🟡 valeurs de départ provisoires, à régler après essai). Le reste se finit automatiquement. Détail : §15, point 30.
 - Ne pas confondre « surface à nettoyer » (nettoyage) et « surface de pose » (rangement, §5).
 - À la fin de chaque surface : petit retour visuel et sonore discret. Plusieurs variantes sonores, de hauteur légèrement différente, évitent la saturation. La production de ce retour relève d'Art (visuel) et de Sound Design (son).
 
@@ -382,9 +382,9 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 29. Mousse tenace : outil et moment de déblocage à définir (piste non validée : face abrasive de l'éponge, comme la rouille).
 30. Surfaces à nettoyer (§4). Statut : provisoire, valeurs de départ, à régler après essai.
     - Une surface est une zone reconnaissable du décor regroupant plusieurs faces ; un matériau = une surface ; la découpe suit les ruptures visibles (porte, fenêtre, soubassement, angle, palier).
-    - Minimum 0,5 m² (un objet entier est exempté). Maximum ouvert (dépend de la zone d'action de l'éponge, non définie). Repère indicatif 1 à 2 m², ce n'est pas une règle.
+    - Minimum 0,5 m² (un objet entier est exempté). Maximum ouvert (dépend de la zone d'action de l'éponge, non définie). Cible 1 à 2 m² (décision validée le 2026-11-12 ; 🟡 valeur indicative, pas une règle).
     - Murs : 2 à 3 faces (≈ 2,3 à 3,4 m²) selon les ruptures. Noyau : panneaux de 6 faces (≈ 1,7 m²). Marche : une marche par surface (0,76 m²).
-    - Fin de surface : l'aire sale restante passe sous min(~0,5 m², 10 % de l'aire géométrique de la surface), après avoir été au-dessus. Une surface propre ou déjà sous le seuil au départ est terminée d'office : elle compte dans le 100 % de la pièce, sans retour visuel ni sonore ni autosave.
+    - Fin de surface (décision validée le 2026-11-12 ; 🟡 seuils provisoires) : l'aire sale restante passe sous min(~0,5 m², 10 % de l'aire géométrique de la surface), après avoir été au-dessus. Une surface propre ou déjà sous le seuil au départ est terminée d'office : elle compte dans le 100 % de la pièce, sans retour visuel ni sonore ni autosave.
     - Les modules techniques de 15° ne sont pas des surfaces. Rappel : à ne pas confondre avec les surfaces de pose du rangement (§5).
 
 ---
