@@ -97,7 +97,7 @@ Deuxième vague : carrelage / faïence, papier jauni, verre.
 - Rendu en normal map et albédo assombri dans le joint. Pas de relief en géométrie : à 0,9 m, 10 mm réels ne se distinguent pas de la normal map.
 - Appareillage en blocs de 30° avec demi-blocs de 15° en décalage, de sorte que les joints verticaux tombent sur les arêtes de facette.
 - Critère : la limite de panneau reste lisible dans tous les états, y compris tout sale. Mousse atténuée d’environ 60 % sur ±30 mm autour des limites. 🟡
-- Format : 2 400 × 1 650 px par anneau (≈ 764 px/m), u = angle/360, v = 0 en bas. Normal map OpenGL Y+ en linéaire, albédo en sRGB. Import en VRAM standard, sans HQ.
+- Format : 2 400 × 1 650 px par anneau (≈ 764 px/m), tuile d’un tour × 1 anneau (3,1416 × 2,16 m), UV1 en mètres selon la Règle d’export §5 (échelle de matériau 1/3,1416 ; 1/2,16), origine sur une limite de panneau. Normal map OpenGL Y+ en linéaire, albédo en sRGB. Import en VRAM standard, sans HQ. Lecture en production par projection cylindrique monde : non testée, à vérifier à la première intégration du noyau. 🟡
 - La pierre procédurale du test est provisoire, en attendant la pierre peinte niveau 2.
 
 ## 2026-11-11 — Modules du fût : règle d'export et tuilage
@@ -125,7 +125,7 @@ Statut : règle d'export validée pour les modules témoins. Style OFFICIEL depu
 
 ### Tuilage (N = 12)
 - Pierre et masque d'épaisseur lus en projection cylindrique monde, tuile = circonférence / N entier. Pas de décalage de u par instance.
-- Mur (R = 2,0 m) : N = 12, tuile 1,047 m. Noyau (R = 0,5 m) : N/4 = 3, tuile 1,047 m. Même densité de texture.
+- Mur (R = 2,0 m) : N = 12, tuile 1,047 m. Noyau (R = 0,5 m) : une tuile par tour (N = 1), soit 3,1416 m × 2,16 m, avec 4 panneaux de 90° par tuile. Décision Direction du 2026-11-12.
 - Pierre et masque à produire tuilables à 1,047 m. Masque d'état basse résolution (≈ 64 px/m), bords adoucis par le shader (seuil + bruit tuilable).
 - Motif visible toutes les ~1 m : variations peintes dans la pierre pour casser la répétition.
 
