@@ -718,6 +718,9 @@ func _measure_tour(sponge: ToolData) -> void:
 	var controller: ToolController = tour.get_node("Player/ToolController") as ToolController
 	_check(controller.slots.count() == 1 and controller.state == null, "scène de vérification : éponge dans son emplacement, aucun outil en main")
 	_check(not tour.is_physics_processing(), "scène de vérification : pinceau du spike coupé")
+	var autosave: Autosave = scene.get_node_or_null("Autosave") as Autosave
+	_check(autosave != null and autosave.room_root == tour and autosave.tools == controller and not autosave.is_busy(),
+			"scène de vérification : Autosave relié au tour et au ToolController, au repos")
 	var bucket: Bucket = scene.get_node_or_null("Bucket") as Bucket
 	var item: TestItem = scene.get_node_or_null("TestItem") as TestItem
 	_check(bucket != null and item != null and not (item is Bucket), "scène de vérification : seau ramassable et objet de test présents")

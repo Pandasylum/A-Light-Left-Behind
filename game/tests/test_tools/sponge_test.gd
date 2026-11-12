@@ -2,6 +2,7 @@ extends Node3D
 ## Scène de vérification des outils du joueur (NON OFFICIELLE) : tour d'essai instanciée telle
 ## quelle, éponge dans son emplacement (rangée au départ : equip_tool la sort), seau ramassable et
 ## objet de test posés au sol. Le sol du tour reçoit une surface de pose pour pouvoir les reposer.
+## L'Autosave de la scène est relié au tour et au ToolController du joueur (outil rangé, fermeture).
 
 const FLOOR_SIZE: Vector2 = Vector2(10.0, 10.0) ## emprise du sol du spike
 const FLOOR_TOP_Y: float = 0.1 ## face supérieure, dans le repère du corps Floor
@@ -22,6 +23,8 @@ func _ready() -> void:
 	surface.position = Vector3(0.0, FLOOR_TOP_Y, 0.0)
 	_tour.get_node(^"Floor").add_child(surface)
 	($Tour/Player/ToolController as ToolController).add_tool(tool)
+	# Sauvegarde automatique : pièce = le tour (repère des id de faces), outils = ceux du joueur.
+	($Autosave as Autosave).setup(_tour, $Tour/Player/ToolController as ToolController)
 	await get_tree().physics_frame
 	_drop_to_floor($Bucket as TestItem)
 	_drop_to_floor($TestItem as TestItem)
