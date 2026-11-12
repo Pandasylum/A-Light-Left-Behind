@@ -91,6 +91,15 @@ Deuxième vague : carrelage / faïence, papier jauni, verre.
 
 2026-11-11 : Mousse sur pierre, test technique concluant. Couche séparée (albédo, rugosité et normale CC0 Moss002, niveau 2) pilotée par un masque d’épaisseur ; seuil par instance, les zones fines partent en premier. La pierre de base doit être sans mousse. La mousse est mate, la pierre sale est brillante (humide). Points ouverts : bords trop nets (à corriger dans le masque), relief et reflets photographiques sur la pierre sale, mousse contre traces et crasse non testée, mousse tenace non testée.
 
+## Noyau de pierre : joints
+
+- Deux niveaux de joints. Appareillage : discret, 6 mm de large, 3 mm de creux, assises de 0,26 m. Limite de panneau : 18 mm de large, 10 mm de creux, joint vertical tous les 90°, bandeau de 45 mm par anneau (90 mm à deux anneaux empilés). 🟡 valeurs de départ.
+- Rendu en normal map et albédo assombri dans le joint. Pas de relief en géométrie : à 0,9 m, 10 mm réels ne se distinguent pas de la normal map.
+- Appareillage en blocs de 30° avec demi-blocs de 15° en décalage, de sorte que les joints verticaux tombent sur les arêtes de facette.
+- Critère : la limite de panneau reste lisible dans tous les états, y compris tout sale. Mousse atténuée d’environ 60 % sur ±30 mm autour des limites. 🟡
+- Format : 2 400 × 1 650 px par anneau (≈ 764 px/m), u = angle/360, v = 0 en bas. Normal map OpenGL Y+ en linéaire, albédo en sRGB. Import en VRAM standard, sans HQ.
+- La pierre procédurale du test est provisoire, en attendant la pierre peinte niveau 2.
+
 ## 2026-11-11 — Modules du fût : règle d'export et tuilage
 
 Origine : demande Engineering (masque d'état par face en UV2, SurfaceMapping cylindre).
