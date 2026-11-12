@@ -1,6 +1,6 @@
 # ART BIBLE — A Light Left Behind
 
-Propriétaire : projet Art Direction & Assets. Dernière mise à jour : 2026-11-12 (pierre : coulures).
+Propriétaire : projet Art Direction & Assets. Dernière mise à jour : 2026-11-12 (seuil du fût).
 Statut : direction de travail NON OFFICIELLE jusqu'au test de style.
 Légende : ✅ validé · 🟡 à décider
 
@@ -170,10 +170,18 @@ Décision (validée développeur, 2026-11-12) : sur la pierre, « trace » = cou
 - Fichiers : `game/tests/test_mousse/` (mousse_coulures.gdshader, test_mousse_coulures.tscn et .gd, tex/masque_coulures_v2.png ; la v1 masque_coulures.png est gardée pour comparaison). Script : build_coulures.py (projet Claude, version 2).
 - Réserves : (1) lecture à l'ensemble : seuls 80 filets, nombre non jugé (certains se lisent comme des fissures). (2) Masque fabriqué à la main pour un plan de 4 x 2 m ; la localisation sur les vrais modules viendra de leur UV2. (3) Netteté des filets : traitée par la v2 (voir ci-dessus) ; gros plan à 0,3 m vérifié dans Godot (vue gauche, proprete 0, mousse 1, lumière chaude) : plus d'aspect encre, les filets se lisent comme des taches d'eau, la mousse reste distincte par la teinte, rien ne brûle. Défaut restant : des filets parallèles et régulièrement espacés (départs trop alignés le long d'un joint) se lisent comme un peigne ou des griffes ; corrigé dans le masque v3 (2026-11-12) : espacement minimal de 22 cm entre filets voisins, 38 filets au lieu de 65, largeurs plus variées, dérive plus marquée. Vérifié dans Godot (vue ensemble, proprete 0, mousse 1, lumière chaude) : plus d'effet de peigne, filets espacés et irréguliers ; contrepartie : couverture divisée par deux (23 % à 12 %), lisibilité à l'ensemble juste suffisante. Réglage si trop discret : monter N dans build_coulures.py (55 par défaut ; l'espacement mini de 22 cm limite le nombre réel, 38 filets). Fichier : tex/masque_coulures_v3.png (bouton « Masque coulures » : v3 / v2). SUJET CLOS côté Art (2026-11-12) ; la v1 et la v2 sont gardées pour comparaison. (4) Nettoyage par `proprete` vérifié dans Godot à 0,3 / 0,6 / 1 (lumière froide et chaude, ensemble) : les coulures partent avec la pierre sale, la mousse reste (curseur indépendant, cohérent avec « mousse tenace »). Mi-nettoyage vérifié à 0,45 (vue centre, mousse 0, lumière froide et chaude) : la pierre sale part par plaques aux bords irréguliers et les coulures partent avec la plaque qui les porte, comme la poussière du bois ; la bascule entre 0,3 et 0,6 reste rapide (fondu étroit du masque de saleté, préexistant). Défaut en gros plan : les coulures restantes ont un bord noir net, plus proche de l'encre que de l'eau (réserve 3 confirmée). Non jugé : le gros plan à 0,3 m.
 
+## 2026-11-12 — Seuil du fût : entrée et sortie (principe validé)
+
+Décision (validée développeur, 2026-11-12) : l'entrée se fait par une ouverture percée dans le mur du fût, au niveau 0, au pied de la première marche. Module « mur avec ouverture » de 30° (ou 2 × 15°). Escalier inchangé. La sortie se fait par le haut. Ce sont deux points de passage.
+
+- Largeur de passage : à confirmer (corde réelle d'un tronçon de 30° à R = 2,0 m ≈ 1,035 m, jambages compris). 🟡
+- Sortie par le haut : module et sol vers la sortie à définir. 🟡
+- Même règle d'export que les autres modules du fût (section « Modules du fût »).
+
 ## Points ouverts
 - Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
 - Hauteur d'étage (décide la hauteur de marche).
-- Entrée et sortie du fût : modules « seuil » et sol vers la sortie à définir. Gros bloc à l'entrée qui empiète sur les marches (non localisé).
+- Entrée (ouverture dans le mur, niveau 0) validée le 2026-11-12 : largeur de passage et module de sortie par le haut à définir. Gros bloc à l'entrée qui empiète sur les marches (non localisé).
 - Noyau en coque témoin (0,25 m) ; version finale pleine à décider.
 - Contact marche/mur : bord de marche à 4 segments d'arc, identique au mur.
 - Import Godot non testé (échelle, normales, UV).
