@@ -274,6 +274,18 @@ func is_finished() -> bool:
 	return _finished
 
 
+## Termine la face de l'extérieur (fin automatique de la surface) : même fin de geste que le
+## reste <= tau (état écrit propre tout de suite, fondu visuel). Crée la grille fine si besoin
+## (synchrone) ; sans effet si la face est déjà terminée.
+func finish_now() -> void:
+	if _finished:
+		return
+	ensure_fine_grid()
+	if _finished:
+		return
+	_finish(true)
+
+
 func is_fading() -> bool:
 	return _fade >= 0.0
 
