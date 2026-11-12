@@ -107,12 +107,14 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 ## Surfaces à nettoyer (décision de Direction, 2026-11-12, Phase 3)
 - Une surface est une zone reconnaissable d'un objet ou du décor, regroupant plusieurs faces. Les grandes surfaces sont découpées. À ne pas confondre avec les surfaces de pose.
 - Fin automatique d’une surface (décision de Direction, 2026-11-12, valeurs de départ provisoires 🟡) : seuil = min(~0,5 m², 10 % de l’aire géométrique de la surface). Aire sale restante = somme des remaining_dirty_area() des faces de la surface. La fin se déclenche uniquement au passage de l’aire sale restante du dessus au dessous du seuil. Une surface propre au départ n’a pas de fin. Le reste se finit automatiquement.
-- Taille d’une surface : minimum 0,5 m², maximum 4 m², cible indicative 1 à 2 m² (Direction, 2026-11-12, 🟡 provisoire). Les surfaces respectent ces bornes ; la découpe est faite par Art. Avec un maximum de 4 m², le 10 % de l’aire s’applique toujours (10 % de 4 m² = 0,4 m² < 0,5 m²), mais la formule min(~0,5 m², 10 %) est conservée.
-- Tailles (Direction, 2026-11-12, valeurs de départ provisoires 🟡) : murs de 2 à 3 faces selon les ruptures visibles ; noyau en panneaux de 6 faces ; une marche = dessus + contremarche dans une même surface (0,76 m²), le dessus seul n’est jamais une surface ; les deux faces partagent le même état de fin et l’aire restante est la somme des deux.
+
+- Taille d’une surface : minimum 0,5 m², cible 1 à 2 m², maximum 2 m² par surface (Direction, 2026-11-12, valeur de départ provisoire 🟡).
+- Tailles (Direction, 2026-11-12, valeurs de départ provisoires 🟡) : murs de 2 à 3 faces selon les ruptures visibles ; noyau en panneaux de 6 faces (≈ 1,7 m²) ; une marche = dessus + contremarche dans une même surface (0,76 m²), le dessus seul n’est jamais une surface ; les deux faces partagent le même état de fin et l’aire restante est la somme des deux.
 - Surface déjà propre au départ : une surface dont l’aire sale initiale est non nulle mais déjà sous le seuil est terminée d’office : elle compte comme propre dans le 100 % de la pièce, sans retour visuel ni sonore, sans autosave, sans événement de fin.
 - 100 % de la pièce : chaque surface vaut 1.
-- Portée du geste : 2,0 m, mesurée depuis la caméra ; aucune limite de hauteur codée (valeur 🟡 provisoire de sponge.tres).
+- Portée du geste : 2,0 m depuis la caméra, sans limite de hauteur ; pas de plafond de hauteur à ajouter (Direction, 2026-11-12).
 - Retour visuel de fin de surface (Direction, 2026-11-12, 🟡 valeurs provisoires, non vérifié dans Godot) : proposition d’Art, discret, 1,4 s, une seule fois, sans trace. Livrable Art : fin_surface.gdshader. Il est placé en next_pass sur la surface terminée ; le paramètre progress est animé de 0 à 1 en 1,4 s à la fin de la surface ; la normale est fournie à normal_tex ; peak réglable (départ 0,07 additif, variante 0,12). Forward+. Voile totalement éteint à progress = 1. Retour sonore : Sound Design. Statut : non implémenté, dépend de l’entité Surface (non codée).
+
 
 ## Outil éponge ✅ (2026-11-11)
 - ToolData : ressource de données (couches nettoyées, rayon, efficacité, perte maximale, salissure par m², portée). Instance de l'éponge : game/data/tools/sponge.tres.
