@@ -42,8 +42,51 @@ func _run() -> void:
 	_check(is_equal_approx(float(veil.get_shader_parameter(&"progress")), 1.0), "progress = 1 en fin de voile")
 	_check(face0.face_material().next_pass == null and spike.veil_tweens.is_empty(), "next_pass nul après le voile")
 	spike.free()
+	_test_surface_veil()
 	print("test_fin_surface : %s" % ("OK" if _failures == 0 else "%d échec(s)" % _failures))
 	quit(1 if _failures > 0 else 0)
+
+
+## Voile de fin posé par CleaningSurface : marche à deux faces (même progress), un seul voile par fin,
+## face libérée pendant le voile, aucun voile au chargement.
+func _test_surface_veil() -> void:
+	var spike: Node3D = (load(SCENE) as PackedScene).instantiate()
+	root.add_child(spike)
+	var face_a: CleanableFace = spike.faces[0]
+	var face_b: CleanableFace = spike.faces[1]
+	var surface: CleaningSurface = CleaningSurface.new()
+	surface.faces = [face_a, face_b] as Array[CleanableFace]
+	spike.add_child(surface)
+	var finishes: Array[int] = [0]
+	surface.surface_finished.connect(func(_s: CleaningSurface) -> void: finishes[0] += 1)
+	_check(face_a.face_material().next_pass == null and surface.veil_tween == null, "chargement : aucun voile")
+	_clean(face_a)
+	_clean(face_b)
+	var veil_a: ShaderMaterial = face_a.face_material().next_pass as ShaderMaterial
+	var veil_b: ShaderMaterial = face_b.face_material().next_pass as ShaderMaterial
+	_check(finishes[0] == 1 and veil_a != null and veil_b != null, "voile posé sur chaque face à la fin (%d fin)" % finishes[0])
+	if veil_a == null or veil_b == null:
+		spike.free()
+		return
+	_check(is_equal_approx(float(veil_a.get_shader_parameter(&"progress")), 0.0) and is_equal_approx(float(veil_a.get_shader_parameter(&"peak")), 0.12)
+			and is_equal_approx(float(veil_a.get_shader_parameter(&"edge_boost")), 0.0), "progress 0, peak 0,12, edge_boost 0")
+	var tween: Tween = surface.veil_tween
+	surface._play_veil() # nouvelle fin pendant le voile : ignorée
+	_check(surface.veil_tween == tween and face_a.face_material().next_pass == veil_a, "pas d'empilement pendant un voile en cours")
+	tween.custom_step(0.7)
+	var pa: float = veil_a.get_shader_parameter(&"progress")
+	_check(absf(pa - 0.5) < 1e-3 and is_equal_approx(pa, float(veil_b.get_shader_parameter(&"progress"))), "progress ~0,5 identique sur les deux faces")
+	face_b.free() # face libérée pendant le voile
+	tween.custom_step(1.0)
+	_check(is_equal_approx(float(veil_a.get_shader_parameter(&"progress")), 1.0), "progress = 1 en fin de voile")
+	_check(face_a.face_material().next_pass == null and surface.veil_tween == null, "next_pass nul après le voile, face libérée sans erreur")
+	spike.free()
+
+
+func _clean(face: CleanableFace) -> void:
+	if is_instance_valid(face):
+		var center: Vector3 = face.global_transform * face.mapping.point_at(Vector2(0.5, 0.5))
+		face.clean_stroke(center, center, 5.0, 100.0)
 
 
 func _test_projection(face: CleanableFace, j: int, k: int) -> void:

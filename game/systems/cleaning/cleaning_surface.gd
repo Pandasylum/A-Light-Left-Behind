@@ -18,12 +18,17 @@ signal surface_finished(surface: CleaningSurface)
 
 const GROUP: StringName = &"cleaning_surfaces"
 const DEBUG_LOG: bool = true # temporaire, à retirer avec le retour visuel
+## Voile de fin de surface (Direction 2026-11-12, valeurs provisoires) : shader d'Art en next_pass.
+const VEIL_DURATION: float = 1.4
+const VEIL_PEAK: float = 0.12
 
 @export var faces: Array[CleanableFace] = []
 ## Constantes du seuil (CleaningParams par défaut si absent).
 @export var params: CleaningParams
 
 var _finished: bool = false
+var veil_tween: Tween ## voile en cours (null sinon) ; un seul par surface
+var _veil_materials: Dictionary = {} ## CleanableFace -> ShaderMaterial du voile
 
 
 func _ready() -> void:
@@ -91,7 +96,45 @@ func _on_face_stroked() -> void:
 			face.finish_now()
 	if DEBUG_LOG:
 		print("surface finie : ", get_path(), " aire=", area_at_finish, " seuil=", threshold())
+	_play_veil()
 	surface_finished.emit(self)
+
+
+## Voile de fin : un seul tween linéaire écrit le même progress sur le matériau de chaque face
+## (marche : dessus et contremarche synchronisés), puis next_pass est retiré. Une fin survenant
+## pendant un voile en cours est ignorée (pas d'empilement).
+func _play_veil() -> void:
+	if (veil_tween != null and veil_tween.is_valid()) or not is_inside_tree():
+		return
+	var valid: Array[CleanableFace] = []
+	for face: CleanableFace in faces:
+		if is_instance_valid(face) and face.face_material() != null and face.world_projection() != null:
+			valid.append(face)
+	var sweep: Dictionary = FinSurfaceSweep.compute(valid)
+	_veil_materials.clear()
+	for face: CleanableFace in valid:
+		var material: ShaderMaterial = FinSurfaceSweep.make_material(face, sweep[face], VEIL_PEAK)
+		material.set_shader_parameter(&"edge_boost", 0.0)
+		face.face_material().next_pass = material
+		_veil_materials[face] = material
+	veil_tween = create_tween()
+	veil_tween.tween_method(_set_veil_progress, 0.0, 1.0, VEIL_DURATION)
+	veil_tween.tween_callback(_end_veil)
+
+
+func _set_veil_progress(value: float) -> void:
+	for material: ShaderMaterial in _veil_materials.values():
+		material.set_shader_parameter(&"progress", value)
+
+
+func _end_veil() -> void:
+	for key: Variant in _veil_materials:
+		# Face libérée pendant le voile : rien à retirer.
+		var face: CleanableFace = key as CleanableFace if is_instance_valid(key) else null
+		if face != null and face.face_material() != null and face.face_material().next_pass == _veil_materials[key]:
+			face.face_material().next_pass = null
+	_veil_materials.clear()
+	veil_tween = null
 
 
 # --- Accès pour le futur 100 % de la pièce (le pourcentage n'est pas calculé ici) ---
