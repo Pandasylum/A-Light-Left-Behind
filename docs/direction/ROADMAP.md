@@ -75,6 +75,11 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Chaufferie (2026-11-10) : au sous-sol, dans l'extension prévue (trappe vers le tunnel), hors des 7 pièces ; le jeu de base garde le chauffage via la cheminée de la salle de vie et la plomberie de la cuisine.
 - Direction artistique (2026-11-10, principe) : palette commune, variations par pièce, lumière froide puis plus chaude ; détails dans ART_BIBLE.md.
 
+## Dépendances à suivre
+
+- Phase 3 — fin de surface (GDD §4, §15 pt 30) : autosave à la fin d'une surface, retour de fin (visuel : Art ; sonore : Sound Design), découpage des surfaces par Art.
+- Menu (GDD §10) : écran-titre, pause, Options, Recommencer.
+
 ## Décisions en attente (GDD §15)
 
 1. Liste exacte des outils de nettoyage et de rangement trouvés dans la pièce 1.
@@ -85,6 +90,13 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 6. Contenu restant de la pièce 1 et de l'atelier (points ouverts au GDD §15).
 7. Langues de sous-titrage supplémentaires.
 8. Détails des sauvegardes, contrôles et compatibilité par plateforme.
+
+## Points ouverts (surfaces et menu)
+
+- Maximum d'une surface (dépend de la zone d'action de l'éponge, non définie).
+- Texte de l'alerte de Recommencer.
+- Ruptures visibles du noyau (Art).
+- Règle de contenu « une surface démarre bien au-dessus de son seuil » (World & Content).
 
 ## Propositions non validées
 
