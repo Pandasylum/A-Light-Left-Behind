@@ -1,6 +1,6 @@
 class_name PauseMenu
 extends CanvasLayer
-## Menu pause (action « pause »). Arrête le jeu, restaure le curseur système, rend la caméra comme
+## Menu pause (action « pause_menu »). Arrête le jeu, restaure le curseur système, rend la caméra comme
 ## avant à la reprise. Retour au menu et Quitter sauvegardent d'abord (Autosave.save_and_wait :
 ## le bouton Quitter n'émet pas la fermeture de fenêtre). Habillage provisoire.
 
@@ -46,7 +46,7 @@ func is_open() -> bool:
 
 ## Traité avant le jeu (_input) pour que le Player ne voie pas la touche.
 func _input(event: InputEvent) -> void:
-	if not event.is_action_pressed(&"pause", false):
+	if not event.is_action_pressed(&"pause_menu", false):
 		return
 	get_viewport().set_input_as_handled()
 	if is_open():
