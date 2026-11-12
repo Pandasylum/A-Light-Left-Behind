@@ -6,8 +6,7 @@ extends RefCounted
 ##   - faces verticales (mur, panneau de noyau, contremarche) : hauteur monde à partir du bord bas ;
 ##   - dessus de marche (SectorMapping) : arc de cercle (rayon moyen) à partir de l'arête commune avec
 ##     la contremarche, abscisse décalée de la hauteur de la contremarche.
-## Valeurs et méthode PROVISOIRES (Art, 2026-11-12). Pas de décision d'architecture : Engineering
-## reprend ce calcul à sa façon dans CleaningSurface si la méthode est retenue.
+## Valeurs et méthode PROVISOIRES (Art, 2026-11-12). Utilisé par CleaningSurface pour le voile de fin.
 
 const SHADER_PATH: String = "res://tests/test_fin_surface/fin_surface.gdshader"
 
