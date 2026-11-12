@@ -1,6 +1,6 @@
 # ART BIBLE — A Light Left Behind
 
-Propriétaire : projet Art Direction & Assets. Dernière mise à jour : 2026-11-10.
+Propriétaire : projet Art Direction & Assets. Dernière mise à jour : 2026-11-12.
 Statut : direction de travail NON OFFICIELLE jusqu'au test de style.
 Légende : ✅ validé · 🟡 à décider
 
@@ -80,11 +80,9 @@ Deuxième vague : carrelage / faïence, papier jauni, verre.
 
 2026-11-11 : test technique. Le shader sale/propre à masque (Godot 4.6, Forward+) fonctionne sur un plan avec textures synthétiques. Style non validé.
 
-2026-11-11 — Règle d'export des modules du fût (PROPOSITION, non officielle)
+2026-11-10 : Protocole de test de style validé. Scène : coin d’atelier, une caméra, 3 matériaux (bois, pierre, métal rouillé), 3 objets. 4 captures : froid/chaud × propre/sale. Le style « peint + éclairage réaliste » reste NON OFFICIEL jusqu’au verdict, rendu le 2026-11-12 (voir section 2026-11-12).
 
-2026-11-10 : Protocole de test de style validé. Scène : coin d’atelier, une caméra, 3 matériaux (bois, pierre, métal rouillé), 3 objets. 4 captures : froid/chaud × propre/sale. Le style « peint + éclairage réaliste » reste NON OFFICIEL jusqu’au verdict.
-
-2026-11-11 : Style (validé par le développeur). « Stylisé réaliste » = textures photo simplifiées (niveau 2) + éclairage réaliste. « Peint à la main » est abandonné. Cohérent avec PROJECT_RULES §4.1. Condition : respecter l’ambiance des références (atelier en bois chaud, lanterne rouillée, escalier de bois dans une tour de pierre). Statut : NON OFFICIEL jusqu’au test bois (sale/propre, froid/chaud).
+2026-11-11 : Style (validé par le développeur). « Stylisé réaliste » = textures photo simplifiées (niveau 2) + éclairage réaliste. « Peint à la main » est abandonné. Cohérent avec PROJECT_RULES §4.1. Condition : respecter l’ambiance des références (atelier en bois chaud, lanterne rouillée, escalier de bois dans une tour de pierre). Statut : OFFICIEL, validé le 2026-11-12 (test bois, voir section 2026-11-12).
 
 2026-11-11 : Sens de « sale » par matériau. Pierre : humidité et mousse ; restaurée, elle devient plus sèche et plus claire. Bois : voile de poussière mate et traces. Métal : rouille. Le contraste de valeur reste suffisant pour lire la saleté. Pour le bois, la lisibilité passe par les signes (poussière, traces) en plus de la valeur.
 
@@ -93,15 +91,11 @@ Deuxième vague : carrelage / faïence, papier jauni, verre.
 
 2026-11-11 : Mousse sur pierre, test technique concluant. Couche séparée (albédo, rugosité et normale CC0 Moss002, niveau 2) pilotée par un masque d’épaisseur ; seuil par instance, les zones fines partent en premier. La pierre de base doit être sans mousse. La mousse est mate, la pierre sale est brillante (humide). Points ouverts : bords trop nets (à corriger dans le masque), relief et reflets photographiques sur la pierre sale, mousse contre traces et crasse non testée, mousse tenace non testée.
 
-### Points ouverts
-Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
-
-
-## 2026-11-11 — Modules du fût : règle d'export et tuilage (REMPLACE les deux entrées précédentes)
+## 2026-11-11 — Modules du fût : règle d'export et tuilage
 
 Origine : demande Engineering (masque d'état par face en UV2, SurfaceMapping cylindre).
 Validé Direction : escalier central hélicoïdal ; marche 1,5 m ; 24 marches par tour. Validé développeur : tuilage N = 12.
-Statut : règle d'export validée pour les modules témoins. Style NON OFFICIEL (test bois non fait). Modules vérifiés dans les .glb par Engineering ; import Godot pas encore testé.
+Statut : règle d'export validée pour les modules témoins. Style OFFICIEL depuis le 2026-11-12 (test bois validé, voir section 2026-11-12). Modules vérifiés dans les .glb par Engineering ; import Godot pas encore testé.
 
 ### Valeurs
 - Rayon intérieur du fût R = 2,0 m. Noyau cylindrique R = 0,5 m. Largeur de marche 1,5 m.
@@ -126,9 +120,33 @@ Statut : règle d'export validée pour les modules témoins. Style NON OFFICIEL 
 - Pierre et masque à produire tuilables à 1,047 m. Masque d'état basse résolution (≈ 64 px/m), bords adoucis par le shader (seuil + bruit tuilable).
 - Motif visible toutes les ~1 m : variations peintes dans la pierre pour casser la répétition.
 
-### Points ouverts
+## 2026-11-12 — Style « stylisé réaliste » : test bois validé (style OFFICIEL)
+
+Décision (validée développeur, 2026-11-12) : après le test bois (sale/propre, lumière froide/chaude, ensemble, gros plan, très gros plan, rasante, poussière 1 et 0,5), la direction « stylisé réaliste » devient officielle : textures photo simplifiées (peinture niveau 2) + éclairage réaliste. « Peint à la main » reste abandonné. La condition posée le 2026-11-11 (test bois à faire) est levée.
+
+### Bois
+- Base : Planks037A (CC0, ambientCG), version propre bois_alb_propre.jpg : taches grises retirées, éclaircie, réchauffée, veinage conservé. Script : build_bois_propre.py.
+- « Sale » = voile de poussière mat + traces. Deux canaux indépendants (shader bois.gdshader), masque d'état en UV2, paramètres d'instance proprete, poussiere, traces.
+- Voile : gris neutre légèrement chaud, sans dominante propre ; seule la lumière le teinte (bleuté sous lumière froide, beige sous lumière chaude).
+- Traces : marques sombres, opacité variable, bord net d'un côté et fondu de l'autre. Lisibles à l'ensemble, sans zoomer.
+- Nettoyage : la poussière part par plaques aux bords doux ; une trace disparaît avec la poussière qui la porte.
+- Valeurs retenues (point de départ, ajustables) : poussiere_plafond 0,25 ; traces_contraste 0,5 ; poussiere_eclaircit 1,0 ; traces_force 1,0 ; rugosite_bois 1,8 (bois nu mat, jamais plus brillant que la référence) ; traces_rugosite en plancher (une trace ne brille jamais plus que le bois nu).
+
+### Rappel des règles de lisibilité (déjà validées le 2026-11-11)
+- Pierre : sale = humidité + mousse (propre : plus sèche, plus claire). Palette gris-brun en lumière chaude ; ligne de mousse vert olive sombre, départ ≈ #313B12.
+- Bois : poussière mate + traces, lisible par signes et contraste de valeur.
+- Métal : rouille (non testé en détail).
+
+## Points ouverts
+- Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
 - Hauteur d'étage (décide la hauteur de marche).
 - Entrée et sortie du fût : modules « seuil » et sol vers la sortie à définir. Gros bloc à l'entrée qui empiète sur les marches (non localisé).
 - Noyau en coque témoin (0,25 m) ; version finale pleine à décider.
 - Contact marche/mur : bord de marche à 4 segments d'arc, identique au mur.
 - Import Godot non testé (échelle, normales, UV).
+- Pierre : relief et reflets photographiques sur la pierre sale ; bords de mousse trop nets (version fût : bords adoucis, à vérifier en jeu).
+- Mousse contre traces non testée ; mousse tenace (outil et déblocage non définis).
+- Métal : test sale/propre à faire.
+- Valeurs de palette par pièce ; détails fins effacés par la simplification.
+- Rendu vérifié sur le PC du développeur pour le bois ; pas encore pour les modules du fût (import Godot).
+- Comparaison Meshy vs Tripo (outil, lampe, caisse) et scène atelier : non faites. Licences gratuites à re-vérifier.
