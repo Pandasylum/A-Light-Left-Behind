@@ -25,6 +25,7 @@ func _run() -> void:
 	_test_clean_at_start()
 	_test_below_threshold_at_start()
 	_test_load()
+	_test_rest_erased()
 	_test_tour()
 	print("test_cleaning_surface : ", "OK" if _failures == 0 else "%d échec(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -139,6 +140,55 @@ func _test_load() -> void:
 			"chargement : état partiel rechargé -> non terminée, sans signal")
 	_sweep(face)
 	_check(surface.is_finished() and _events.size() == 2, "chargement : le passage sous le seuil après un chargement émet le signal")
+	room.free()
+
+
+# --- Reste effacé à la fin de la surface ---
+
+func _test_rest_erased() -> void:
+	var room: Node3D = _room("Reste")
+	var a: CleanableFace = _face(room, "A", Vector2(1.0, 1.0))
+	var b: CleanableFace = _face(room, "B", Vector2(1.0, 1.0))
+	var surface: CleaningSurface = _surface(room, "S", [a, b])
+	_events.clear()
+	var order: Array[String] = []
+	# L'état exporté pendant l'émission doit déjà contenir les faces propres.
+	var at_emit: Dictionary = {}
+	surface.surface_finished.connect(func(_s: CleaningSurface) -> void:
+		order.append("signal")
+		at_emit.merge(CleanableFace.export_room(room)))
+	_sweep(a, 0.0, 0.5)
+	_sweep(b, 0.0, 0.5)
+	_check(not surface.is_finished() and _events.is_empty(), "reste : bandes partielles, non terminée")
+	_sweep(a, 0.5, 1.0)
+	var residue: float = b.remaining_dirty_area()
+	_sweep(b, 0.5, 0.85)
+	_check(surface.is_finished() and _events.size() == 1, "reste : surface terminée, un signal")
+	_check(a.is_finished() and b.is_finished(), "reste : toutes les faces terminées")
+	_check(surface.remaining_dirty_area() == 0.0 and a.remaining_dirty_area() == 0.0 and b.remaining_dirty_area() == 0.0,
+			"reste : aire sale restante nulle (face B avait %.3f m² avant)" % residue)
+	_check(b.cleanliness() >= 0.999 and b.remaining_texels(0) == 0, "reste : état de la face B propre")
+	_check(b.is_fading() or b.is_finished(), "reste : fondu lancé comme une fin de geste")
+	var id_a: String = String(room.get_path_to(a))
+	var id_b: String = String(room.get_path_to(b))
+	_check(at_emit.has(id_a) and at_emit.has(id_b), "reste : export_room dans l'émission contient les deux faces")
+	var clean: bool = true
+	for id: String in [id_a, id_b]:
+		var bytes: PackedByteArray = Marshalls.base64_to_raw(at_emit[id]["donnees"]).decompress(int(at_emit[id]["largeur"]) * int(at_emit[id]["hauteur"]) * int(at_emit[id]["canaux"]), FileAccess.COMPRESSION_ZSTD)
+		_check(not bytes.is_empty(), "reste : export décompressé")
+		for v: int in bytes:
+			if v != 255:
+				clean = false
+	_check(clean, "reste : export pendant l'émission = tous les texels propres")
+	_sweep(b)
+	_check(_events.size() == 1 and surface.is_finished() and surface.remaining_dirty_area() == 0.0, "reste : aucune seconde émission, reste nul")
+	# Rechargement : surface propre, sans signal.
+	var saved: Dictionary = CleanableFace.export_room(room)
+	CleanableFace.import_room(room, {})
+	_check(not surface.is_finished(), "reste : pièce sale rechargée -> non terminée")
+	CleanableFace.import_room(room, saved)
+	_check(surface.is_finished() and surface.remaining_dirty_area() == 0.0 and _events.size() == 1,
+			"reste : rechargement -> surface propre, sans signal")
 	room.free()
 
 

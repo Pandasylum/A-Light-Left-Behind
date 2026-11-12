@@ -11,7 +11,8 @@ extends Node
 ## qui modifie une de ses faces (signal CleanableFace.stroked), jamais par polling.
 ## Aucun état sauvegardé : après un chargement, « terminée » se recalcule depuis les faces.
 
-## Fin de surface : émis une seule fois, au passage sous le seuil pendant un geste. Jamais émis pour
+## Fin de surface : émis une seule fois, au passage sous le seuil pendant un geste, après que toutes
+## les faces ont été terminées (reste effacé). Jamais émis pour
 ## une surface terminée d'office (propre ou déjà sous le seuil au départ) ni au chargement.
 signal surface_finished(surface: CleaningSurface)
 
@@ -81,6 +82,11 @@ func _on_face_stroked() -> void:
 	if _finished or remaining_dirty_area() > threshold():
 		return
 	_finished = true
+	# Le reste se finit automatiquement (GDD §4) : chaque face passe par la fin de geste existante,
+	# état propre écrit de façon synchrone avant l'émission (l'Autosave exporte des faces propres).
+	for face: CleanableFace in faces:
+		if is_instance_valid(face):
+			face.finish_now()
 	surface_finished.emit(self)
 
 
