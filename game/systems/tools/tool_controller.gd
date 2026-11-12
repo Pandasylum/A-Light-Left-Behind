@@ -16,6 +16,9 @@ signal action_finished
 const WORLD_LAYER: int = 1
 const BUCKET_LAYER: int = 4 ## couche 3 (valeur de masque)
 const MARKER_SIZE: float = 20.0 ## px, marqueur de visée provisoire
+const DEBUG_SURFACES: bool = true # temporaire, à retirer avec l'indicateur de pièce
+const DEBUG_AIM_REACH_M: float = 5.0 ## portée du rayon de visée du debug des surfaces
+const DEBUG_FINISHED_SHOWN_S: float = 2.0 ## durée d'affichage de « Surface finie ! »
 
 var slots: ToolSlots = ToolSlots.new()
 ## État de l'outil en main (null si aucun outil en main).
@@ -30,6 +33,7 @@ var _rinse_latched: bool = false ## rinçage déjà fait pour l'appui en cours
 var _last_point: Vector3 = Vector3.ZERO
 var _label: Label
 var _marker: Panel
+var _finished_msg_until_msec: int = 0 ## fin d'affichage de « Surface finie ! » (debug surfaces)
 
 @onready var _player: Player = get_parent() as Player
 @onready var _camera: Camera3D = get_node_or_null(^"../Head/Camera3D") as Camera3D
@@ -55,6 +59,8 @@ func _ready() -> void:
 	if _carry != null:
 		_carry.held_changed.connect(on_held_item_changed)
 	_refresh_label()
+	if DEBUG_SURFACES:
+		_connect_surfaces.call_deferred() # les surfaces de la pièce sont prêtes après le joueur
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -68,6 +74,8 @@ func _process(_delta: float) -> void:
 	_marker.visible = _player != null and _player.camera_locked
 	if _marker.visible:
 		_marker.position = _marker.get_viewport().get_mouse_position() - _marker.size * 0.5
+	if DEBUG_SURFACES:
+		_refresh_label()
 
 
 ## Point unique de relâchement : l'outil n'est plus tenu -> le verrou caméra est relâché.
@@ -230,11 +238,84 @@ func import_tools(section: Dictionary, catalog: Array[ToolData]) -> bool:
 ## Texte de debug : salissure et efficacité effective de l'outil en main ; "Outil : rangé" si
 ## aucun n'est en main ; "" sans emplacement.
 func debug_text() -> String:
+	var tool_text: String = _tool_debug_text()
+	if not DEBUG_SURFACES:
+		return tool_text
+	var lines: Array[String] = []
+	if tool_text != "":
+		lines.append(tool_text)
+	lines.append_array(_surfaces_debug_lines())
+	return "\n".join(lines)
+
+
+func _tool_debug_text() -> String:
 	if state == null:
 		return "Outil : rangé" if slots.count() > 0 else ""
 	return "Outil : %s\nSalissure : %d %%\nEfficacité : %.2f (%d %%)\nDernier geste : %.2f ms" % [
 		state.data.id, roundi(state.soil * 100.0), state.effective_efficiency(),
 		roundi(state.efficiency_factor() * 100.0), last_stroke_usec / 1000.0]
+
+
+# --- Debug des surfaces (temporaire, DEBUG_SURFACES) ---
+
+func _connect_surfaces() -> void:
+	for node: Node in get_tree().get_nodes_in_group(CleaningSurface.GROUP):
+		if not node.is_connected(&"surface_finished", _on_surface_finished):
+			node.connect(&"surface_finished", _on_surface_finished)
+
+
+func _on_surface_finished(_surface: CleaningSurface) -> void:
+	_finished_msg_until_msec = Time.get_ticks_msec() + roundi(DEBUG_FINISHED_SHOWN_S * 1000.0)
+
+
+func _surfaces_debug_lines() -> Array[String]:
+	var surfaces: Array[Node] = get_tree().get_nodes_in_group(CleaningSurface.GROUP)
+	var done: int = 0
+	for node: Node in surfaces:
+		if (node as CleaningSurface).is_finished():
+			done += 1
+	var lines: Array[String] = ["Surfaces terminées : %d / %d" % [done, surfaces.size()]]
+	var aimed: CleaningSurface = _aimed_surface(surfaces)
+	if aimed == null:
+		lines.append("Surface visée : aucune")
+	else:
+		lines.append("Surface visée : %s — sale restant %.3f m² / seuil %.3f m² — terminée : %s" % [
+				aimed.name, aimed.remaining_dirty_area(), aimed.threshold(),
+				"oui" if aimed.is_finished() else "non"])
+	if Time.get_ticks_msec() < _finished_msg_until_msec:
+		lines.append("Surface finie !")
+	return lines
+
+
+## Surface visée par le centre de l'écran (ou le curseur si la caméra est verrouillée) : la surface
+## dont une face a la boîte la plus proche du point touché (null si rien n'est visé).
+func _aimed_surface(surfaces: Array[Node]) -> CleaningSurface:
+	if _camera == null or not _camera.is_inside_tree():
+		return null
+	var from: Vector3 = _camera.global_position
+	var direction: Vector3 = -_camera.global_basis.z
+	if _player != null and _player.camera_locked:
+		var cursor: Vector2 = _camera.get_viewport().get_mouse_position()
+		from = _camera.project_ray_origin(cursor)
+		direction = _camera.project_ray_normal(cursor)
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(
+			from, from + direction * DEBUG_AIM_REACH_M, WORLD_LAYER)
+	var hit: Dictionary = _camera.get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return null
+	var point: Vector3 = hit["position"]
+	var best: CleaningSurface = null
+	var best_distance: float = 0.05 ## m, tolérance de la boîte de face
+	for node: Node in surfaces:
+		var surface: CleaningSurface = node as CleaningSurface
+		for face: CleanableFace in surface.faces:
+			if face == null:
+				continue
+			var d: float = face.distance_to_bounds(point)
+			if d <= best_distance:
+				best_distance = d
+				best = surface
+	return best
 
 
 func _is_active() -> bool:
