@@ -13,3 +13,7 @@ extends Resource
 @export var texels_par_m: float = 64.0
 ## Densité de l'échantillonnage grossier de l'aire sale initiale (au chargement).
 @export var texels_par_m_grossier: float = 16.0
+## Fin de surface (CleaningSurface) : seuil = min(seuil_surface_max_m2, seuil_surface_fraction × aire
+## géométrique de la surface). PROVISOIRES (GDD §15 point 30), à régler après essai.
+@export var seuil_surface_max_m2: float = 0.5
+@export var seuil_surface_fraction: float = 0.10
