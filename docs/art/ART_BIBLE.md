@@ -144,7 +144,18 @@ Décision (validée développeur, 2026-11-12) : après le test bois (sale/propre
 ### Rappel des règles de lisibilité (déjà validées le 2026-11-11)
 - Pierre : sale = humidité + mousse (propre : plus sèche, plus claire). Palette gris-brun en lumière chaude ; ligne de mousse vert olive sombre, départ ≈ #313B12.
 - Bois : poussière mate + traces, lisible par signes et contraste de valeur.
-- Métal : rouille (non testé en détail).
+- Métal : rouille (canal indépendant localisé aux joints et bords ; voir la section « Métal : test rouille » du 2026-11-12).
+
+## 2026-11-12 — Métal : test rouille (principe validé)
+
+Décision (validée développeur, 2026-11-12) : sur le métal, « sale » = rouille, gérée comme un canal indépendant de la base propre, localisé par un masque UV2 (joints entre panneaux, bords) et piloté par un paramètre d'instance `rouille` (0 = propre, 1 = rouillé). Rugosité de la base propre relevée par un plancher (0,42) : la rugosité d'origine de Metal055B (médiane 0,28) brûle sous une lumière en incidence miroir (mesuré en rendu approché : 85 % du plan à l'état propre, 35 % à 0,5).
+
+- Base propre : Metal055B (CC0, ambientCG), rouille retirée (10 % de la surface), peinture niveau 2. Rugosité propre 0,45–0,60.
+- Canal rouille : Metal056C (CC0, ambientCG), peinture niveau 2, rugosité mate (0,62–0,98), normale propre à 056C.
+- Croissance : carte de seuil alignée sur l'albédo ; `rouille` = part de surface rouillée (0,5 = moitié). Le masque UV2 (canal V) décale l'avancée : joints et bords d'abord.
+- Rendu vérifié dans Godot (PC du développeur, test_metal.tscn) : pas de reflet brûlé en rasante (lumière froide et chaude), rouille lisible à l'ensemble par contraste de valeur. Masque de test : bande de ~4 cm autour des joints (une bande de 12 cm se lisait comme une tache en croix). 🟡 valeur de départ.
+- Fichiers : `game/tests/test_metal/` (metal.gdshader, test_metal.tscn, tex/). Scripts : build_metal_propre.py, rendu_metal.py.
+- Réserves : (1) sous lumière chaude, la plaque propre rend beige (peinture claire sans reflet franc) et se lit moins comme du métal ; sous lumière froide, elle se lit comme du métal peint. (2) Le masque du test est fabriqué à la main pour un plan de 2 m ; la localisation des vrais modules viendra de leur UV2, à définir. (3) Normale de la base propre quasi plate. (4) Rouille à 100 % : garde les zones grises de 056C. (5) Gros plan et très gros plan réalistes, et lisibilité par signes, non jugés.
 
 ## Points ouverts
 - Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
@@ -155,7 +166,7 @@ Décision (validée développeur, 2026-11-12) : après le test bois (sale/propre
 - Import Godot non testé (échelle, normales, UV).
 - Pierre : relief et reflets photographiques sur la pierre sale ; bords de mousse trop nets (version fût : bords adoucis, à vérifier en jeu).
 - Mousse contre traces non testée ; mousse tenace (outil et déblocage non définis).
-- Métal : test sale/propre à faire.
+- Métal : réserves du test rouille (beige sous lumière chaude, masque UV2 des vrais modules à définir, gros plans non jugés).
 - Valeurs de palette par pièce ; détails fins effacés par la simplification.
 - Rendu vérifié sur le PC du développeur pour le bois ; pas encore pour les modules du fût (import Godot).
 - Comparaison Meshy vs Tripo (outil, lampe, caisse) et scène atelier : non faites. Licences gratuites à re-vérifier.

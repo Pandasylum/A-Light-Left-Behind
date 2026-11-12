@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://cxx7ib4v0rskh"]
+
+[ext_resource type="Script" uid="uid://do4h6ykr34me6" path="res://tests/test_metal/test_metal.gd" id="1_scr"]
+[ext_resource type="Shader" uid="uid://bppl1fr6f1n84" path="res://tests/test_metal/metal.gdshader" id="2_sha"]
+[ext_resource type="Texture2D" uid="uid://dw2ererjsyiad" path="res://tests/test_metal/tex/metal_alb_propre.jpg" id="3_tex"]
+[ext_resource type="Texture2D" uid="uid://bwyle2eo07fks" path="res://tests/test_metal/tex/metal_alb_rouille.jpg" id="4_tex"]
+[ext_resource type="Texture2D" uid="uid://xmyu3uaffryx" path="res://tests/test_metal/tex/metal_rug_propre.jpg" id="5_tex"]
+[ext_resource type="Texture2D" uid="uid://dk1b7jqp4tkj8" path="res://tests/test_metal/tex/masque_etat_etroit.png" id="6_67w87"]
+[ext_resource type="Texture2D" uid="uid://db60q1qvv5n5m" path="res://tests/test_metal/tex/metal_rug_rouille.jpg" id="6_tex"]
+[ext_resource type="Texture2D" uid="uid://b30equ26y6a3n" path="res://tests/test_metal/tex/metal_rug_brute.jpg" id="7_tex"]
+[ext_resource type="Texture2D" uid="uid://cyjwqrkdremoq" path="res://tests/test_metal/tex/metal_normal_propre.jpg" id="8_tex"]
+[ext_resource type="Texture2D" uid="uid://dsw4ak4lybx6m" path="res://tests/test_metal/tex/metal_normal_rouille.jpg" id="9_tex"]
+[ext_resource type="Texture2D" uid="uid://0yyv4oxidyxl" path="res://tests/test_metal/tex/metal_croissance.png" id="11_tex"]
+
+[sub_resource type="PlaneMesh" id="Plan_metal"]
+lightmap_size_hint = Vector2i(12, 12)
+add_uv2 = true
+
+[sub_resource type="ShaderMaterial" id="Mat_metal"]
+render_priority = 0
+shader = ExtResource("2_sha")
+shader_parameter/albedo_propre = ExtResource("3_tex")
+shader_parameter/albedo_rouille = ExtResource("4_tex")
+shader_parameter/rug_propre = ExtResource("5_tex")
+shader_parameter/rug_rouille = ExtResource("6_tex")
+shader_parameter/rug_brute = ExtResource("7_tex")
+shader_parameter/normal_propre = ExtResource("8_tex")
+shader_parameter/normal_rouille = ExtResource("9_tex")
+shader_parameter/rugosite_brute = false
+shader_parameter/rugosite_plancher = 0.42
+shader_parameter/force_normal = 1.0
+shader_parameter/uv_echelle = Vector2(1, 1)
+shader_parameter/masque_etat = ExtResource("6_67w87")
+shader_parameter/croissance = ExtResource("11_tex")
+shader_parameter/localisation = 0.8
+shader_parameter/douceur = 0.06
+
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 1
+background_color = Color(0.06, 0.08, 0.12, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.4, 0.48, 0.62, 1)
+ambient_light_energy = 0.5
+
+[node name="TestMetal" type="Node3D" unique_id=809401009]
+script = ExtResource("1_scr")
+
+[node name="Reference" type="MeshInstance3D" parent="." unique_id=1917992052]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.05, 0, 0)
+instance_shader_parameters/rouille = 0.0
+mesh = SubResource("Plan_metal")
+surface_material_override/0 = SubResource("Mat_metal")
+
+[node name="Plaque" type="MeshInstance3D" parent="." unique_id=865729646]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.05, 0, 0)
+mesh = SubResource("Plan_metal")
+surface_material_override/0 = SubResource("Mat_metal")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1721001764]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, -0.5, 1.9, -0.4)
+current = true
+
+[node name="Lumiere" type="DirectionalLight3D" parent="." unique_id=934261599]
+transform = Transform3D(0.819152, -0.368688, 0.439385, 0, 0.766044, 0.642788, -0.573576, -0.526541, 0.627507, 0, 5, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=463592677]
+environment = SubResource("Env_1")
+
+[node name="Interface" type="CanvasLayer" parent="." unique_id=1161075112]
+
+[node name="Panneau" type="VBoxContainer" parent="Interface" unique_id=696898537]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 424.0
+offset_bottom = 300.0
+
+[node name="Titre" type="Label" parent="Interface/Panneau" unique_id=996625346]
+layout_mode = 2
+text = "Gauche : référence propre — Droite : plaque testée"
+
+[node name="EtiquetteRouille" type="Label" parent="Interface/Panneau" unique_id=1880700448]
+layout_mode = 2
+text = "rouille = 0.00"
+
+[node name="CurseurRouille" type="HSlider" parent="Interface/Panneau" unique_id=843800018]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+
+[node name="BoutonLumiere" type="Button" parent="Interface/Panneau" unique_id=1164208603]
+layout_mode = 2
+text = "Lumière : froide"
+
+[node name="BoutonVue" type="Button" parent="Interface/Panneau" unique_id=1871111542]
+layout_mode = 2
+text = "Vue : ensemble"
+
+[node name="BoutonRugosite" type="Button" parent="Interface/Panneau" unique_id=2021857446]
+layout_mode = 2
+text = "Rugosité : corrigée"
