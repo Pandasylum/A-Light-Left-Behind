@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://props/test_item.tscn" id="5_item"]
 [ext_resource type="Resource" path="res://data/items/test_small_1.tres" id="6_small"]
 [ext_resource type="Script" path="res://core/autosave.gd" id="7_autosave"]
+[ext_resource type="PackedScene" path="res://ui/menu/pause_menu.tscn" id="8_pause"]
 
 [node name="SpongeTest" type="Node3D"]
 script = ExtResource("1_test")
@@ -23,3 +24,5 @@ item_data = ExtResource("6_small")
 
 [node name="Autosave" type="Node" parent="."]
 script = ExtResource("7_autosave")
+
+[node name="PauseMenu" parent="." instance=ExtResource("8_pause")]
