@@ -93,7 +93,6 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 
 ## Points ouverts (surfaces et menu)
 
-- Maximum d'une surface (dépend de la zone d'action de l'éponge, non définie).
 - Texte de l'alerte de Recommencer.
 - Ruptures visibles du noyau (Art).
 - Règle de contenu « une surface démarre bien au-dessus de son seuil » (World & Content).
