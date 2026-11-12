@@ -7,6 +7,12 @@ extends Node
 ## Si le rayon touche d'abord un seau posé, le clic rince l'outil (une fois par appui) au lieu de nettoyer.
 ## Texte de debug et marqueur provisoires.
 
+## Un outil vient d'être remis dans son emplacement (déclencheur de sauvegarde automatique).
+signal tool_stowed
+## L'action d'outil en cours (geste continu sur une surface) vient de finir : clic relâché, surface
+## quittée, outil rangé ou cancel_action().
+signal action_finished
+
 const WORLD_LAYER: int = 1
 const BUCKET_LAYER: int = 4 ## couche 3 (valeur de masque)
 const MARKER_SIZE: float = 20.0 ## px, marqueur de visée provisoire
@@ -105,7 +111,19 @@ func take_out(index: int = ToolSlots.NONE) -> bool:
 
 ## Range l'outil en main dans son emplacement (sans effet si aucun).
 func stow_tool() -> void:
-	slots.stow()
+	if slots.stow():
+		tool_stowed.emit()
+
+
+## Vrai tant qu'un geste continu est en cours (une sauvegarde automatique attend sa fin).
+func is_action_active() -> bool:
+	return _stroking
+
+
+## Interrompt proprement le geste en cours : chaque pas déjà appliqué est complet (faces et salissure
+## cohérentes), le prochain contact démarre un nouveau geste. Sans effet si aucun geste n'est en cours.
+func cancel_action() -> void:
+	_set_stroking(false)
 
 
 ## Action equip_tool : range l'outil en main, sinon sort l'outil sélectionné.
@@ -139,7 +157,7 @@ func _physics_process(delta: float) -> void:
 	if not Input.is_action_pressed(&"use_primary"):
 		_rinse_latched = false
 	if state == null or _camera == null or not _is_active():
-		_stroking = false
+		_set_stroking(false)
 		return
 	var from: Vector3 = _camera.global_position
 	var direction: Vector3 = -_camera.global_basis.z
@@ -157,11 +175,11 @@ func _physics_process(delta: float) -> void:
 ## posé rince une fois par appui et ne nettoie rien derrière lui ; tout autre objet nettoie.
 func apply_aim_hit(hit: Dictionary, delta: float) -> void:
 	if hit.is_empty():
-		_stroking = false
+		_set_stroking(false)
 		return
 	var collider: Object = hit.get("collider")
 	if collider is Bucket:
-		_stroking = false
+		_set_stroking(false)
 		if not _rinse_latched and rinse_at(collider as Bucket):
 			_rinse_latched = true
 		return
@@ -227,8 +245,16 @@ func _accepts_input() -> bool:
 	return Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or (_player != null and _player.camera_locked)
 
 
+func _set_stroking(value: bool) -> void:
+	if _stroking == value:
+		return
+	_stroking = value
+	if not value:
+		action_finished.emit()
+
+
 func _on_tool_held_changed() -> void:
-	_stroking = false
+	_set_stroking(false)
 	set_tool_held(state != null)
 	_refresh_label()
 

@@ -6,6 +6,7 @@
 [ext_resource type="Resource" path="res://data/tools/sponge.tres" id="4_sponge"]
 [ext_resource type="PackedScene" path="res://props/test_item.tscn" id="5_item"]
 [ext_resource type="Resource" path="res://data/items/test_small_1.tres" id="6_small"]
+[ext_resource type="Script" path="res://core/autosave.gd" id="7_autosave"]
 
 [node name="SpongeTest" type="Node3D"]
 script = ExtResource("1_test")
@@ -19,3 +20,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.75, 0.5, 0.1)
 [node name="TestItem" parent="." instance=ExtResource("5_item")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.75, 0.5, 0.6)
 item_data = ExtResource("6_small")
+
+[node name="Autosave" type="Node" parent="."]
+script = ExtResource("7_autosave")

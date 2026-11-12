@@ -401,6 +401,25 @@ func _tour_save(service: Node, tour: Node3D, tools: ToolSlots, label: String) ->
 			label, size, (data["nettoyage"] as Dictionary).size(), export_usec / 1000.0, write_usec / 1000.0, worst_usec / 1000.0, SAVE_WRITES,
 			stringify_usec / 1000.0, read_usec / 1000.0, import_usec / 1000.0])
 	print("  %-22s en file : appel %.2f ms sur le fil principal, écriture en arrière-plan %.1f ms" % ["", queue_usec / 1000.0, background_usec / 1000.0])
+	# Export étalé de l'Autosave (déclencheur en jeu) : même contenu, coût par image sur le fil principal.
+	var autosave: Autosave = Autosave.new()
+	autosave.handle_quit = false
+	autosave.slot_id = "tour_auto"
+	autosave.setup(tour, tour.get_node("Player/ToolController") as ToolController, service)
+	autosave.request_save()
+	while autosave.is_busy():
+		autosave.advance()
+	service.call("flush")
+	var block: Dictionary = CleanableFace.export_room(tour)
+	var staggered: Dictionary = ((service.call("load_slot", "tour_auto") as Dictionary)["data"] as Dictionary).get(Autosave.CLEANING_KEY, {})
+	var identical: bool = autosave.last_error == 0 and staggered.size() == block.size()
+	for id: String in block:
+		identical = identical and staggered.has(id) and staggered[id]["donnees"] == block[id]["donnees"]
+	_check(identical, "tour %s : export étalé identique à l'export d'un bloc (%d faces)" % [label, block.size()])
+	_check(autosave.worst_step_usec < 16667, "tour %s : pire image de l'export étalé sous 16,7 ms (%.2f ms)" % [label, autosave.worst_step_usec / 1000.0])
+	print("  %-22s étalé (Autosave, budget %.1f ms par image) : %d images, pire image %.2f ms sur le fil principal (écriture en file comprise)" % [
+			"", autosave.export_budget_usec / 1000.0, autosave.export_frames, autosave.worst_step_usec / 1000.0])
+	autosave.free()
 	return Vector2i(export_usec + worst_usec, export_usec + queue_usec)
 
 
@@ -510,7 +529,7 @@ func _measure_tour() -> void:
 	var dir: DirAccess = DirAccess.open("user://test_saves/")
 	if dir != null:
 		for file: String in dir.get_files():
-			if file.begins_with("tour."):
+			if file.begins_with("tour.") or file.begins_with("tour_auto."):
 				dir.remove(file)
 	service.free()
 
