@@ -2,7 +2,8 @@ class_name Autosave
 extends Node
 ## Sauvegarde automatique sur événements (décision de Direction du 12/11/2026) : un seul emplacement,
 ## aucun intervalle fixe, aucune sauvegarde manuelle. Déclencheurs : outil rangé
-## (ToolController.tool_stowed), fermeture du jeu, request_save() pour les déclencheurs à venir.
+## (ToolController.tool_stowed), fin d'une surface à nettoyer (CleaningSurface.surface_finished),
+## fermeture du jeu, request_save() pour les déclencheurs à venir.
 ## Un déclencheur reçu pendant une action d'outil attend sa fin. L'export des faces est étalé sur
 ## plusieurs images (budget export_budget_usec, liste de faces figée au départ) : l'encodage zstd +
 ## base64 des 188 faces du tour coûte 12 à 16 ms d'un bloc sur le fil principal, 0,6 ms au pire par
@@ -79,6 +80,16 @@ func setup(room: Node, tool_controller: ToolController, save_service: Node = nul
 		tools.action_finished.connect(_on_action_finished)
 	if service != null and not service.is_connected(&"save_finished", _on_save_finished):
 		service.connect(&"save_finished", _on_save_finished)
+	if room != null:
+		for surface: CleaningSurface in CleaningSurface.room_surfaces(room):
+			watch_surface(surface)
+
+
+## Relie la fin d'une surface à nettoyer à request_save() (idempotent). setup() l'applique à toutes
+## les surfaces de la pièce ; à appeler pour une surface ajoutée plus tard.
+func watch_surface(surface: CleaningSurface) -> void:
+	if not surface.surface_finished.is_connected(_on_surface_finished):
+		surface.surface_finished.connect(_on_surface_finished)
 
 
 func is_configured() -> bool:
@@ -196,6 +207,10 @@ func _reset() -> void:
 	_index = 0
 	_stale = false
 	set_process(false)
+
+
+func _on_surface_finished(_surface: CleaningSurface) -> void:
+	request_save()
 
 
 func _on_action_finished() -> void:

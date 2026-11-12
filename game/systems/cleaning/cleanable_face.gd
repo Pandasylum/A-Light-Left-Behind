@@ -10,6 +10,8 @@ extends Node3D
 ## au contact d'une face non prête, ensure_fine_grid la calcule en synchrone (repli).
 
 signal finished ## fin de geste déclenchée (reste <= tau) ; l'état est déjà écrit propre
+signal stroked ## un clean_stroke a modifié la face (émis après la fin de geste éventuelle)
+signal state_imported ## import_state terminé (accepté ou rejeté) : l'état vient d'un chargement
 
 const GROUP: StringName = &"cleanable_faces"
 const COMPRESSION: int = FileAccess.COMPRESSION_ZSTD ## sans perte
@@ -200,6 +202,7 @@ func clean_stroke(from: Vector3, to: Vector3, radius_m: float, amount: float, la
 		_upload()
 		if remaining_ratio() <= params.tau:
 			_finish(true)
+		stroked.emit()
 	return changed
 
 
@@ -404,6 +407,12 @@ func export_state(room_root: Node) -> Dictionary:
 ## Restaure l'état. {} = sale. Toute incohérence = face sale + push_warning (renvoie false).
 ## La taille attendue vient de la scène (grille de la face), jamais du fichier.
 func import_state(entry: Dictionary) -> bool:
+	var accepted: bool = _import_entry(entry)
+	state_imported.emit()
+	return accepted
+
+
+func _import_entry(entry: Dictionary) -> bool:
 	_reset_dirty()
 	if entry.is_empty():
 		return true

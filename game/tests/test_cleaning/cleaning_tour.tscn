@@ -9,6 +9,7 @@ core_rings = 3
 steps = 24
 straight_wall = false
 wall_openings = Array[Vector2i]([Vector2i(0, 22), Vector2i(0, 23), Vector2i(2, 0), Vector2i(2, 1)])
+build_surfaces = true
 
 [node name="Player" parent="." index="3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.05, 0.32)

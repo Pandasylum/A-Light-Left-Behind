@@ -15,6 +15,7 @@ const BRUSH_REACH: float = 3.0 # m
 const BRUSH_RATE: float = 4.0 # dose par seconde, PROVISOIRE
 const WORLD_LAYER: int = 1
 const FRAME_WINDOW: float = 5.0 # s, fenêtre de la pire image affichée
+const CORE_PANEL_SECTORS: int = 6 ## secteurs de 15° par panneau de noyau (90°)
 
 @export var stone_material: ShaderMaterial
 @export var force_generated_modules: bool = false
@@ -27,14 +28,19 @@ const FRAME_WINDOW: float = 5.0 # s, fenêtre de la pire image affichée
 ## Ouvertures du mur courbe : (anneau, secteur) sans tronçon de mur.
 @export var wall_openings: Array[Vector2i] = []
 @export var prewarm_radius: float = 4.0 ## m ; <= 0 : pas de préchauffage. PROVISOIRE
+## Crée les surfaces à nettoyer (nœud Surfaces) par règle : une marche (dessus + contremarche),
+## une face de mur, un panneau de noyau (CORE_PANEL_SECTORS secteurs d'un même anneau).
+@export var build_surfaces: bool = false
 
 var faces: Array[CleanableFace] = []
+var surfaces: Array[CleaningSurface] = []
 var init_usec: int = 0 ## construction de l'assemblage, poids grossiers compris
 var generated: PackedStringArray = PackedStringArray() ## modules générés par code (.glb absents)
 var notes: PackedStringArray = PackedStringArray() ## écarts constatés avec les conventions
 
 var _params: CleaningParams = CleaningParams.new()
 var _shapes: Dictionary = {}
+var _surface_groups: Dictionary = {} # nom de surface -> faces, dans l'ordre de construction
 var _aimed: CleanableFace
 var _brushing: bool = false
 var _last_point: Vector3 = Vector3.ZERO
@@ -124,12 +130,17 @@ func _ready() -> void:
 		for j: int in core_rings:
 			# Un seul anneau : noms du spike P2-N1 (Noyau<k>) conservés.
 			var core_name: String = "Noyau%d" % k if core_rings == 1 else "Noyau%d_%d" % [j, k]
-			_add_module(assembly, defs, "noyau", core_name, k * THETA, Vector3(0.0, j * RING_HEIGHT, 0.0))
+			@warning_ignore("integer_division")
+			var panel: int = k / CORE_PANEL_SECTORS
+			_add_module(assembly, defs, "noyau", core_name, k * THETA, Vector3(0.0, j * RING_HEIGHT, 0.0),
+					"Noyau%d_P%d" % [j, panel])
 		for j: int in wall_rings:
 			if not wall_openings.has(Vector2i(j, k)):
 				_add_module(assembly, defs, "mur", "Mur%d_%d" % [j, k], k * THETA, Vector3(0.0, j * RING_HEIGHT, 0.0))
 	if straight_wall:
 		_add_module(assembly, defs, "mur_droit", "MurDroit", 0.0, Vector3(-2.5, 0.0, 0.0))
+	if build_surfaces:
+		_build_surfaces()
 	init_usec = Time.get_ticks_usec() - t0
 	if prewarm_radius > 0.0:
 		prewarmer = CleaningPrewarmer.new()
@@ -144,7 +155,23 @@ func _ready() -> void:
 		push_warning("cleaning_spike : " + note)
 
 
-func _add_module(parent: Node3D, defs: Dictionary, kind: String, node_name: String, angle: float, offset: Vector3) -> void:
+## Une CleaningSurface par groupe de faces, sous le nœud Surfaces (id stable = Surfaces/<nom>).
+func _build_surfaces() -> void:
+	var holder: Node = Node.new()
+	holder.name = "Surfaces"
+	add_child(holder)
+	for key: String in _surface_groups:
+		var surface: CleaningSurface = CleaningSurface.new()
+		surface.name = key
+		surface.faces.assign(_surface_groups[key] as Array)
+		surface.params = _params
+		holder.add_child(surface)
+		surfaces.append(surface)
+
+
+## surface_name : surface à nettoyer qui reçoit les faces du module (défaut : une surface par module).
+func _add_module(parent: Node3D, defs: Dictionary, kind: String, node_name: String, angle: float, offset: Vector3,
+		surface_name: String = "") -> void:
 	var def: Dictionary = defs[kind]
 	var module: Node3D = _instantiate(kind, def)
 	module.name = node_name
@@ -182,6 +209,10 @@ func _add_module(parent: Node3D, defs: Dictionary, kind: String, node_name: Stri
 		face.surface_index = surface
 		module.add_child(face) # enfant du module, transformation identité
 		faces.append(face)
+		var group: String = surface_name if not surface_name.is_empty() else node_name
+		if not _surface_groups.has(group):
+			_surface_groups[group] = []
+		(_surface_groups[group] as Array).append(face)
 
 
 func _instantiate(kind: String, def: Dictionary) -> Node3D:
