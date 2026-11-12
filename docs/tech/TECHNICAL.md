@@ -1,6 +1,6 @@
 # TECHNICAL — A Light Left Behind
 
-Propriétaire : projet Godot Engineering. Dernière mise à jour : 2026-11-11.
+Propriétaire : projet Godot Engineering. Dernière mise à jour : 2026-11-12.
 Légende : ✅ décision validée · 🟡 à décider en Phase 0
 
 ## Contraintes validées ✅
@@ -101,9 +101,8 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 
 ## Surfaces à nettoyer (décision de Direction, 2026-11-12, Phase 3)
 - Une surface est une zone reconnaissable d'un objet ou du décor, regroupant plusieurs faces. Les grandes surfaces sont découpées. À ne pas confondre avec les surfaces de pose.
-- Fin automatique d'une surface : le seuil de faces sales restantes est min(3, partie entière de 10 % du nombre de faces de la surface). Décision de Direction du 2026-11-12. Exemples : 4 et 9 faces → seuil 0 (toutes les faces exigées) ; 10 à 19 → 1 ; 20 à 29 → 2 ; 30 et plus → 3. Les valeurs 3 et 10 % sont de départ, à régler après essai.
-- Le reste se finit automatiquement.
-- Points ouverts : taille minimale et maximale d'une surface, à fixer par Direction et Art à partir des chiffres fournis par Engineering. Piste de départ : minimum d'environ dix faces, à confirmer.
+- Fin automatique d’une surface (décision de Direction, 2026-11-12, valeurs de départ provisoires 🟡) : seuil = min(~0,5 m², 10 % de l’aire géométrique de la surface). Aire sale restante = somme des remaining_dirty_area() des faces de la surface. La fin se déclenche uniquement au passage de l’aire sale restante du dessus au dessous du seuil. Une surface propre au départ n’a pas de fin. Le reste se finit automatiquement.
+- Taille d’une surface : minimum 0,5 m², cible 1 à 2 m², maximum ouvert. Valeurs de départ provisoires 🟡, Direction, 2026-11-12.
 
 ## Outil éponge ✅ (2026-11-11)
 - ToolData : ressource de données (couches nettoyées, rayon, efficacité, perte maximale, salissure par m², portée). Instance de l'éponge : game/data/tools/sponge.tres.
