@@ -26,7 +26,7 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 ## En cours — Phase 0
 
 - [Terminé] Assainissement documentaire : renommage, ROADMAP.md, README.md.
-- [À faire] Audit ou initialisation du dépôt Godot 4.6 : structure de dossiers, conventions de nommage, suivi des bugs.
+- [À faire] Audit ou initialisation du dépôt Godot 4.7.2 : structure de dossiers, conventions de nommage, suivi des bugs.
 - [À faire] Backlog priorisé et liste des risques techniques.
 
 ## Décisions validées (2026-11-09)
