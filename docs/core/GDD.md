@@ -275,11 +275,20 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 
 - Écran-titre : Nouvelle partie (remplacée par Continuer dès qu'une sauvegarde existe), Options, Quitter.
 - Pause en jeu : Reprendre, Options, Retour au menu principal, Quitter.
-- Options : identiques à l'écran-titre et en pause. Contenu : mapping des touches, affichage, volumes, puis Recommencer (en rouge).
+- Options : identiques à l'écran-titre et en pause. Contenu : mapping des touches, affichage, volumes, langue, puis Recommencer (en rouge). Le libellé de chaque langue est affiché dans sa propre langue (Français, English).
 - Recommencer : alerte de validation dont le choix par défaut est « Annuler ». Efface la sauvegarde sans modifier les réglages, puis ramène à l'écran-titre, qui affiche alors Nouvelle partie.
 - Si la sauvegarde est illisible, l'écran-titre l'indique (« sauvegarde endommagée ») ; Nouvelle partie reste disponible avec confirmation, la sauvegarde endommagée étant mise de côté sans être effacée.
 - Pas de réinitialisation des réglages pour l'instant.
 - Retour au menu principal et Quitter sauvegardent la partie. Si une action d'outil est en cours, elle se termine ou s'annule proprement avant.
+
+#### Langues (décisions validées le 2026-11-12)
+
+- Langues au lancement : fr, en.
+- Langue de référence : fr. Les textes sont écrits en français, l'anglais est une traduction relue.
+- Premier lancement : le jeu suit la langue du système ; si elle n'est pas supportée, il passe en en.
+- Le joueur peut changer la langue dans Options ; le changement s'applique immédiatement, sans redémarrage, et le choix est mémorisé dans les réglages (il n'est pas effacé par Recommencer).
+- Une langue ajoutée plus tard doit rester possible sans modification du code.
+- Aucune langue non latine prévue pour l'instant ; si l'une est ajoutée plus tard, la police devra être revue (Art).
 
 ### Sauvegarde
 
