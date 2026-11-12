@@ -3,6 +3,11 @@ extends Node
 ## Service de sauvegarde générique : JSON versionné, écriture atomique, copie de repli (.bak),
 ## migrations entre versions, mise de côté des fichiers illisibles (.corrompu, jamais supprimés).
 ## Ne connaît pas le contenu des données. Un fichier de sauvegarde est NON FIABLE (import possible).
+## En jeu, écrire par save_slot_threaded : une écriture complète bloque jusqu'à ~50 ms (3 images à 60 FPS).
+## Toutes les fonctions publiques s'appellent depuis le fil principal.
+
+## Fin d'une écriture mise en file par save_slot_threaded, émis sur le fil principal.
+signal save_finished(slot_id: String, error: SaveError)
 
 const FORMAT_VERSION: int = 1
 const SLOT_EXTENSION: String = "json"
@@ -39,6 +44,14 @@ var _migrations: Dictionary[int, Callable] = {}
 var _verified: Dictionary[String, bool] = {}
 ## Emplacements dont le dernier chargement a échoué alors que des fichiers existent.
 var _damaged: Dictionary[String, bool] = {}
+## Écritures en attente du fil de travail : emplacement -> données (la plus récente remplace l'attente).
+var _pending: Dictionary[String, Dictionary] = {}
+## Résultats à émettre sur le fil principal : [slot_id, SaveError].
+var _finished: Array[Array] = []
+## Protège _pending, _finished et _worker_running (seul état partagé avec le fil de travail).
+var _queue_mutex: Mutex = Mutex.new()
+var _worker_running: bool = false
+var _thread: Thread
 
 
 ## Déclare l'étape qui fait passer les données de from_version à from_version + 1.
@@ -49,10 +62,84 @@ func register_migration(from_version: int, step: Callable) -> void:
 	_migrations[from_version] = step
 
 
-## Écrit l'emplacement de façon atomique. Retourne un SaveError.
+## Écrit l'emplacement de façon atomique et attend la fin de l'écriture (bloque le fil appelant).
+## Retourne un SaveError. En jeu, préférer save_slot_threaded.
 func save_slot(slot_id: String, data: Dictionary) -> SaveError:
 	if not _is_valid_slot_id(slot_id):
 		return SaveError.INVALID_SLOT_ID
+	flush()
+	return _write_slot(slot_id, data)
+
+
+## Même écriture atomique, sur un fil de travail : sérialisation, écriture, relecture de contrôle et
+## rotation de la copie de repli hors du fil principal. Retourne INVALID_SLOT_ID, sinon OK = mise en
+## file ; le résultat réel arrive par save_finished. Les données sont copiées (l'appelant peut les
+## modifier ensuite). Une écriture encore en attente pour le même emplacement est remplacée par la
+## plus récente. Rien n'est perdu en quittant : la file est vidée à la destruction du service.
+func save_slot_threaded(slot_id: String, data: Dictionary) -> SaveError:
+	if not _is_valid_slot_id(slot_id):
+		return SaveError.INVALID_SLOT_ID
+	var snapshot: Dictionary = data.duplicate(true)
+	_queue_mutex.lock()
+	_pending[slot_id] = snapshot
+	var start: bool = not _worker_running
+	_worker_running = true
+	_queue_mutex.unlock()
+	if start:
+		_join_worker()
+		_thread = Thread.new()
+		_thread.start(_drain_pending)
+	return SaveError.OK
+
+
+## Attend la fin des écritures en file, puis émet leurs résultats. Appelé d'office avant toute lecture
+## ou écriture synchrone d'un emplacement : un fichier n'est jamais lu pendant sa rotation.
+func flush() -> void:
+	_join_worker()
+	_deliver_results()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		_join_worker()
+
+
+func _join_worker() -> void:
+	if _thread != null:
+		_thread.wait_to_finish()
+		_thread = null
+
+
+## Fil de travail : écrit les emplacements en attente un par un, jusqu'à vider la file.
+func _drain_pending() -> void:
+	while true:
+		_queue_mutex.lock()
+		if _pending.is_empty():
+			_worker_running = false
+			_queue_mutex.unlock()
+			return
+		var slot_id: String = _pending.keys()[0]
+		var data: Dictionary = _pending[slot_id]
+		_pending.erase(slot_id)
+		_queue_mutex.unlock()
+		var error: SaveError = _write_slot(slot_id, data)
+		_queue_mutex.lock()
+		_finished.append([slot_id, error])
+		_queue_mutex.unlock()
+		_deliver_results.call_deferred()
+
+
+func _deliver_results() -> void:
+	_queue_mutex.lock()
+	var results: Array[Array] = _finished.duplicate()
+	_finished.clear()
+	_queue_mutex.unlock()
+	for result: Array in results:
+		save_finished.emit(result[0], result[1])
+
+
+## Écriture atomique d'un emplacement valide (fil principal ou fil de travail, jamais les deux à la fois).
+func _write_slot(slot_id: String, data: Dictionary) -> SaveError:
 	var payload: String = JSON.stringify(data, "", true, true)
 	if payload.is_empty() or JSON.parse_string(payload) == null:
 		return SaveError.INVALID_DATA
@@ -124,6 +211,7 @@ func save_slot(slot_id: String, data: Dictionary) -> SaveError:
 func load_slot(slot_id: String) -> Dictionary:
 	if not _is_valid_slot_id(slot_id):
 		return _result(SaveError.INVALID_SLOT_ID, {}, false)
+	flush()
 	var path: String = _slot_path(slot_id)
 	var main: Dictionary = _read_and_validate(path)
 	if main["error"] == SaveError.OK:
@@ -166,6 +254,7 @@ func load_slot(slot_id: String) -> Dictionary:
 func slot_exists(slot_id: String) -> bool:
 	if not _is_valid_slot_id(slot_id):
 		return false
+	flush()
 	var path: String = _slot_path(slot_id)
 	return FileAccess.file_exists(path) or FileAccess.file_exists(path + BACKUP_SUFFIX)
 
@@ -176,6 +265,7 @@ func slot_exists(slot_id: String) -> bool:
 func is_slot_damaged(slot_id: String) -> bool:
 	if not _is_valid_slot_id(slot_id):
 		return false
+	flush()
 	if _damaged.has(slot_id):
 		return true
 	var path: String = _slot_path(slot_id)

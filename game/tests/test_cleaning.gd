@@ -6,7 +6,10 @@ const Spike := preload("res://tests/test_cleaning/cleaning_spike.gd")
 const SPIKE_SCENE: String = "res://tests/test_cleaning/cleaning_spike.tscn"
 const TOUR_SCENE: String = "res://tests/test_cleaning/cleaning_tour.tscn"
 const SaveServiceScript: GDScript = preload("res://core/save_service.gd")
+const SPONGE: String = "res://data/tools/sponge.tres"
 const RADIUS: float = 0.15
+## Écritures répétées par mesure de sauvegarde du tour (moyenne et pire cas).
+const SAVE_WRITES: int = 5
 
 var _failures: int = 0
 var _spike: Node3D
@@ -351,14 +354,33 @@ func _test_prewarm() -> void:
 
 # --- Mesures sur le tour complet (P2-N2) ---
 
-func _tour_save(service: Node, tour: Node3D, label: String) -> void:
+## Écriture complète (188 faces + outils) répétée SAVE_WRITES fois : la 1re crée le fichier, les
+## suivantes font tourner la copie de repli (régime établi), puis une écriture en file (fil de travail).
+## Retourne le temps bloqué sur le fil principal en µs : x = pire écriture synchrone, y = écriture en file.
+func _tour_save(service: Node, tour: Node3D, tools: ToolSlots, label: String) -> Vector2i:
 	var t0: int = Time.get_ticks_usec()
-	var data: Dictionary = {"nettoyage": CleanableFace.export_room(tour)}
+	var data: Dictionary = {"nettoyage": CleanableFace.export_room(tour), ToolSlots.SAVE_KEY: tools.export_state()}
 	var export_usec: int = Time.get_ticks_usec() - t0
 	t0 = Time.get_ticks_usec()
-	var error: int = service.call("save_slot", "tour", data)
-	var write_usec: int = Time.get_ticks_usec() - t0
+	JSON.stringify(data, "", true, true)
+	var stringify_usec: int = Time.get_ticks_usec() - t0
+	var error: int = 0
+	var write_usec: int = 0
+	var worst_usec: int = 0
+	for n: int in SAVE_WRITES:
+		t0 = Time.get_ticks_usec()
+		error = maxi(error, int(service.call("save_slot", "tour", data)))
+		var usec: int = Time.get_ticks_usec() - t0
+		write_usec += usec
+		worst_usec = maxi(worst_usec, usec)
+	write_usec /= SAVE_WRITES
+	t0 = Time.get_ticks_usec()
+	error = maxi(error, int(service.call("save_slot_threaded", "tour", data)))
+	var queue_usec: int = Time.get_ticks_usec() - t0
+	service.call("flush")
+	var background_usec: int = Time.get_ticks_usec() - t0
 	_check(error == 0, "tour %s : écriture par le SaveService (erreur %d)" % [label, error])
+	_check(FileAccess.file_exists(String(service.get("save_dir")) + "tour.json.bak"), "tour %s : copie de repli présente" % label)
 	var size: int = FileAccess.get_file_as_bytes(String(service.get("save_dir")) + "tour.json").size()
 	t0 = Time.get_ticks_usec()
 	var loaded: Dictionary = service.call("load_slot", "tour")
@@ -374,8 +396,12 @@ func _tour_save(service: Node, tour: Node3D, label: String) -> void:
 	for face: CleanableFace in tour.get("faces"):
 		same = same and face.is_finished() == before[face][1] and (face.state_bytes() == before[face][0] or face.is_finished())
 	_check(same, "tour %s : état identique après relecture (%d rejet(s))" % [label, rejected])
-	print("  %-22s fichier %7d o (%d faces écrites) ; export %.1f ms ; écriture SaveService %.1f ms ; relecture SaveService %.1f ms ; import %.1f ms" % [
-			label, size, (data["nettoyage"] as Dictionary).size(), export_usec / 1000.0, write_usec / 1000.0, read_usec / 1000.0, import_usec / 1000.0])
+	_check((loaded["data"] as Dictionary).get(ToolSlots.SAVE_KEY) == JSON.parse_string(JSON.stringify(data[ToolSlots.SAVE_KEY])), "tour %s : section « outils » relue à l'identique" % label)
+	print("  %-22s fichier %7d o (%d faces écrites + outils) ; export %.1f ms ; écriture SaveService moyenne %.1f ms, pire %.1f ms sur %d (dont sérialisation JSON %.1f ms) ; relecture SaveService %.1f ms ; import %.1f ms" % [
+			label, size, (data["nettoyage"] as Dictionary).size(), export_usec / 1000.0, write_usec / 1000.0, worst_usec / 1000.0, SAVE_WRITES,
+			stringify_usec / 1000.0, read_usec / 1000.0, import_usec / 1000.0])
+	print("  %-22s en file : appel %.2f ms sur le fil principal, écriture en arrière-plan %.1f ms" % ["", queue_usec / 1000.0, background_usec / 1000.0])
+	return Vector2i(export_usec + worst_usec, export_usec + queue_usec)
 
 
 func _measure_tour() -> void:
@@ -446,7 +472,12 @@ func _measure_tour() -> void:
 	service.set("save_dir", "user://test_saves/")
 	print("Sauvegarde du tour (fichier du SaveService, enveloppe comprise) :")
 	_check(CleanableFace.export_room(tour).is_empty(), "tour : faces préchauffées mais intactes absentes de la sauvegarde")
-	_tour_save(service, tour, "0 % (tout sale)")
+	# Outils sauvegardés avec le tour : une éponge sale en main (section « outils »).
+	var tools: ToolSlots = ToolSlots.new()
+	tools.add_tool(load(SPONGE) as ToolData)
+	tools.state_at(0).add_cleaned_area(0.337)
+	tools.take_out(0)
+	var worst_save_usec: Vector2i = _tour_save(service, tour, tools, "0 % (tout sale)")
 	# 50 % : traits pseudo-aléatoires sur chaque face jusqu'à la moitié de sa propreté.
 	t0 = Time.get_ticks_usec()
 	var strokes: int = 0
@@ -464,7 +495,7 @@ func _measure_tour() -> void:
 	mean /= area
 	_check(mean > 0.45 and mean < 0.65, "tour : propreté moyenne proche de 50 %% (%.1f %%)" % (mean * 100.0))
 	print("  (%d traits en %.0f ms, propreté moyenne pondérée %.1f %%)" % [strokes, (Time.get_ticks_usec() - t0) / 1000.0, mean * 100.0])
-	_tour_save(service, tour, "50 % (traits)")
+	worst_save_usec = worst_save_usec.max(_tour_save(service, tour, tools, "50 % (traits)"))
 	# 100 % : un tampon couvrant chaque face.
 	var all_finished: bool = true
 	for face: CleanableFace in faces:
@@ -472,7 +503,10 @@ func _measure_tour() -> void:
 				face.global_transform * face.mapping.point_at(Vector2(0.5, 0.5)), 6.0, 1.0)
 		all_finished = all_finished and face.is_finished()
 	_check(all_finished, "tour : toutes les faces finies après le nettoyage complet")
-	_tour_save(service, tour, "100 % (tout propre)")
+	worst_save_usec = worst_save_usec.max(_tour_save(service, tour, tools, "100 % (tout propre)"))
+	for entry: Array in [["synchrone (save_slot)", worst_save_usec.x], ["en file (save_slot_threaded)", worst_save_usec.y]]:
+		print("  pire sauvegarde complète %s, export + écriture sur le fil principal : %.1f ms, soit %.0f %% d'une image à 60 FPS (16,7 ms)" % [
+				entry[0], entry[1] / 1000.0, entry[1] / 16667.0 * 100.0])
 	var dir: DirAccess = DirAccess.open("user://test_saves/")
 	if dir != null:
 		for file: String in dir.get_files():

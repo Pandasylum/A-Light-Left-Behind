@@ -18,6 +18,7 @@ func _init() -> void:
 		_case_truncated_file, _case_invalid_json, _case_unknown_version, _case_missing_section,
 		_case_main_deleted, _case_both_unreadable, _case_save_keeps_valid_backup,
 		_case_every_version_loads, _case_migration_chain,
+		_case_threaded_write, _case_threaded_queue, _case_threaded_unreadable_files,
 	]
 	for c: Callable in cases:
 		_clean()
@@ -356,4 +357,75 @@ func _case_migration_chain() -> String:
 			return "échec de migration non rejeté proprement : %s" % [r]
 		if not _has("g.json") or _has("g.json.corrompu") or not _svc.is_slot_damaged("g"):
 			return "un fichier intact non migrable doit rester en place et être signalé"
+	return ""
+
+
+## Écriture en file : résultat par save_finished, données copiées, rien de perdu si le service est détruit.
+func _case_threaded_write() -> String:
+	var results: Array = []
+	_svc.save_finished.connect(func(slot_id: String, error: int) -> void: results.append([slot_id, error]))
+	if _svc.save_slot_threaded("mauvais/nom", {}) != E.INVALID_SLOT_ID:
+		return "identifiant invalide non refusé à la mise en file"
+	var data: Dictionary = {"v": "en file", "liste": [1, 2, {"x": 3}]}
+	if _svc.save_slot_threaded("t", data) != E.OK:
+		return "mise en file refusée"
+	data["v"] = "modifié après l'appel"
+	(data["liste"] as Array).append(4)
+	var r: Dictionary = _svc.load_slot("t") # attend l'écriture en file
+	if not r["ok"] or r["from_backup"] or r["data"] != {"v": "en file", "liste": [1.0, 2.0, {"x": 3.0}]}:
+		return "le chargement doit attendre l'écriture en file et relire les données copiées : %s" % [r]
+	if results != [["t", E.OK]]:
+		return "save_finished attendu une fois avec OK : %s" % [results]
+	if _has("t.json.tmp"):
+		return "fichier temporaire laissé après l'écriture"
+	# Service détruit juste après la mise en file : l'écriture va à son terme.
+	_svc.save_slot_threaded("t", {"v": "avant destruction"})
+	_new_service()
+	r = _svc.load_slot("t")
+	if not r["ok"] or r["from_backup"] or (r["data"] as Dictionary).get("v") != "avant destruction":
+		return "écriture en file perdue à la destruction du service : %s" % [r]
+	return ""
+
+
+## Rafale d'écritures en file : la dernière gagne, la copie de repli reste valide, mélange avec le synchrone.
+func _case_threaded_queue() -> String:
+	var results: Array = []
+	_svc.save_finished.connect(func(slot_id: String, error: int) -> void: results.append([slot_id, error]))
+	_svc.save_slot("q", {"v": "ancienne"})
+	for n: int in 20:
+		_svc.save_slot_threaded("q", {"v": "rafale %d" % n, "lest": "x".repeat(20000)})
+	_svc.save_slot_threaded("autre", {"v": "autre emplacement"})
+	_svc.flush()
+	if results.is_empty() or results.size() > 21 or results.any(func(e: Array) -> bool: return e[1] != E.OK):
+		return "résultats de la rafale incorrects : %s" % [results]
+	if not results.has(["autre", E.OK]) or (_svc.load_slot("autre")["data"] as Dictionary).get("v") != "autre emplacement":
+		return "second emplacement non écrit"
+	var r: Dictionary = _svc.load_slot("q")
+	if not r["ok"] or r["from_backup"] or (r["data"] as Dictionary).get("v") != "rafale 19":
+		return "la dernière écriture de la rafale doit gagner : %s" % [(r["data"] as Dictionary).get("v")]
+	# Écriture synchrone après une mise en file : elle passe après, dans l'ordre des appels.
+	_svc.save_slot_threaded("q", {"v": "en file"})
+	if _svc.save_slot("q", {"v": "synchrone"}) != E.OK or (_svc.load_slot("q")["data"] as Dictionary).get("v") != "synchrone":
+		return "l'écriture synchrone doit passer après l'écriture en file"
+	_write("q.json", "tronqué")
+	_new_service()
+	r = _svc.load_slot("q")
+	if not r["ok"] or not r["from_backup"] or (r["data"] as Dictionary).get("v") != "en file":
+		return "copie de repli invalide après des écritures en file : %s" % [r]
+	return ""
+
+
+## Écriture en file par-dessus des fichiers illisibles : mis de côté, jamais supprimés ni écrasés.
+func _case_threaded_unreadable_files() -> String:
+	_write("u.json", "principal illisible")
+	_write("u.json.bak", "copie illisible")
+	_write("u.json.corrompu", "déjà mis de côté")
+	_svc.save_slot_threaded("u", {"v": "nouvelle"})
+	_svc.flush()
+	if _read("u.json.corrompu") != "déjà mis de côté" or _read("u.json.corrompu.2") != "principal illisible" \
+			or _read("u.json.bak.corrompu") != "copie illisible":
+		return "fichiers illisibles supprimés ou écrasés par l'écriture en file"
+	var r: Dictionary = _svc.load_slot("u")
+	if not r["ok"] or r["from_backup"] or r["damaged"] or _svc.is_slot_damaged("u") or (r["data"] as Dictionary).get("v") != "nouvelle":
+		return "relecture incorrecte après l'écriture en file : %s" % [r]
 	return ""
