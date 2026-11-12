@@ -51,15 +51,20 @@ Vérification automatique : `tools/check_project.sh` (Godot headless Linux, vers
 Couches de collision (2026-11-10). Couche 1 : monde (sol, murs, meubles). Couche 2 : joueur (masque 1). Les couches suivantes seront ajoutées ici au fur et à mesure.
 Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (masque 4). Le raycast d’interaction lit les couches 1 et 3, portée 2,0 m (provisoire).
 
-## Autosave (décidé le 2026-11-12) 🟡 — décidé, non implémenté
+## Autosave (décidé le 2026-11-12) 🟡 — partiellement implémenté
 - Sauvegarde sur événements plus sortie. Aucun intervalle fixe, aucune sauvegarde manuelle, un seul emplacement.
-- Rangement d'un outil : l'outil remis à son emplacement déclenche une sauvegarde, avec son état. Implémentable maintenant.
-- Sortie : quitter ou revenir au menu principal déclenche une sauvegarde, après la fin ou l'annulation propre de l'action d'outil en cours. Implémentable maintenant.
-- Changement de pièce : le passage d'une pièce à une autre déclenche une sauvegarde. Implémentable quand le système de pièces existe.
-- Fin de surface : la fin d'une surface à nettoyer déclenche une sauvegarde. Implémentable après la Phase 3.
-- Un déclencheur reçu pendant une action d'outil est mis en attente et exécuté à la fin de l'action. Les déclencheurs rapprochés sont fusionnés en une seule écriture.
+- Rangement d'un outil (12/11/2026) : l'outil remis à son emplacement déclenche une sauvegarde, avec son état. Implémenté : `Autosave`, `request_save()` pour les déclencheurs à venir.
+- Sortie (12/11/2026) : quitter le jeu déclenche une sauvegarde, après la fin ou l'annulation propre de l'action d'outil en cours. Implémenté via `save_and_wait()`, réutilisable pour le retour au menu. Le retour au menu principal n'est pas encore implémenté.
+- Changement de pièce (12/11/2026) : le passage d'une pièce à une autre déclenchera une sauvegarde. Non implémenté ; implémentable quand le système de pièces existe.
+- Fin de surface (12/11/2026) : la fin d'une surface à nettoyer déclenchera une sauvegarde. Non implémenté ; implémentable après la Phase 3.
+- Action d'outil (12/11/2026) : geste continu sur une surface, qui finit au clic relâché, à la surface quittée ou à l'outil rangé. La fin d'une action d'outil ne déclenche jamais de sauvegarde ; elle libère uniquement un déclencheur en attente.
+- Déclencheurs rapprochés (12/11/2026) : ceux reçus avant la fin de l'export en cours donnent une seule écriture, l'export repartant du début. Aucun délai d'attente n'est ajouté.
 - Écriture atomique : fichier temporaire, puis remplacement, avec l'ancienne version conservée en `.bak`. Le chargement lit le `.bak` si le fichier principal est illisible.
-- À mesurer : le coût d'une écriture (188 faces + outils). Si elle pèse sur les 60 FPS, elle passe dans un thread, sans changer les déclencheurs.
+- Mesure (12/11/2026) : le coût de `export_room` est de l'encodage CPU (zstd ≈ 58 %, base64 ≈ 29 %), pas de la lecture GPU. L'export est étalé sur plusieurs images, avec un budget de 2 ms par image (provisoire), une liste de faces figée et un contrôle de validité de chaque face. Pire image mesurée : 2,98 ms en headless, contre 20,1 ms d'un bloc. Non mesuré sur un vrai GPU.
+- Écriture (12/11/2026) : par `save_slot_threaded`, résultat par `save_finished`. Emplacement `partie` (provisoire).
+- Décision (12/11/2026) : pas d'omission des écritures inutiles. À rouvrir si le profilage montre un problème.
+- Intégration (12/11/2026) : `Autosave` est instancié dans `sponge_test.tscn` seulement, sans autoload, tant que la scène de jeu n'existe pas.
+- Note (12/11/2026) : la salissure d'un outil relue du fichier peut différer sur les dernières décimales (JSON existant) ; les tests comparent avec tolérance.
 - Menu : « Continuer » remplace « Nouvelle partie » si une sauvegarde existe. « Recommencer » (Options) supprime le fichier principal et le `.bak`, ne touche pas aux réglages, puis ramène à l'écran-titre, après une alerte avec « Annuler » par défaut. À implémenter.
 - Sauvegardes illisibles (principal et `.bak`) : jamais traitées comme une absence de sauvegarde. L'écran-titre affiche « sauvegarde endommagée ». Les fichiers sont renommés (par exemple `.corrompu`), jamais supprimés ni écrasés. « Nouvelle partie » reste disponible avec confirmation, qui précise que la sauvegarde endommagée sera mise de côté. L'entrée dans le journal est conservée.
 
@@ -102,11 +107,14 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 ## Surfaces à nettoyer (décision de Direction, 2026-11-12, Phase 3)
 - Une surface est une zone reconnaissable d'un objet ou du décor, regroupant plusieurs faces. Les grandes surfaces sont découpées. À ne pas confondre avec les surfaces de pose.
 - Fin automatique d’une surface (décision de Direction, 2026-11-12, valeurs de départ provisoires 🟡) : seuil = min(~0,5 m², 10 % de l’aire géométrique de la surface). Aire sale restante = somme des remaining_dirty_area() des faces de la surface. La fin se déclenche uniquement au passage de l’aire sale restante du dessus au dessous du seuil. Une surface propre au départ n’a pas de fin. Le reste se finit automatiquement.
+
 - Taille d’une surface : minimum 0,5 m², cible 1 à 2 m², maximum 2 m² par surface (Direction, 2026-11-12, valeur de départ provisoire 🟡).
 - Tailles (Direction, 2026-11-12, valeurs de départ provisoires 🟡) : murs de 2 à 3 faces selon les ruptures visibles ; noyau en panneaux de 6 faces (≈ 1,7 m²) ; une marche = dessus + contremarche dans une même surface (0,76 m²), le dessus seul n’est jamais une surface ; les deux faces partagent le même état de fin et l’aire restante est la somme des deux.
 - Surface déjà propre au départ : une surface dont l’aire sale initiale est non nulle mais déjà sous le seuil est terminée d’office : elle compte comme propre dans le 100 % de la pièce, sans retour visuel ni sonore, sans autosave, sans événement de fin.
 - 100 % de la pièce : chaque surface vaut 1.
 - Portée du geste : 2,0 m depuis la caméra, sans limite de hauteur ; pas de plafond de hauteur à ajouter (Direction, 2026-11-12).
+- Retour visuel de fin de surface (Direction, 2026-11-12, 🟡 valeurs provisoires, non vérifié dans Godot) : proposition d’Art, discret, 1,4 s, une seule fois, sans trace. Livrable Art : fin_surface.gdshader. Il est placé en next_pass sur la surface terminée ; le paramètre progress est animé de 0 à 1 en 1,4 s à la fin de la surface ; la normale est fournie à normal_tex ; peak réglable (départ 0,07 additif, variante 0,12). Forward+. Voile totalement éteint à progress = 1. Retour sonore : Sound Design. Statut : non implémenté, dépend de l’entité Surface (non codée).
+
 
 ## Outil éponge ✅ (2026-11-11)
 - ToolData : ressource de données (couches nettoyées, rayon, efficacité, perte maximale, salissure par m², portée). Instance de l'éponge : game/data/tools/sponge.tres.

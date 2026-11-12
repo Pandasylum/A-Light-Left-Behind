@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="A Light Left Behind"
-run/main_scene="res://core/main.tscn"
+run/main_scene="res://ui/menu/title_screen.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
 [autoload]

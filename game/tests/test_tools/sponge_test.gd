@@ -2,6 +2,7 @@ extends Node3D
 ## Scène de vérification des outils du joueur (NON OFFICIELLE) : tour d'essai instanciée telle
 ## quelle, éponge dans son emplacement (rangée au départ : equip_tool la sort), seau ramassable et
 ## objet de test posés au sol. Le sol du tour reçoit une surface de pose pour pouvoir les reposer.
+## L'Autosave de la scène est relié au tour et au ToolController du joueur (outil rangé, fermeture).
 
 const FLOOR_SIZE: Vector2 = Vector2(10.0, 10.0) ## emprise du sol du spike
 const FLOOR_TOP_Y: float = 0.1 ## face supérieure, dans le repère du corps Floor
@@ -22,6 +23,9 @@ func _ready() -> void:
 	surface.position = Vector3(0.0, FLOOR_TOP_Y, 0.0)
 	_tour.get_node(^"Floor").add_child(surface)
 	($Tour/Player/ToolController as ToolController).add_tool(tool)
+	# Sauvegarde automatique : pièce = le tour (repère des id de faces), outils = ceux du joueur.
+	($Autosave as Autosave).setup(_tour, $Tour/Player/ToolController as ToolController)
+	_apply_continue()
 	await get_tree().physics_frame
 	_drop_to_floor($Bucket as TestItem)
 	_drop_to_floor($TestItem as TestItem)
@@ -39,3 +43,14 @@ func _drop_to_floor(item: TestItem) -> void:
 	var surface: PlacementSurface = PlacementSurface.of_body(hit["collider"])
 	if surface != null:
 		item.on_placed(surface)
+
+
+## « Continuer » (GameFlow.continue_requested) : applique la sauvegarde « partie » à la pièce et aux outils.
+func _apply_continue() -> void:
+	var data: Dictionary = GameFlow.take_continue_data(get_node_or_null(^"/root/SaveService"))
+	if data.is_empty():
+		return
+	CleanableFace.import_room(_tour, data.get(Autosave.CLEANING_KEY, {}))
+	if data.has(ToolSlots.SAVE_KEY):
+		var catalog: Array[ToolData] = [tool]
+		($Tour/Player/ToolController as ToolController).import_tools(data[ToolSlots.SAVE_KEY], catalog)
