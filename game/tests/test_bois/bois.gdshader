@@ -11,8 +11,8 @@ shader_type spatial;
 //    (avec un léger rebord le long d'un côté de chaque trace), B = traces (opacité variable, un bord net, un bord fondu).
 // 4. Par objet (Inspecteur > GeometryInstance3D > Instance Shader Parameters, ou set_instance_shader_parameter) :
 //    proprete (0 sale -> 1 propre, efface tout), poussiere et traces (1 = canal complet, 0 = canal nettoyé).
-// 5. Si c'est illisible : monter « Poussiere eclaircit » / « Traces force » ; si le voile brûle : baisser « Poussiere plafond » ;
-//    si les bords sont trop nets : monter « Bruit force ».
+// 5. Si c'est illisible : monter « Poussiere plafond » / baisser « Traces contraste » ; si le voile brûle : baisser « Poussiere plafond » ;
+//    si les bords sont trop nets : monter « Bruit force » ; si le bois nu brille comme du métal : monter « Rugosite bois ».
 
 // ---- État, par objet (chaque planche a ses propres valeurs, un seul matériau partagé) ----
 // 0.0 = entièrement sale, 1.0 = entièrement propre (efface poussière ET traces).
@@ -28,7 +28,8 @@ group_uniforms bois;
 uniform sampler2D albedo_bois : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D normal_bois : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D roughness_bois : hint_roughness_r, filter_linear_mipmap_anisotropic, repeat_enable;
-uniform float rugosite_bois : hint_range(0.0, 2.0) = 1.0; // multiplie la texture
+// Multiplie la texture. Planks037A est lisse (≈ 0,45 en moyenne) : à 1.0 le bois nu renvoie une plage brillante sous la lumière.
+uniform float rugosite_bois : hint_range(0.0, 2.0) = 1.8;
 uniform float force_normal : hint_range(0.0, 2.0) = 1.0;
 uniform vec2 uv_echelle = vec2(1.0); // répétition de la texture de bois
 
@@ -47,9 +48,9 @@ uniform float bruit_force : hint_range(0.0, 1.0) = 0.5; // 0 = bords du masque t
 group_uniforms canal_poussiere;
 // Gris neutre légèrement chaud : aucune dominante bleue propre, seule la lumière teinte le voile.
 uniform vec3 poussiere_couleur : source_color = vec3(0.60, 0.56, 0.50);
-uniform float poussiere_eclaircit : hint_range(0.0, 1.0) = 0.45; // part de couleur de poussière dans le voile
+uniform float poussiere_eclaircit : hint_range(0.0, 1.0) = 1.0; // part de couleur de poussière dans le voile
 // Plafond : gain de valeur maximal du voile par rapport au bois nu (0 = n'éclaircit jamais, 1 = pas de plafond).
-uniform float poussiere_plafond : hint_range(0.0, 1.0) = 0.12;
+uniform float poussiere_plafond : hint_range(0.0, 1.0) = 0.25;
 // Perte de couleur du bois sous le voile. Le bois tend vers la teinte de la poussière, jamais vers un gris pur.
 uniform float poussiere_desature : hint_range(0.0, 1.0) = 0.7;
 uniform float poussiere_matite : hint_range(0.0, 1.0) = 1.0; // 1 = plus aucun reflet sous la poussière
@@ -60,10 +61,10 @@ uniform float douceur_poussiere : hint_range(0.005, 0.5) = 0.3; // fondu quand �
 
 group_uniforms canal_traces;
 uniform vec3 traces_couleur : source_color = vec3(0.30, 0.25, 0.22); // multiplie le bois : plus sombre = plus lisible
-uniform float traces_force : hint_range(0.0, 1.0) = 0.9;
+uniform float traces_force : hint_range(0.0, 1.0) = 1.0;
 // Courbe du masque de traces : < 1 renforce les zones légères (lisibilité sans voile), 1 = masque tel quel.
-uniform float traces_contraste : hint_range(0.3, 2.0) = 0.8;
-uniform float traces_rugosite : hint_range(0.0, 1.0) = 0.75; // rugosité dans les traces
+uniform float traces_contraste : hint_range(0.3, 2.0) = 0.5;
+uniform float traces_rugosite : hint_range(0.0, 1.0) = 0.75; // rugosité minimale dans les traces
 uniform float traces_percent_poussiere : hint_range(0.0, 1.0) = 0.8; // 1 = les traces trouent le voile de poussière
 uniform float douceur_traces : hint_range(0.005, 0.5) = 0.2; // fondu quand « traces » baisse
 
@@ -107,7 +108,7 @@ void fragment() {
 
 	// --- Reflets ---
 	float rug = clamp(texture(roughness_bois, uv).r * rugosite_bois, 0.0, 1.0);
-	rug = mix(rug, traces_rugosite, marque);
+	rug = mix(rug, max(rug, traces_rugosite), marque); // une trace ne brille jamais plus que le bois nu
 	float mat = smoothstep(0.0, poussiere_seuil_mat, voile) * poussiere_matite;
 	rug = mix(rug, 1.0, mat);
 
