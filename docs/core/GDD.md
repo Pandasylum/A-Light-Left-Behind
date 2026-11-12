@@ -88,6 +88,8 @@ Types de saleté et outils :
 - Les grandes zones (sols, murs) sont découpées en surfaces de 2 m² au plus.
 - Les deux faces d'une marche partagent l'état de fin.
 - Note : des améliorations de vitesse de nettoyage sont envisagées plus tard. Elles ne sont ni définies ni validées et ne modifient pas ce maximum.
+- Noyau à 24 pans (module de 15°) conservé à titre provisoire, à revoir au vertical slice avec le vrai éclairage. 🟡
+- Défaut connu : les joints horizontaux se cassent en polyligne tous les 15°. Discret à 2,0 m, net près des bords à 0,9 m. Seule une augmentation du nombre de faces le supprimerait.
 
 ## 5. Manipulation, transport et rangement ✅
 
