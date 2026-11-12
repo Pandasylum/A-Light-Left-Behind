@@ -97,7 +97,7 @@ Deuxième vague : carrelage / faïence, papier jauni, verre.
 - Rendu en normal map et albédo assombri dans le joint. Pas de relief en géométrie : à 0,9 m, 10 mm réels ne se distinguent pas de la normal map.
 - Appareillage en blocs de 30° avec demi-blocs de 15° en décalage, de sorte que les joints verticaux tombent sur les arêtes de facette.
 - Critère : la limite de panneau reste lisible dans tous les états, y compris tout sale. Mousse atténuée d’environ 60 % sur ±30 mm autour des limites. 🟡
-- Format : 2 400 × 1 650 px par anneau (≈ 764 px/m), tuile d’un tour × 1 anneau (3,1416 × 2,16 m), UV1 en mètres selon la Règle d’export §5 (échelle de matériau 1/3,1416 ; 1/2,16), origine sur une limite de panneau. Normal map OpenGL Y+ en linéaire, albédo en sRGB. Import en VRAM standard, sans HQ. Lecture en production par projection cylindrique monde : non testée, à vérifier à la première intégration du noyau. 🟡
+- Format : 2 400 × 1 650 px par anneau (≈ 764 px/m), tuile d’un tour × 1 anneau (3,1416 × 2,16 m), UV1 en mètres selon la Règle d’export §5 (échelle de matériau 1/3,1416 ; 1/2,16), origine sur une limite de panneau. Normal map OpenGL Y+ en linéaire, albédo en sRGB. Import en VRAM standard, sans HQ. Lecture en production par projection cylindrique monde : vérifiée dans Godot (essai 2026-11-12). 🟡
 - La pierre procédurale du test est provisoire, en attendant la pierre peinte niveau 2.
 
 ## 2026-11-11 — Modules du fût : règle d'export et tuilage
