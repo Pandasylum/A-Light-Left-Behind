@@ -1,6 +1,6 @@
 # ART BIBLE — A Light Left Behind
 
-Propriétaire : projet Art Direction & Assets. Dernière mise à jour : 2026-11-12.
+Propriétaire : projet Art Direction & Assets. Dernière mise à jour : 2026-11-12 (pierre : coulures).
 Statut : direction de travail NON OFFICIELLE jusqu'au test de style.
 Légende : ✅ validé · 🟡 à décider
 
@@ -157,6 +157,19 @@ Décision (validée développeur, 2026-11-12) : sur le métal, « sale » = roui
 - Fichiers : `game/tests/test_metal/` (metal.gdshader, test_metal.tscn, tex/). Scripts : build_metal_propre.py, rendu_metal.py.
 - Réserves : (1) sous lumière chaude, la plaque propre rend beige (peinture claire sans reflet franc) et se lit moins comme du métal ; sous lumière froide, elle se lit comme du métal peint. (2) Le masque du test est fabriqué à la main pour un plan de 2 m ; la localisation des vrais modules viendra de leur UV2, à définir. (3) Normale de la base propre quasi plate. (4) Rouille à 100 % : garde les zones grises de 056C. (5) Gros plan et très gros plan réalistes, et lisibilité par signes, non jugés.
 
+## 2026-11-12 — Pierre : mousse contre traces (coulures d'eau), principe validé
+
+Décision (validée développeur, 2026-11-12) : sur la pierre, « trace » = coulures d'eau sombres (filets verticaux qui naissent des joints et sous les plaques de mousse). Canal indépendant `coulures` (paramètre d'instance 1 -> 0), masque en UV comme la mousse ; la coulure part avec la pierre sale (`proprete`) et ne dépend pas de la mousse. Suie réservée à la salle de la lanterne (test à part) ; extérieur : autre matériau, autre test.
+
+- Valeurs retenues pour le masque v1 (point de départ, ajustables) : facteur d'albédo ×0,16 (« sombres fort »), contraste 0,45 ; pour la v2, voir la compensation ci-dessous. Rugosité et normale inchangées dans une coulure (la pierre sale a déjà une rugosité médiane de 0,37 : pas de reflet en plus).
+- Superposition : la mousse épaisse recouvre la coulure ; la mousse fine la laisse transparaître (35 %). La mousse se distingue de la coulure par la teinte (olive) et la forme (plaque contre trait), pas par la valeur.
+- Écartés : coulures à ×0,28 (trop faibles à l'ensemble) ; calcaire / salpêtre ×1,25 et ×1,5 (invisibles) et ×2,4 (se lit comme des bandes claires ou de la peinture, contredit « sale = plus sombre »).
+- Vérifié dans Godot (PC du développeur, test_mousse_coulures.tscn, style « peint » niveau 2) : lisible à l'ensemble en lumière froide et chaude, lisible à 1 m, aucun reflet brûlé en rasante, états 0,5 (mousse et coulures) lisibles.
+- Nettoyage progressif des coulures : défaut constaté puis corrigé le 2026-11-12. Avec un fondu étroit, une coulure à 0,5 se réduisait à un trait noir net (encre ou fissure). Réglage retenu : `douceur_coulures` 0,4 et `coulures_estompe` 0,6 (opacité plancher qui baisse avec le curseur). Vérifié dans Godot à 0,5, en lumière froide et chaude : visible, plus légère qu'à 1, sans trait noir. 🟡 valeurs de départ.
+- Masque v2 « doux » retenu (validé développeur, 2026-11-12) : filets plus larges (65 au lieu de 80), cœur plafonné à 0,85, halo humide, bord moins franc, fondu d'entrée de quelques centimètres. Raison : la v1 se lisait comme de l'encre en gros plan (vérifié dans Godot, vue centre, proprete 0,45). Compromis assumé : à l'ensemble la v2 est un cran moins lisible que la v1 (vérifié, proprete 0, lumière chaude). Compensation : `coulures_contraste` 0,35 (au lieu de 0,45) et facteur d'albédo ×0,13 (au lieu de ×0,16). Vérifiée dans Godot (vue ensemble, proprete 0, mousse 1, lumière froide et chaude) : les traînées se lisent sans zoomer, presque aussi bien que la v1, sans contour dur. 🟡 valeurs de départ.
+- Fichiers : `game/tests/test_mousse/` (mousse_coulures.gdshader, test_mousse_coulures.tscn et .gd, tex/masque_coulures_v2.png ; la v1 masque_coulures.png est gardée pour comparaison). Script : build_coulures.py (projet Claude, version 2).
+- Réserves : (1) lecture à l'ensemble : seuls 80 filets, nombre non jugé (certains se lisent comme des fissures). (2) Masque fabriqué à la main pour un plan de 4 x 2 m ; la localisation sur les vrais modules viendra de leur UV2. (3) Netteté des filets : traitée par la v2 (voir ci-dessus) ; gros plan à 0,3 m vérifié dans Godot (vue gauche, proprete 0, mousse 1, lumière chaude) : plus d'aspect encre, les filets se lisent comme des taches d'eau, la mousse reste distincte par la teinte, rien ne brûle. Défaut restant : des filets parallèles et régulièrement espacés (départs trop alignés le long d'un joint) se lisent comme un peigne ou des griffes ; corrigé dans le masque v3 (2026-11-12) : espacement minimal de 22 cm entre filets voisins, 38 filets au lieu de 65, largeurs plus variées, dérive plus marquée. Vérifié dans Godot (vue ensemble, proprete 0, mousse 1, lumière chaude) : plus d'effet de peigne, filets espacés et irréguliers ; contrepartie : couverture divisée par deux (23 % à 12 %), lisibilité à l'ensemble juste suffisante. Réglage si trop discret : monter N dans build_coulures.py (55 par défaut ; l'espacement mini de 22 cm limite le nombre réel, 38 filets). Fichier : tex/masque_coulures_v3.png (bouton « Masque coulures » : v3 / v2). SUJET CLOS côté Art (2026-11-12) ; la v1 et la v2 sont gardées pour comparaison. (4) Nettoyage par `proprete` vérifié dans Godot à 0,3 / 0,6 / 1 (lumière froide et chaude, ensemble) : les coulures partent avec la pierre sale, la mousse reste (curseur indépendant, cohérent avec « mousse tenace »). Mi-nettoyage vérifié à 0,45 (vue centre, mousse 0, lumière froide et chaude) : la pierre sale part par plaques aux bords irréguliers et les coulures partent avec la plaque qui les porte, comme la poussière du bois ; la bascule entre 0,3 et 0,6 reste rapide (fondu étroit du masque de saleté, préexistant). Défaut en gros plan : les coulures restantes ont un bord noir net, plus proche de l'encre que de l'eau (réserve 3 confirmée). Non jugé : le gros plan à 0,3 m.
+
 ## Points ouverts
 - Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
 - Hauteur d'étage (décide la hauteur de marche).
@@ -165,7 +178,7 @@ Décision (validée développeur, 2026-11-12) : sur le métal, « sale » = roui
 - Contact marche/mur : bord de marche à 4 segments d'arc, identique au mur.
 - Import Godot non testé (échelle, normales, UV).
 - Pierre : relief et reflets photographiques sur la pierre sale ; bords de mousse trop nets (version fût : bords adoucis, à vérifier en jeu).
-- Mousse contre traces non testée ; mousse tenace (outil et déblocage non définis).
+- Mousse tenace (outil et déblocage non définis, hors périmètre Art : GDD / Engineering). Mousse contre traces : testée avec les coulures (voir section du 2026-11-12) ; reste la correction du nettoyage à 0,5.
 - Métal : réserves du test rouille (beige sous lumière chaude, masque UV2 des vrais modules à définir, gros plans non jugés).
 - Valeurs de palette par pièce ; détails fins effacés par la simplification.
 - Rendu vérifié sur le PC du développeur pour le bois ; pas encore pour les modules du fût (import Godot).
