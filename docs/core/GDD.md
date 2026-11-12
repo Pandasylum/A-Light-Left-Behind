@@ -393,7 +393,9 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 29. Mousse tenace : outil et moment de déblocage à définir (piste non validée : face abrasive de l'éponge, comme la rouille).
 30. Surfaces à nettoyer (§4). Statut : provisoire, valeurs de départ, à régler après essai.
     - Une surface est une zone reconnaissable du décor regroupant plusieurs faces ; un matériau = une surface ; la découpe suit les ruptures visibles (porte, fenêtre, soubassement, angle, palier).
-    - Minimum 0,5 m² (un objet entier est exempté). Maximum 4 m² (décision validée le 2026-11-12 ; 🟡 valeur provisoire). Cible 1 à 2 m² (décision validée le 2026-11-12 ; 🟡 valeur indicative, pas une règle).
+    - Minimum 0,5 m² (un objet entier est exempté). Maximum 2 m² par surface (décision validée le 2026-11-12 ; 🟡 valeur de départ provisoire, voir §4 « Surface maximale par action de nettoyage »). Cible 1 à 2 m² (décision validée le 2026-11-12 ; 🟡 valeur indicative, pas une règle).
+    - Règle de découpe des murs : une face de mur = une surface (1,13 m²). Un mur de 2 ou 3 faces donne 2 ou 3 surfaces à nettoyer successivement. Deux faces ne sont pas regroupées, car 2,26 m² dépasse le plafond de 2 m².
+    - La hauteur de mur de 2,16 m reste provisoire. Elle n'est pas ajustée pour s'adapter au plafond de 2 m².
     - Murs : 2 à 3 faces (≈ 2,3 à 3,4 m²) selon les ruptures. Noyau : panneaux de 6 faces (≈ 1,7 m²). Marche : une marche par surface (0,76 m²).
     - Fin de surface (décision validée le 2026-11-12 ; 🟡 seuils provisoires) : l'aire sale restante passe sous min(~0,5 m², 10 % de l'aire géométrique de la surface), après avoir été au-dessus. Une surface propre ou déjà sous le seuil au départ est terminée d'office : elle compte dans le 100 % de la pièce, sans retour visuel ni sonore ni autosave.
     - Remarque : avec un maximum de 4 m², 10 % de l'aire reste toujours inférieur à 0,5 m² ; le seuil effectif est donc 10 % de l'aire géométrique de la surface. La formule min(~0,5 m², 10 %) reste inchangée, car elle redevient utile si le maximum augmente.
