@@ -128,7 +128,7 @@ Statut : règle d'export validée pour les modules témoins. Style OFFICIEL depu
 - Mur (R = 2,0 m) : N = 12, tuile 1,047 m. Noyau (R = 0,5 m) : une tuile par tour (N = 1), soit 3,1416 m × 2,16 m, avec 4 panneaux de 90° par tuile. Décision Direction du 2026-11-12.
 - Pierre et masque à produire tuilables à 1,047 m. Masque d'état basse résolution (≈ 64 px/m), bords adoucis par le shader (seuil + bruit tuilable).
 - Motif visible toutes les ~1 m : variations peintes dans la pierre pour casser la répétition.
-
+- Format : tuile d’Art = 1 tour × 1 module (3,1416 × 2,16 m, N = 1) ; u = angle/360 (0 = limite de panneau), v = hauteur/2,16 depuis le bas. Lecture par projection cylindrique monde, vérifiée dans Godot (essai 2026-11-12). Variante UV1 non retenue. 🟡
 ## 2026-11-12 — Style « stylisé réaliste » : test bois validé (style OFFICIEL)
 
 Décision (validée développeur, 2026-11-12) : après le test bois (sale/propre, lumière froide/chaude, ensemble, gros plan, très gros plan, rasante, poussière 1 et 0,5), la direction « stylisé réaliste » devient officielle : textures photo simplifiées (peinture niveau 2) + éclairage réaliste. « Peint à la main » reste abandonné. La condition posée le 2026-11-11 (test bois à faire) est levée.
