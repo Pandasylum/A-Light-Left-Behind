@@ -25,6 +25,7 @@ func _ready() -> void:
 	($Tour/Player/ToolController as ToolController).add_tool(tool)
 	# Sauvegarde automatique : pièce = le tour (repère des id de faces), outils = ceux du joueur.
 	($Autosave as Autosave).setup(_tour, $Tour/Player/ToolController as ToolController)
+	_apply_continue()
 	await get_tree().physics_frame
 	_drop_to_floor($Bucket as TestItem)
 	_drop_to_floor($TestItem as TestItem)
@@ -42,3 +43,14 @@ func _drop_to_floor(item: TestItem) -> void:
 	var surface: PlacementSurface = PlacementSurface.of_body(hit["collider"])
 	if surface != null:
 		item.on_placed(surface)
+
+
+## « Continuer » (GameFlow.continue_requested) : applique la sauvegarde « partie » à la pièce et aux outils.
+func _apply_continue() -> void:
+	var data: Dictionary = GameFlow.take_continue_data(get_node_or_null(^"/root/SaveService"))
+	if data.is_empty():
+		return
+	CleanableFace.import_room(_tour, data.get(Autosave.CLEANING_KEY, {}))
+	if data.has(ToolSlots.SAVE_KEY):
+		var catalog: Array[ToolData] = [tool]
+		($Tour/Player/ToolController as ToolController).import_tools(data[ToolSlots.SAVE_KEY], catalog)

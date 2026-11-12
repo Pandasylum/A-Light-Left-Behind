@@ -47,6 +47,7 @@ var _stale: bool = false # une action d'outil a eu lieu depuis le début de l'ex
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS ## l'export étalé continue pendant la pause
 	if handle_quit:
 		get_tree().auto_accept_quit = false
 	set_process(_phase != Phase.IDLE)

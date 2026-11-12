@@ -159,6 +159,12 @@ func set_camera_locked(locked: bool) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN if locked else Input.MOUSE_MODE_CAPTURED
 
 
+## Rend le mode souris d'avant la pause ; le 1er mouvement après une recapture est ignoré (pas de saut de caméra).
+func restore_mouse_mode(mode: Input.MouseMode) -> void:
+	_skip_motion = mode == Input.MOUSE_MODE_CAPTURED
+	Input.mouse_mode = mode
+
+
 ## Applique une rotation souris (en pixels) : yaw sur Player, pitch sur Head.
 func look_by(relative: Vector2) -> void:
 	rotate_y(-relative.x * mouse_sensitivity)
