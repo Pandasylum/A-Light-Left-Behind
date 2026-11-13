@@ -115,9 +115,13 @@ Types de saleté et outils :
   - Seau (décision validée le 2026-11-11) : objet libre de catégorie moyenne (MEDIUM). Il peut être ramassé et déplacé avec les règles des objets moyens (pris en main ; toute autre prise refusée pendant le port). Il n'entre jamais dans la ceinture.
   - Gros objets (armoires, commodes, tables).
   - Objets fixes (radiateurs, installations, éléments muraux) : ne peuvent pas être déplacés.
+- Précision sur les catégories (décision validée le 2026-11-13) : le mot « catégorie » désigne la taille (petit, moyen, gros, fixe). Les zones de rangement filtrent par taille. Il n'y a pas de catégorie de rangement distincte (livres, outils, plantes…) et aucun champ supplémentaire dans les données d'objet.
 - Collisions : un placement qui chevauche est refusé, sauf l'empilement autorisé (voir Empilement).
 - Un objet tombe s'il est lâché ou posé trop près du bord de son support. Il est alors décalé au plus court hors du support quitté, vers un point de dépôt atteignable (jamais dans un mur ni sous un meuble inaccessible). Un objet tombé n'est jamais détruit ni perdu ; il passe en « non rangé », sans pénalité supplémentaire ; le pourcentage se rétablit dès que l'objet est reposé. Avant le premier passage d'une pièce à 100 %, un objet tombé fait baisser le pourcentage. Au premier passage à 100 %, le statut « restaurée » de la pièce est verrouillé définitivement (verrou par pièce). Un axe ajouté plus tard (par exemple la réparation) ne retire pas ce statut.
 - Meubles (décision validée le 2026-11-10) : les meubles libres sont la palette et la table ; les meubles fixes sont l'étagère basse et la bibliothèque. Un meuble libre peut être déplacé après avoir été nettoyé et réparé ; son positionnement reste libre. La palette et la table ne se déplacent que vides (règle ci-dessus).
+  - Meuble libre au sol (décision validée le 2026-11-13) : un meuble libre (table, palette) peut rester au sol. C'est un support déclaré : la règle « le sol n'est jamais une zone » ne vise que les objets à ranger.
+  - Meuble libre et 100 % (décision validée le 2026-11-13) : un meuble libre ne compte pas dans le 100 % du rangement ; seule sa réparation compte, lorsqu'elle est requise.
+  - Étagères murales (décision validée le 2026-11-13) : meubles fixes, supports déclarés, qui acceptent des petits objets (SMALL).
 - Un message d'indice explique au joueur pourquoi un support qui porte des objets ne peut pas être déplacé.
 - Les installations fixes et gros équipements ne sont pas déplaçables.
 - Les réparations de meubles dépendent de leur matériau.
@@ -372,6 +376,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
    - mécanisme de l'évolution de l'atmosphère (globale ou par pièce) ;
    - rôle, contenu et fonctionnement du journal (mentionné comme découverte du noyau de départ).
 3. Liste des postures par objet et par zone de pose (voir §5, Orientation).
+   - Note (décision validée le 2026-11-13) : le vestibule ne contient aucun objet à posture multiple. La liste des postures attend la bibliothèque de la salle de vie et les pièces suivantes.
 4. ~~Liste, ordre et coûts des améliorations d'outils.~~ Fusionné au point 5.
 5. Catalogue des améliorations d'outils (arbres, contenu de chacun) et ordre de déblocage. Les améliorations n'ont pas de coût en matériaux : elles se débloquent par la récupération d'items d'amélioration. L'éponge abrasive en est le premier exemple.
    Contenu précis restant de l'atelier (voir « Pièce 2 — atelier », §6) et du reste de la première pièce tutorielle (voir « Pièce 1 — tutoriel », §6). Points ouverts de l'atelier :
@@ -393,7 +398,13 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 16. Comportement de l'outil multifonction selon la cible.
 17. ~~Définition de « désordre ».~~ Réglé : critère de rangement testable (§5).
 18. ~~Règles d'empilement par catégorie d'objets.~~ Réglé : voir §5, Empilement (2026-11-10).
-19. Liste des zones de rangement par catégorie.
+19. Liste des zones de rangement par catégorie (§5). Ouvert pour les autres pièces.
+   - Vestibule (🟡 provisoire, valeurs de départ ; décision validée le 2026-11-13) :
+     - table (libre, peut rester au sol) : SMALL, MEDIUM ;
+     - palette (libre) : SMALL, MEDIUM, LARGE ;
+     - étagère basse (fixe) : SMALL ;
+     - étagères murales (fixes) : SMALL.
+   - Le coffre (LARGE) se range sur la palette. Le coffre n'est pas une zone de rangement.
 20. Valeur du pas de rotation (grossier par défaut, mode fin optionnel après essai) : réglage de départ, voir TECHNICAL.md.
 21. ~~Articulation entre orientations autorisées et paliers de rotation.~~ Réglé : le joueur ne règle que l'angle vertical, la posture est imposée par la zone (§5).
 22. ~~Portée du 100 % acquis (par pièce ou global).~~ Réglé : verrou par pièce, au premier 100 % (§5).
