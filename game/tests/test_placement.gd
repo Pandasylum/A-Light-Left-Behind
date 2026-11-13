@@ -478,7 +478,7 @@ func _test_greybox_flow() -> void:
 	_check(placement._surface == table_surface and placement._verdict == PlacementController.Verdict.BLOCKED,
 			"contre l'objet posé : bloqué (verdict %d)" % placement._verdict)
 	placement.place_held()
-	_check(carry.held_body() == second and msg.text == "place.blocked", "bloqué : message place.blocked, objet toujours en main")
+	_check(carry.held_body() == second and msg.text == TranslationServer.translate("place.blocked"), "bloqué : message place.blocked, objet toujours en main")
 	_check(second.get_parent() != placed_root and second.collision_layer == 0, "bloqué : aucun changement d'état")
 
 	# Empilement : le raycast lit les objets posés, la surface visée est le dessus de l'objet.
@@ -496,7 +496,7 @@ func _test_greybox_flow() -> void:
 
 	# Reprise refusée tant que le porteur porte une charge, puis autorisée.
 	carry.pick_up(item.get_node("Interactable"))
-	_check(carry.held_body() == null and msg.text == "carry.supports_object" and item.get_parent() == placed_root,
+	_check(carry.held_body() == null and msg.text == TranslationServer.translate("carry.supports_object") and item.get_parent() == placed_root,
 			"porteur : reprise refusée (carry.supports_object)")
 	carry.pick_up(second.get_node("Interactable"))
 	_check(carry.held_body() == second and second.support_surface == null and not item.has_loads(), "charge reprise : porteur libéré")
@@ -525,7 +525,7 @@ func _test_greybox_flow() -> void:
 	_check(placement._verdict == PlacementController.Verdict.CANNOT_STACK, "MEDIUM sur SMALL : interdit (verdict %d)" % placement._verdict)
 	_check(placement._material.albedo_color == PlacementController.COLOR_INVALID, "empilement interdit : aperçu rouge")
 	placement.place_held()
-	_check(carry.held_body() == medium and msg.text == "place.cannot_stack" and not item.has_loads(),
+	_check(carry.held_body() == medium and msg.text == TranslationServer.translate("place.cannot_stack") and not item.has_loads(),
 			"empilement interdit : place.cannot_stack, objet toujours en main")
 	# MEDIUM sur LARGE : permis (dessus du LARGE posé au sol).
 	var large: TestItem = room.get_node("TestItems/large_1")
@@ -542,7 +542,7 @@ func _test_greybox_flow() -> void:
 	_check(placement._verdict == PlacementController.Verdict.NO_SURFACE and placement._surface == null, "flanc de la table : aucune surface visée")
 	_check(not placement._preview.visible, "flanc : aucun aperçu")
 	placement.place_held()
-	_check(carry.held_body() == medium and msg.text == "place.no_surface", "flanc : place.no_surface")
+	_check(carry.held_body() == medium and msg.text == TranslationServer.translate("place.no_surface"), "flanc : place.no_surface")
 
 	# Aucune surface visée.
 	_aim(player, Vector3(0, 0.05, 0.7), 0.0, 30.0)
@@ -550,7 +550,7 @@ func _test_greybox_flow() -> void:
 	placement._update_target()
 	_check(placement._verdict == PlacementController.Verdict.NO_SURFACE, "ciel : aucune surface")
 	placement.place_held()
-	_check(carry.held_body() == medium and msg.text == "place.no_surface", "sans surface : message place.no_surface")
+	_check(carry.held_body() == medium and msg.text == TranslationServer.translate("place.no_surface"), "sans surface : message place.no_surface")
 
 	# Sol : surface is_floor, pose valide ; rotation par paliers.
 	_aim(player, Vector3(0, 0.05, 0.7), 0.0, -60.0)
@@ -579,7 +579,7 @@ func _test_greybox_flow() -> void:
 	_check(placement._material.albedo_color == PlacementController.COLOR_FALL, "instable : aperçu orange")
 	placement.place_held()
 	_check(carry.held_body() == null and large.get_parent() == placed_root, "instable : l'objet est posé (chute)")
-	_check(msg.text == "place.fell", "instable : message place.fell (%s)" % msg.text)
+	_check(msg.text == TranslationServer.translate("place.fell"), "instable : message place.fell (%s)" % msg.text)
 	_check(large.support_surface == floor_surface and is_equal_approx(large.global_position.y, floor_surface.top_y() + large.item_data.height * 0.5),
 			"chute : atterri sur le sol (y = %.3f)" % large.global_position.y)
 	_check(large.collision_layer == 4 and large.visible, "chute : collision couche 3 réactivée, visible")
@@ -678,7 +678,7 @@ func _test_furniture() -> void:
 
 	# Meuble chargé : non prenable, puis prenable après retrait de la charge.
 	carry.pick_up(low.get_node("Interactable"))
-	_check(carry.held_body() == null and msg.text == "carry.supports_object" and low.has_loads(), "meuble chargé : non prenable")
+	_check(carry.held_body() == null and msg.text == TranslationServer.translate("carry.supports_object") and low.has_loads(), "meuble chargé : non prenable")
 	carry.pick_up(medium.get_node("Interactable"))
 	_check(carry.held_body() == medium and not low.has_loads(), "charge retirée : le meuble est libéré")
 	_aim_at(player, Vector3(-3.0, 0.05, 2.2), Vector3(-3.0, 0.0, 1.5))
