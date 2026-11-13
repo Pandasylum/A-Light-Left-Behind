@@ -353,7 +353,7 @@ Les ambiances doivent rester discrètes et immersives.
 
 ## 7. Direction technique
 
-- Moteur : Godot 4.6.
+- Moteur : Godot 4.7.2.
 - Langage : GDScript.
 - Format de ressources 3D privilégié : GLB / glTF.
 - Blender peut être utilisé pour préparer les ressources avant leur intégration.

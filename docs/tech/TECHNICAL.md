@@ -4,7 +4,7 @@ Propriétaire : projet Godot Engineering. Dernière mise à jour : 2026-11-12.
 Légende : ✅ décision validée · 🟡 à décider en Phase 0
 
 ## Contraintes validées ✅
-- Moteur : Godot 4.7.2. Plateforme : PC uniquement (mobile abandonné le 2026-11-09).
+- Moteur : Godot 4.7.2 (2026-11-13 : version de Godot = 4.7.2, épinglée par tools/godot.sh, validé par le développeur). Plateforme : PC uniquement (mobile abandonné le 2026-11-09).
 - Un seul dépôt Git. Une PR par sujet.
 - Deux PC de travail, synchronisés via Git uniquement (aucun transfert de fichiers hors dépôt).
 - Entrées : clavier/souris de référence, manette en bonus non engagé. Toutes les entrées passent par des actions de l'Input Map, jamais par des touches en dur.
