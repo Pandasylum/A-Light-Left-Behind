@@ -1,0 +1,20 @@
+{
+	"actions": [
+		{ "action": "move_forward", "label_key": "controls.action.move_forward" },
+		{ "action": "move_back", "label_key": "controls.action.move_back" },
+		{ "action": "move_left", "label_key": "controls.action.move_left" },
+		{ "action": "move_right", "label_key": "controls.action.move_right" },
+		{ "action": "walk_slow", "label_key": "controls.action.walk_slow" },
+		{ "action": "interact", "label_key": "controls.action.interact" },
+		{ "action": "use_primary", "label_key": "controls.action.use_primary" },
+		{ "action": "use_secondary", "label_key": "controls.action.use_secondary" },
+		{ "action": "equip_tool", "label_key": "controls.action.equip_tool" },
+		{ "action": "drop_object", "label_key": "controls.action.drop_object" },
+		{ "action": "cycle_item", "label_key": "controls.action.cycle_item" },
+		{ "action": "rotate_left", "label_key": "controls.action.rotate_left" },
+		{ "action": "rotate_right", "label_key": "controls.action.rotate_right" },
+		{ "action": "lock_camera", "label_key": "controls.action.lock_camera" },
+		{ "action": "inventory_open", "label_key": "controls.action.inventory_open" },
+		{ "action": "journal_open", "label_key": "controls.action.journal_open" }
+	]
+}

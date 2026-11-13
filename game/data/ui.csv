@@ -22,3 +22,36 @@ options.volume.master,Général,Master
 options.volume.music,Musique,Music
 options.volume.ambience,Ambiances,Ambience
 options.volume.effects,Effets,Effects
+options.section.controls,Touches,Controls
+options.section.camera,Souris et caméra,Mouse and camera
+options.mouse_sensitivity,Sensibilité de la souris,Mouse sensitivity
+options.invert_y,Inverser l'axe vertical,Invert vertical axis
+options.fov,Champ de vision,Field of view
+controls.reset,Touches par défaut,Default keys
+controls.press_key,Appuyez sur une touche… (Échap : annuler),Press a key… (Esc: cancel)
+controls.unbound,Aucune,None
+controls.action.move_forward,Avancer,Move forward
+controls.action.move_back,Reculer,Move back
+controls.action.move_left,Aller à gauche,Move left
+controls.action.move_right,Aller à droite,Move right
+controls.action.walk_slow,Marche lente,Slow walk
+controls.action.interact,Interagir,Interact
+controls.action.use_primary,Action principale,Primary action
+controls.action.use_secondary,Action secondaire,Secondary action
+controls.action.equip_tool,Sortir ou ranger l'outil,Take out or stow tool
+controls.action.drop_object,Poser l'objet,Put down object
+controls.action.cycle_item,Changer d'objet,Switch item
+controls.action.rotate_left,Pivoter à gauche,Rotate left
+controls.action.rotate_right,Pivoter à droite,Rotate right
+controls.action.lock_camera,Figer la caméra,Lock camera
+controls.action.inventory_open,Inventaire,Inventory
+controls.action.journal_open,Journal,Journal
+controls.mouse.1,Clic gauche,Left click
+controls.mouse.2,Clic droit,Right click
+controls.mouse.3,Clic molette,Middle click
+controls.mouse.4,Molette haut,Wheel up
+controls.mouse.5,Molette bas,Wheel down
+controls.mouse.6,Molette gauche,Wheel left
+controls.mouse.7,Molette droite,Wheel right
+controls.mouse.8,Bouton latéral arrière,Back side button
+controls.mouse.9,Bouton latéral avant,Forward side button

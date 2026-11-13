@@ -4,6 +4,11 @@
 	"window_size": [1280, 720],
 	"min_window_size": [960, 540],
 	"fallback_language": "en",
+	"camera": {
+		"sensitivity": { "min": 0.2, "max": 3.0, "step": 0.1, "default": 1.0 },
+		"invert_y": false,
+		"fov": { "min": 70, "max": 95, "step": 1, "default": 80 }
+	},
 	"volume": {
 		"min": 0,
 		"max": 100,
