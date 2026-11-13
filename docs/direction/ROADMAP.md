@@ -1,6 +1,6 @@
 # A LIGHT LEFT BEHIND — ROADMAP
 
-Dernière mise à jour : 2026-11-10
+Dernière mise à jour : 2026-11-13
 Suivi de production. Le détail des phases est dans `PLAN_DE_PRODUCTION.md`. Les décisions de conception sont dans `GDD.md`, qui prévaut en cas de contradiction.
 
 Statuts : À faire · En cours · À tester · Bloqué · Terminé
@@ -75,6 +75,7 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Chaufferie (2026-11-10) : au sous-sol, dans l'extension prévue (trappe vers le tunnel), hors des 7 pièces ; le jeu de base garde le chauffage via la cheminée du salon et la plomberie de la cuisine.
 - Direction artistique (2026-11-10, principe) : palette commune, variations par pièce, lumière froide puis plus chaude ; détails dans ART_BIBLE.md.
 - Cadre narratif (2026-11-13) : le nouveau gardien ignorait l'état réel du phare (lampe hors service, bâtiment abandonné, informations cachées) et le départ de son prédécesseur ; le mauvais temps l'empêche de repartir ; sa fille n'apparaît jamais et existe dans ses pensées ; départ de l'ancien gardien, panne de la lampe, légende du passeur et chronologie non décidés (incertitude préservée). Aucun lore rattaché au sous-sol, à la chaufferie ni au tunnel. Détails : GDD §1, §14, §15 pt 31.
+- Structure du phare (2026-11-13, détail : GDD §5 et §6) : maison accolée à la tour ; la tour est le hub et sert de passage commun (N0, N1, N2), le fût (rayon 2,0 m) est dans ce passage, avec une porte fût/passage à chaque niveau. N0 = vestibule, atelier, cuisine, salon, hub (ordre vestibule → atelier → hub, atelier à côté du hub). N1 = chambre + bureau en une seule grande pièce (bureau = zone). N2 = archives + machinerie. N3 = lanterne. Toujours 7 pièces principales. Machinerie : petite pièce séparée dans la moitié basse du fût au N2, bloc de maçonnerie dessous, « zone de la lampe » avec la lanterne, verrouillée jusqu'à la lanterne et exclue de « le reste ». Porte du fût (module « mur avec ouverture » 30°, décision du 2026-11-12 reformulée) verrouillée tant que cuisine, salon et atelier ne sont pas à 100 %. Escalier arrêté au palier N2 ; échelle vers la lanterne par une trappe à côté de la machinerie, verrouillée tant que « le reste » n'est pas à 100 % ; environ 10 m de hauteur conservés. Règle de l'échelle : objet moyen ou gros en main = refusé, petit objet = ceinture si place libre sinon refusé, vérification avant la montée. Montée automatique : animée la première fois (fentes de lumière, vent, fondu à mi-hauteur), transition courte ensuite, appui long pour passer (durée non décidée).
 
 ## Dépendances à suivre
 
@@ -85,7 +86,7 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 
 1. Liste exacte des outils de nettoyage et de rangement trouvés dans la pièce 1.
 2. Définition technique du 100 % (nettoyage, réparation, rangement).
-3. Liste des pièces et graphe des embranchements.
+3. Graphe des embranchements (liste des pièces et niveaux réglés le 2026-11-13 ; voir points ouverts de la structure du phare ci-dessous).
 4. Nombre d'orientations prédéfinies par objet ou famille.
 5. Catalogue des améliorations d'outils et ordre de déblocage (sans coût en matériaux : déblocage par la récupération d'items d'amélioration).
 6. Contenu restant de la pièce 1 et de l'atelier (points ouverts au GDD §15).
@@ -97,6 +98,15 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Texte de l'alerte de Recommencer.
 - Ruptures visibles du noyau (Art).
 - Règle de contenu « une surface démarre bien au-dessus de son seuil » (World & Content).
+
+## Points ouverts (structure du phare, 2026-11-13)
+
+- 🟡 La clé de la machinerie est-elle en lanterne ?
+- 🟡 Position de la porte extérieure du bâtiment (proposition : côté vestibule).
+- 🟡 Position du tableau électrique dans le passage.
+- 🟡 Quelles portes (cuisine, salon) sont verrouillées au départ.
+- 🟡 Place disponible dans le fût au N2 (machinerie + palier + échelle) : à vérifier à l'échelle réelle par Art.
+- 🟡 Durée de l'appui long pour passer la montée de l'échelle.
 
 ## Propositions non validées
 
