@@ -55,14 +55,23 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - ✅ Portage (2026-11-13, provisoire) : la sauvegarde inclut l'objet en main et les objets à la ceinture. Au chargement, le joueur retrouve exactement son portage d'avant la sauvegarde (même objet en main, mêmes objets à la ceinture).
 - ✅ Un objet porté est sauvegardé une seule fois, dans le portage, jamais en plus dans une pièce. Chaque objet est identifié par un identifiant stable.
 - ✅ Au rechargement, les objets reprennent leur place sauvegardée et le pourcentage de la pièce se recalcule depuis cet état. Le verrou « restaurée » reste inchangé (déjà sauvegardé).
-- 🟡 Format (2026-11-13, proposition d'Engineering, à valider) : section « disposition » du SaveService, à côté de « nettoyage » et « outils », avec sa propre version. Section absente = disposition initiale de la scène.
-- 🟡 Objets de pièce : un enregistrement par objet libre (identifiant, position absolue dans la pièce, angle, posture, support = identifiant de la surface porteuse ou « sol »). La posture vaut « à plat » tant que le lot 2 n'existe pas, mais le champ est réservé.
-- 🟡 Portage : main et ceinture par emplacement, identifiés par l'identifiant stable. La capacité de ceinture reste celle du joueur.
-- 🟡 Identifiant stable : chemin depuis la racine de la pièce, comme l'id des surfaces à nettoyer, pas l'id d'ItemData.
-- 🟡 Restauration : meubles libres, puis objets posés, puis reconstruction des charges depuis le support sauvegardé, puis portage. L'état « rangé » est évalué après la restauration complète.
-- 🟡 Incohérences : section illisible, objet à la fois porté et en pièce, ou portage supérieur à la capacité de ceinture = disposition initiale + avertissement dans le journal (comme pour « outils »). Entrée inconnue ou support introuvable : cette entrée seule est ignorée.
+- ✅ Format (2026-11-13, implémenté dans [PR #112](https://github.com/Pandasylum/A-Light-Left-Behind/pull/112), validé par le développeur) : section « disposition » du SaveService, à côté de « nettoyage » et « outils », avec sa propre version. Section absente = disposition initiale de la scène. La version du format du SaveService reste inchangée.
+- ✅ Implémentation (2026-11-13) : module `game/systems/layout/`, avec une logique pure et un nœud de scène RoomLayout.
+- ✅ Objets de pièce (2026-11-13) : un enregistrement par objet libre (identifiant, position absolue dans la pièce, angle, posture, support = identifiant de la surface porteuse ou « sol »). La posture est conservée dans RoomLayout, pas sur TestItem, où elle reste « à plat ».
+- ✅ Support « sol » (2026-11-13) : la surface de sol qui contient le point. Une seule surface de sol aujourd'hui ; à revoir s'il y en a plusieurs.
+- ✅ Portage (2026-11-13) : main et ceinture par emplacement, identifiés par l'identifiant stable. La capacité de ceinture reste celle du joueur. Une ceinture restaurée avec un outil en main est un état permis.
+- ✅ Identifiant stable (2026-11-13) : chemin complet depuis la racine de la pièce, comme l'id des surfaces à nettoyer, pas l'id d'ItemData.
+- ✅ Restauration (2026-11-13) : meubles libres, puis objets posés, puis reconstruction des charges depuis le support sauvegardé, puis portage. Aucun objet créé ni supprimé. Aucune sauvegarde déclenchée au chargement. L'état « rangé » est évalué avec le support sauvegardé, après restauration de la disposition et du portage.
+- ✅ Objet jamais déplacé (2026-11-13) : un objet jamais posé ni déplacé n'est pas écrit et garde sa place initiale.
+- ✅ Rejet de la section (2026-11-13) : disposition initiale, portage vide et avertissement dans le journal si la section est illisible, de version inconnue, avec un identifiant en double, un objet à la fois porté et en pièce, une ceinture au-delà de sa capacité, un objet non petit en ceinture, ou un identifiant de portage inconnu. Une entrée sans identifiant rejette aussi toute la section.
+- ✅ Rejet d'une entrée (2026-11-13) : une position, un angle ou une posture illisible n'ignore que l'entrée. Un objet posé sur un objet ignoré ou porté est ignoré aussi. Entrée inconnue ou support introuvable : cette entrée seule est ignorée.
+- ✅ Objet en main et outil en main dans l'état sauvegardé (2026-11-13) : l'objet est gardé, l'outil est rangé, avertissement dans le journal.
 - 🟡 Déclencheur : dépôt validé (chute comprise), par la demande de sauvegarde existante de l'Autosave, qui fusionne les demandes rapprochées. Pas d'optimisation de l'export des faces : à reconsidérer après mesure en playtest. La prise, le changement d'objet en main (cycle_item) et le changement de ceinture ne déclenchent pas de sauvegarde : la fermeture du jeu (déjà couverte, sauvegarde avec attente) enregistre le portage du moment. Après un plantage, la disposition revient à la dernière sauvegarde, cohérente (objet à sa place de dépôt, portage correspondant).
-- 🟡 Coût estimé : environ 100 octets par objet, négligeable devant les masques de nettoyage.
+- ✅ Coût mesuré (2026-11-13) : 176 octets par objet (identifiants en chemin complet), soit environ 9 Ko pour 50 objets. Négligeable. Remplace l'estimation « environ 100 octets ». Pas de compression des identifiants.
+- 🟡 Posture (2026-11-13) : contrainte pour le lot de posture : la posture devra passer dans l'état de pose de l'objet, avec la forme de pose (contrainte (a)).
+- 🟡 Écart mineur (2026-11-13) : la position de cycle_item n'est pas sauvegardée ; les objets en main et à la ceinture sont identiques.
+- 🟡 Dette connue (2026-11-13) : le test des outils échoue sur 3 vérifications sur main (texte de débogage du contrôleur d'outils, indicateur de surfaces activé), antérieures à la PR #112 (vérifié le 2026-11-13). À traiter avec le retrait des indicateurs de débogage du journal et des surfaces.
+- Limites de test (2026-11-13) : le doublon après rechargement n'est vérifié que par comptage. L'export et l'import du portage sont testés dans test_disposition.gd, pas dans test_carry.gd.
 
 ## Autosave (décidé le 2026-11-12) 🟡 — partiellement implémenté
 - Sauvegarde sur événements plus sortie. Aucun intervalle fixe, aucune sauvegarde manuelle, un seul emplacement.
@@ -173,7 +182,7 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 
 ## Rangement (GDD §5) 🟡 (proposition d'Engineering, 2026-11-13, plan en lots)
 - 🟡 Lot 1 : zones de rangement en scène (Area3D + ZoneData), critère « objet rangé » testable, signal de changement d'état. Interrogation par requêtes à la pose et à la reprise (pas de body_entered). Ni posture imposée, ni comptage par pièce, ni verrou du 100 %. État dérivé du monde, jamais sauvegardé.
-- 🟡 Lot de persistance de la disposition (nouveau, entre le lot 1 et le lot 3) : voir Sauvegarde, « disposition et portage ».
+- ✅ Lot de persistance de la disposition (livré 2026-11-13, [PR #112](https://github.com/Pandasylum/A-Light-Left-Behind/pull/112)) : voir Sauvegarde, « disposition et portage ». Le lot 3 en dépend, plus le lot 1.
 - 🟡 Lot 2 : posture imposée par la zone, avec les contraintes (a) et (b) déjà écrites plus haut. Bloqué par GDD §15 point 3.
 - 🟡 Lot 3 : comptage par pièce, pourcentage, verrou « restaurée » au premier 100 %, indicateur de progression. Dépend du lot 1 et de la persistance.
 - GDD §15 points 3 (postures par objet et par zone) et 19 (liste des zones par catégorie) restent ouverts. Le lot 1 tourne sur des zones de test.
