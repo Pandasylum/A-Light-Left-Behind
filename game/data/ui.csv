@@ -26,7 +26,7 @@ options.section.controls,Touches,Controls
 options.section.camera,Souris et caméra,Mouse and camera
 options.mouse_sensitivity,Sensibilité de la souris,Mouse sensitivity
 options.invert_y,Inverser l'axe vertical,Invert vertical axis
-options.fov,Champ de vision,Field of view
+options.fov,Champ de vision (horizontal),Field of view (horizontal)
 controls.reset,Touches par défaut,Default keys
 controls.press_key,Appuyez sur une touche… (Échap : annuler),Press a key… (Esc: cancel)
 controls.unbound,Aucune,None

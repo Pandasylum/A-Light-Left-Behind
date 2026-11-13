@@ -14,7 +14,6 @@
 		{ "action": "rotate_left", "label_key": "controls.action.rotate_left" },
 		{ "action": "rotate_right", "label_key": "controls.action.rotate_right" },
 		{ "action": "lock_camera", "label_key": "controls.action.lock_camera" },
-		{ "action": "inventory_open", "label_key": "controls.action.inventory_open" },
-		{ "action": "journal_open", "label_key": "controls.action.journal_open" }
+		{ "action": "inventory_open", "label_key": "controls.action.inventory_open" }
 	]
 }

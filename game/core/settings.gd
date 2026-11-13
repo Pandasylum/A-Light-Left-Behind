@@ -26,7 +26,7 @@ var window_size: Vector2i = Vector2i(1280, 720)
 var volumes: Dictionary = {}
 var look_sensitivity: float = 1.0 ## multiplicateur de la sensibilité de base du joueur
 var invert_y: bool = false
-var fov: int = 80 ## degrés (vertical)
+var fov: int = 80 ## degrés, champ HORIZONTAL pour l'écran de référence (camera_vertical_fov() donne celui de la caméra)
 
 var _cfg: Dictionary = {}
 var _languages: Array = []
@@ -179,6 +179,16 @@ func set_invert_y(value: bool) -> void:
 		return
 	invert_y = value
 	changed.emit()
+
+
+## SEUL endroit de la conversion : champ horizontal (réglage, écran de référence 16:9 des données) -> champ
+## vertical en degrés pour la caméra (axe vertical conservé, indépendant de la fenêtre).
+func camera_vertical_fov() -> float:
+	var ref: Variant = fov_range().get("reference_aspect", [16, 9])
+	var aspect: float = 16.0 / 9.0
+	if ref is Array and (ref as Array).size() == 2 and float((ref as Array)[1]) > 0.0 and float((ref as Array)[0]) > 0.0:
+		aspect = float((ref as Array)[0]) / float((ref as Array)[1])
+	return rad_to_deg(2.0 * atan(tan(deg_to_rad(float(fov)) / 2.0) / aspect))
 
 
 func set_fov(value: float) -> void:

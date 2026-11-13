@@ -180,7 +180,7 @@ func _apply_settings() -> void:
 		return
 	_sensitivity_factor = float(_settings.get(&"look_sensitivity"))
 	_invert_y = bool(_settings.get(&"invert_y"))
-	camera.fov = float(_settings.get(&"fov"))
+	camera.fov = float(_settings.call(&"camera_vertical_fov"))
 
 
 ## Applique une rotation souris (en pixels) : yaw sur Player, pitch sur Head.
