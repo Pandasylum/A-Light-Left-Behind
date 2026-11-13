@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 [autoload]
 
 SaveService="*res://core/save_service.gd"
+Settings="*res://core/settings.gd"
 
 [debug]
 

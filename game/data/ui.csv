@@ -10,3 +10,15 @@ menu.confirm,Confirmer,Confirm
 menu.cancel,Annuler,Cancel
 menu.save_damaged,Sauvegarde endommagée,Damaged save
 menu.new_game_confirm_damaged,La sauvegarde est endommagée. Elle sera conservée à part et une nouvelle partie commencera. Continuer ?,The save is damaged. It will be kept separately and a new game will start. Continue?
+options.section.language,Langue,Language
+options.section.display,Affichage,Display
+options.section.audio,Audio,Audio
+options.language,Langue,Language
+options.display_mode,Mode d'affichage,Display mode
+options.display_mode.fullscreen,Plein écran,Fullscreen
+options.display_mode.windowed,Fenêtré,Windowed
+options.vsync,Synchronisation verticale,Vertical sync
+options.volume.master,Général,Master
+options.volume.music,Musique,Music
+options.volume.ambience,Ambiances,Ambience
+options.volume.effects,Effets,Effects
