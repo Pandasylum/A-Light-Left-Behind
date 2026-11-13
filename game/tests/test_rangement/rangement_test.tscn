@@ -1,0 +1,93 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/test_rangement/rangement_test.gd" id="1_scene"]
+[ext_resource type="PackedScene" path="res://rooms/test/greybox.tscn" id="2_greybox"]
+[ext_resource type="Script" path="res://systems/storage/storage_zone.gd" id="3_zone"]
+[ext_resource type="Script" path="res://systems/storage/storage_service.gd" id="4_service"]
+[ext_resource type="Script" path="res://data/zone_data.gd" id="5_zone_data"]
+[ext_resource type="PackedScene" path="res://props/test_item.tscn" id="6_item"]
+[ext_resource type="Resource" path="res://data/items/test_small_1.tres" id="7_small_1"]
+
+[sub_resource type="Resource" id="data_palette"]
+script = ExtResource("5_zone_data")
+id = &"test_zone_palette"
+accepted_categories = Array[int]([0, 1, 2])
+
+[sub_resource type="Resource" id="data_table"]
+script = ExtResource("5_zone_data")
+id = &"test_zone_table"
+accepted_categories = Array[int]([0, 1, 2])
+
+[sub_resource type="Resource" id="data_table_small"]
+script = ExtResource("5_zone_data")
+id = &"test_zone_table_small"
+accepted_categories = Array[int]([0])
+
+[sub_resource type="Resource" id="data_floor"]
+script = ExtResource("5_zone_data")
+id = &"test_zone_sol"
+accepted_categories = Array[int]([0, 1, 2])
+
+[sub_resource type="BoxShape3D" id="shape_palette"]
+size = Vector3(1.2, 1, 1)
+
+[sub_resource type="BoxShape3D" id="shape_table_half"]
+size = Vector3(0.6, 1, 0.8)
+
+[sub_resource type="BoxShape3D" id="shape_floor"]
+size = Vector3(2, 1.4, 1.4)
+
+[node name="RangementTest" type="Node3D"]
+script = ExtResource("1_scene")
+
+[node name="Greybox" parent="." instance=ExtResource("2_greybox")]
+
+[node name="Zones" type="Node3D" parent="."]
+
+[node name="ZonePalette" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.55, -0.5)
+script = ExtResource("3_zone")
+zone_data = SubResource("data_palette")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZonePalette"]
+shape = SubResource("shape_palette")
+
+[node name="ZoneTable" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 1.15, -0.5)
+script = ExtResource("3_zone")
+zone_data = SubResource("data_table")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneTable"]
+shape = SubResource("shape_table_half")
+
+[node name="ZoneTableSmall" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 1.15, -0.5)
+script = ExtResource("3_zone")
+zone_data = SubResource("data_table_small")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneTableSmall"]
+shape = SubResource("shape_table_half")
+
+[node name="ZoneSol" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.5, 3.4)
+script = ExtResource("3_zone")
+zone_data = SubResource("data_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneSol"]
+shape = SubResource("shape_floor")
+
+[node name="ExtraItems" type="Node3D" parent="."]
+
+[node name="small_palette" parent="ExtraItems" instance=ExtResource("6_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9, 0.2, -0.8)
+item_data = ExtResource("7_small_1")
+
+[node name="StorageService" type="Node" parent="."]
+script = ExtResource("4_service")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="States" type="VBoxContainer" parent="Hud"]
+offset_left = 12.0
+offset_top = 12.0
+mouse_filter = 2

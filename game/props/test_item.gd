@@ -2,6 +2,9 @@ class_name TestItem
 extends StaticBody3D
 ## Objet de test ramassable. Le cube suit l'ItemData (x, z = emprise ; hauteur = height).
 
+## Émis après une pose (chute comprise) ou une reprise : la surface porteuse a changé (écouté par le rangement).
+signal support_changed(item: TestItem)
+
 @export var item_data: ItemData
 
 ## Surface de pose porteuse (null tant que l'objet n'est pas posé ; vidée à la reprise).
@@ -45,6 +48,7 @@ func on_placed(surface: PlacementSurface) -> void:
 	var carrier: Node = surface.get_parent()
 	if carrier != null and carrier.get(&"loads") != null and not (carrier.get(&"loads") as Array).has(self):
 		(carrier.get(&"loads") as Array).append(self)
+	support_changed.emit(self)
 
 
 ## Appelé à la reprise : plus de surface porteuse, retiré des charges du porteur.
@@ -54,9 +58,10 @@ func on_picked_up() -> void:
 		if carrier != null and carrier.get(&"loads") != null:
 			(carrier.get(&"loads") as Array).erase(self)
 	support_surface = null
+	support_changed.emit(self)
 
 
 ## Vrai si l'objet est posé sur une surface qui n'est pas le sol et qui est un support déclaré
-## (installation fixe ou meuble libre). Réservé au rangement (lot ultérieur).
+## (installation fixe ou meuble libre). Utilisé par le rangement (StorageService).
 func rests_on_declared_support() -> bool:
 	return support_surface != null and not support_surface.is_floor and support_surface.is_declared_support
