@@ -8,7 +8,7 @@ extends RefCounted
 ##     la contremarche, abscisse décalée de la hauteur de la contremarche.
 ## Valeurs et méthode PROVISOIRES (Art, 2026-11-12). Utilisé par CleaningSurface pour le voile de fin.
 
-const SHADER_PATH: String = "res://tests/test_fin_surface/fin_surface.gdshader"
+const SHADER_PATH: String = "res://systems/cleaning/fin_surface.gdshader"
 
 
 ## Uniforms balayage_* de chaque face : { CleanableFace -> { nom d'uniform -> valeur } }.

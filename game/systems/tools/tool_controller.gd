@@ -16,7 +16,7 @@ signal action_finished
 const WORLD_LAYER: int = 1
 const BUCKET_LAYER: int = 4 ## couche 3 (valeur de masque)
 const MARKER_SIZE: float = 20.0 ## px, marqueur de visée provisoire
-const DEBUG_SURFACES: bool = true # temporaire, à retirer avec l'indicateur de pièce
+const DEBUG_SURFACES: bool = false # temporaire, à retirer avec l'indicateur de pièce
 const DEBUG_AIM_REACH_M: float = 5.0 ## portée du rayon de visée du debug des surfaces
 const DEBUG_FINISHED_SHOWN_S: float = 2.0 ## durée d'affichage de « Surface finie ! »
 
