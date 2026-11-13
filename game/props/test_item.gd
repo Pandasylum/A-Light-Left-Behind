@@ -11,6 +11,12 @@ signal support_changed(item: TestItem)
 var support_surface: PlacementSurface = null
 ## Objets posés sur le dessus de celui-ci (mis à jour à la pose et à la reprise).
 var loads: Array[Node3D] = []
+## Identifiant stable pour la sauvegarde de la disposition : chemin d'origine depuis la racine de la
+## pièce (comme surface_id des CleaningSurface), attribué une fois par RoomLayout. Vide = non suivi.
+var layout_id: String = ""
+## Vrai quand la place de l'objet vient de la sauvegarde : au chargement, sa surface porteuse n'est
+## plus cherchée (ni par le StorageService, ni par la pose initiale de la scène).
+var placement_restored: bool = false
 
 
 func _ready() -> void:
@@ -53,12 +59,26 @@ func on_placed(surface: PlacementSurface) -> void:
 
 ## Appelé à la reprise : plus de surface porteuse, retiré des charges du porteur.
 func on_picked_up() -> void:
-	if support_surface != null:
-		var carrier: Node = support_surface.get_parent()
-		if carrier != null and carrier.get(&"loads") != null:
-			(carrier.get(&"loads") as Array).erase(self)
+	_leave_carrier()
 	support_surface = null
 	support_changed.emit(self)
+
+
+## Chargement : surface porteuse sauvegardée, par le chemin de la pose (on_placed), sans contrôle de
+## pose ni chute. L'objet est déjà à sa position ; il quitte d'abord, sans signal, un porteur précédent.
+func restore_support(surface: PlacementSurface) -> void:
+	_leave_carrier()
+	placement_restored = true
+	on_placed(surface)
+
+
+## Se retire des charges du porteur actuel (dessus d'un objet), s'il y en a un.
+func _leave_carrier() -> void:
+	if not is_instance_valid(support_surface):
+		return
+	var carrier: Node = support_surface.get_parent()
+	if carrier != null and carrier.get(&"loads") != null:
+		(carrier.get(&"loads") as Array).erase(self)
 
 
 ## Vrai si l'objet est posé sur une surface qui n'est pas le sol et qui est un support déclaré

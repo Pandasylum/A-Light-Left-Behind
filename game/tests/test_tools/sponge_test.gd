@@ -3,6 +3,7 @@ extends Node3D
 ## quelle, éponge dans son emplacement (rangée au départ : equip_tool la sort), seau ramassable et
 ## objet de test posés au sol. Le sol du tour reçoit une surface de pose pour pouvoir les reposer.
 ## L'Autosave de la scène est relié au tour et au ToolController du joueur (outil rangé, fermeture).
+## Le nœud Disposition (RoomLayout, pièce = cette scène) sauvegarde et restaure la place des objets.
 
 const FLOOR_SIZE: Vector2 = Vector2(10.0, 10.0) ## emprise du sol du spike
 const FLOOR_TOP_Y: float = 0.1 ## face supérieure, dans le repère du corps Floor
@@ -25,10 +26,13 @@ func _ready() -> void:
 	($Tour/Player/ToolController as ToolController).add_tool(tool)
 	# Sauvegarde automatique : pièce = le tour (repère des id de faces), outils = ceux du joueur.
 	($Autosave as Autosave).setup(_tour, $Tour/Player/ToolController as ToolController)
+	# Références prises avant le chargement : un objet restauré en main ou en ceinture change de parent.
+	var bucket: TestItem = $Bucket
+	var item: TestItem = $TestItem
 	_apply_continue()
 	await get_tree().physics_frame
-	_drop_to_floor($Bucket as TestItem)
-	_drop_to_floor($TestItem as TestItem)
+	_drop_to_floor(bucket)
+	_drop_to_floor(item)
 
 
 ## Pose l'objet sur ce qui se trouve sous lui (rayon vertical, couche monde) ; son origine est au
@@ -39,13 +43,17 @@ func _drop_to_floor(item: TestItem) -> void:
 	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
 	if hit.is_empty():
 		return
+	if item.placement_restored:
+		return ## place ou portage restauré depuis la sauvegarde : pas de pose initiale
 	item.global_position = (hit["position"] as Vector3) + Vector3.UP * item.item_data.height * 0.5
 	var surface: PlacementSurface = PlacementSurface.of_body(hit["collider"])
 	if surface != null:
 		item.on_placed(surface)
 
 
-## « Continuer » (GameFlow.continue_requested) : applique la sauvegarde « partie » à la pièce et aux outils.
+## « Continuer » (GameFlow.continue_requested) : applique la sauvegarde « partie » à la pièce, aux
+## outils, puis à la disposition des objets et au portage (section absente = disposition initiale,
+## portage vide). Les outils d'abord : un outil en main est rangé si la main retrouve un objet.
 func _apply_continue() -> void:
 	var data: Dictionary = GameFlow.take_continue_data(get_node_or_null(^"/root/SaveService"))
 	if data.is_empty():
@@ -54,3 +62,4 @@ func _apply_continue() -> void:
 	if data.has(ToolSlots.SAVE_KEY):
 		var catalog: Array[ToolData] = [tool]
 		($Tour/Player/ToolController as ToolController).import_tools(data[ToolSlots.SAVE_KEY], catalog)
+	($Disposition as RoomLayout).restore(data.get(LayoutState.SAVE_KEY, {}))

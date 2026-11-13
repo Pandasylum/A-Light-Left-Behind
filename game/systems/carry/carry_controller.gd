@@ -52,10 +52,7 @@ func pick_up(interactable: Interactable) -> void:
 	if result != CarryInventory.Result.OK:
 		_show_refusal(result)
 		return
-	if body.has_method(&"on_picked_up"):
-		body.call(&"on_picked_up") ## objet repris : plus de surface porteuse, retiré des charges du porteur
-	else:
-		body.set(&"support_surface", null)
+	_take_from_world(body)
 	_refresh_visuals()
 
 
@@ -94,6 +91,53 @@ func release_held() -> Node3D:
 	return body
 
 
+## Image du portage (sauvegarde) : nœud de l'objet en main (held) et de chaque emplacement de
+## ceinture dans l'ordre (belt ; null = vide), d'après CarryInventory.export_state().
+func export_carry() -> Dictionary:
+	var state: Dictionary = inventory.export_state()
+	var belt: Array[Node3D] = []
+	for ref: Variant in state["belt_refs"]:
+		belt.append(ref as Node3D)
+	return {"held": state["held_ref"] as Node3D, "belt": belt}
+
+
+## Chargement : remet ces objets en main et en ceinture, aux mêmes emplacements, par le chemin de
+## la prise (objet retiré de son support, HandAnchor, masquage de la ceinture), sans contrôle de
+## distance ni de portée. État contraire aux règles de prise = rien ne change (false).
+## held_changed n'est émis que si la main reçoit un objet (une ceinture seule laisse l'outil en main).
+func import_carry(held: Node3D, belt: Array[Node3D]) -> bool:
+	var state: Dictionary = {"held": _data_of(held), "held_ref": held, "belt": [], "belt_refs": []}
+	var bodies: Array[Node3D] = [held]
+	bodies.append_array(belt)
+	for body: Node3D in belt:
+		(state["belt"] as Array).append(_data_of(body))
+		(state["belt_refs"] as Array).append(body)
+	for body: Node3D in bodies:
+		if body != null and _data_of(body) == null:
+			return false
+	if not inventory.import_state(state):
+		return false
+	for body: Node3D in bodies:
+		if body != null:
+			_take_from_world(body)
+	if held != null:
+		held_changed.emit()
+	_apply_visuals()
+	return true
+
+
+func _data_of(body: Node3D) -> ItemData:
+	return body.get("item_data") as ItemData if body != null else null
+
+
+## Objet pris : plus de surface porteuse, retiré des charges du porteur.
+func _take_from_world(body: Node3D) -> void:
+	if body.has_method(&"on_picked_up"):
+		body.call(&"on_picked_up")
+	else:
+		body.set(&"support_surface", null)
+
+
 func _on_target_changed(target: Interactable) -> void:
 	if _target != null and _target.interacted.is_connected(_on_interacted):
 		_target.interacted.disconnect(_on_interacted)
@@ -112,6 +156,10 @@ func _on_interacted(_player: Node, interactable: Interactable) -> void:
 ## masqué, collision désactivée.
 func _refresh_visuals() -> void:
 	held_changed.emit()
+	_apply_visuals()
+
+
+func _apply_visuals() -> void:
 	var held: Node3D = inventory.held_ref() as Node3D
 	if held != null:
 		_attach(held)
