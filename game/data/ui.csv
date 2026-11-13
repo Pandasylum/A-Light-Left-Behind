@@ -55,3 +55,35 @@ controls.mouse.6,Molette gauche,Wheel left
 controls.mouse.7,Molette droite,Wheel right
 controls.mouse.8,Bouton latéral arrière,Back side button
 controls.mouse.9,Bouton latéral avant,Forward side button
+interact.pick_up,Prendre,Pick up
+carry.fixed,Cet objet est fixé.,This object is fixed in place.
+carry.hands_full,Vos mains sont pleines.,Your hands are full.
+carry.belt_full,Votre ceinture est pleine.,Your belt is full.
+carry.not_stowable,Cet objet ne se range pas à la ceinture.,This object cannot be stowed on the belt.
+carry.cycle_blocked,Impossible de changer d'objet.,Cannot switch items.
+carry.supports_object,Un autre objet est posé dessus.,Another object is resting on it.
+place.no_surface,Aucune surface où poser l'objet.,No surface to put the object on.
+place.cannot_stack,Impossible de l'empiler ici.,It cannot be stacked here.
+place.blocked,L'emplacement est occupé.,The spot is blocked.
+place.fell,L'objet a glissé et est retombé.,The object slipped and fell.
+tool.hand_occupied,Votre main porte déjà un objet.,Your hand is already holding an object.
+tool.sponge,Éponge,Sponge
+tool.debug.stowed,Outil : rangé,Tool: stowed
+tool.debug.state,Outil : %s\nSalissure : %d %%\nEfficacité : %.2f (%d %%)\nDernier geste : %.2f ms,Tool: %s\nSoil: %d %%\nEfficiency: %.2f (%d %%)\nLast stroke: %.2f ms
+item.bucket,Seau,Bucket
+item.test.small_1,Petit objet 1,Small object 1
+item.test.small_2,Petit objet 2,Small object 2
+item.test.small_3,Petit objet 3,Small object 3
+item.test.small_4,Petit objet 4,Small object 4
+item.test.small_5,Petit objet 5,Small object 5
+item.test.small_6,Petit objet 6,Small object 6
+item.test.small_7,Petit objet 7,Small object 7
+item.test.medium_1,Objet moyen,Medium object
+item.test.large_1,Grand objet,Large object
+item.test.furniture_low,Meuble bas,Low furniture
+item.test.furniture_tall,Meuble haut,Tall furniture
+progress.pending,Progression en attente,Progress pending
+progress.room,Pièce,Room
+progress.surfaces,Surfaces nettoyées,Surfaces cleaned
+progress.stored,Objets rangés,Items stored
+progress.restored,Pièce restaurée,Room restored
