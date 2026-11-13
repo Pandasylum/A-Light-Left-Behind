@@ -37,6 +37,12 @@ static func items_under(node: Node) -> Array[TestItem]:
 	return items
 
 
+## Objets de la pièce suivis par le service (lecture seule, portés compris), dans l'ordre de l'arbre.
+func tracked_items() -> Array[TestItem]:
+	var room: Node = get_node_or_null(room_path)
+	return items_under(room) if room != null else []
+
+
 func is_stored(item: TestItem) -> bool:
 	return item != null and _stored.has(item.get_instance_id())
 

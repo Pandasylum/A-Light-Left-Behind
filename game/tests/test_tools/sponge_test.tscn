@@ -9,6 +9,16 @@
 [ext_resource type="Script" path="res://core/autosave.gd" id="7_autosave"]
 [ext_resource type="PackedScene" path="res://ui/menu/pause_menu.tscn" id="8_pause"]
 [ext_resource type="Script" path="res://systems/layout/room_layout.gd" id="9_layout"]
+[ext_resource type="Script" path="res://systems/storage/storage_service.gd" id="10_storage"]
+[ext_resource type="Script" path="res://systems/progress/room_progress.gd" id="11_progress"]
+[ext_resource type="Script" path="res://data/room_data.gd" id="12_room_data"]
+[ext_resource type="PackedScene" path="res://systems/progress/progress_indicator.tscn" id="13_indicator"]
+
+[sub_resource type="Resource" id="room_data_sponge"]
+script = ExtResource("12_room_data")
+id = &"sponge_test"
+name_key = "room.sponge_test"
+active_axes = Array[int]([0, 2])
 
 [node name="SpongeTest" type="Node3D"]
 script = ExtResource("1_test")
@@ -27,8 +37,20 @@ item_data = ExtResource("6_small")
 script = ExtResource("9_layout")
 player_path = NodePath("../Tour/Player")
 
+[node name="StorageService" type="Node" parent="."]
+script = ExtResource("10_storage")
+
+[node name="RoomProgress" type="Node" parent="."]
+script = ExtResource("11_progress")
+room_data = SubResource("room_data_sponge")
+storage_path = NodePath("../StorageService")
+
 [node name="Autosave" type="Node" parent="."]
 script = ExtResource("7_autosave")
 layout_path = NodePath("../Disposition")
+progress_path = NodePath("../RoomProgress")
+
+[node name="ProgressIndicator" parent="." instance=ExtResource("13_indicator")]
+progress_path = NodePath("../RoomProgress")
 
 [node name="PauseMenu" parent="." instance=ExtResource("8_pause")]

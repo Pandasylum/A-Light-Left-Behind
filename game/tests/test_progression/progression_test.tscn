@@ -1,0 +1,163 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/test_progression/progression_test.gd" id="1_scene"]
+[ext_resource type="PackedScene" path="res://tests/test_cleaning/cleaning_spike.tscn" id="2_spike"]
+[ext_resource type="PackedScene" path="res://props/test_item.tscn" id="3_item"]
+[ext_resource type="PackedScene" path="res://props/bucket.tscn" id="4_bucket"]
+[ext_resource type="Resource" path="res://data/tools/sponge.tres" id="5_sponge"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="6_item_data"]
+[ext_resource type="Script" path="res://data/zone_data.gd" id="7_zone_data"]
+[ext_resource type="Script" path="res://data/room_data.gd" id="8_room_data"]
+[ext_resource type="Script" path="res://systems/placement/placement_surface.gd" id="9_surface"]
+[ext_resource type="Script" path="res://systems/storage/storage_zone.gd" id="10_zone"]
+[ext_resource type="Script" path="res://systems/storage/storage_service.gd" id="11_storage"]
+[ext_resource type="Script" path="res://systems/progress/room_progress.gd" id="12_progress"]
+[ext_resource type="Script" path="res://systems/layout/room_layout.gd" id="13_layout"]
+[ext_resource type="Script" path="res://core/autosave.gd" id="14_autosave"]
+[ext_resource type="PackedScene" path="res://systems/progress/progress_indicator.tscn" id="15_indicator"]
+
+[sub_resource type="Resource" id="room_data_test"]
+script = ExtResource("8_room_data")
+id = &"progression_test"
+name_key = "room.progression_test"
+active_axes = Array[int]([0, 2])
+
+[sub_resource type="Resource" id="item_a"]
+script = ExtResource("6_item_data")
+id = &"progression_item_a"
+category = 0
+footprint = Vector2(0.3, 0.3)
+height = 0.3
+tracks_storing = true
+
+[sub_resource type="Resource" id="item_b"]
+script = ExtResource("6_item_data")
+id = &"progression_item_b"
+category = 0
+footprint = Vector2(0.3, 0.3)
+height = 0.3
+tracks_storing = true
+
+[sub_resource type="Resource" id="item_c"]
+script = ExtResource("6_item_data")
+id = &"progression_item_c"
+category = 0
+footprint = Vector2(0.3, 0.3)
+height = 0.3
+tracks_storing = true
+
+[sub_resource type="Resource" id="zone_data"]
+script = ExtResource("7_zone_data")
+id = &"progression_zone"
+accepted_categories = Array[int]([0, 1, 2])
+
+[sub_resource type="BoxShape3D" id="shape_shelf"]
+size = Vector3(1.2, 0.5, 0.8)
+
+[sub_resource type="BoxMesh" id="mesh_shelf"]
+size = Vector3(1.2, 0.5, 0.8)
+
+[sub_resource type="BoxShape3D" id="shape_zone"]
+size = Vector3(1.2, 0.8, 0.8)
+
+[node name="ProgressionTest" type="Node3D"]
+script = ExtResource("1_scene")
+tool = ExtResource("5_sponge")
+
+[node name="Spike" parent="." instance=ExtResource("2_spike")]
+sectors = 0
+wall_rings = 0
+core_rings = 0
+steps = 2
+build_surfaces = true
+prewarm_radius = 0.0
+
+[node name="Shelves" type="Node3D" parent="."]
+
+[node name="ShelfA" type="StaticBody3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.25, -1.2)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shelves/ShelfA"]
+shape = SubResource("shape_shelf")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Shelves/ShelfA"]
+mesh = SubResource("mesh_shelf")
+
+[node name="PlacementSurface" type="Node3D" parent="Shelves/ShelfA"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+script = ExtResource("9_surface")
+size = Vector2(1.2, 0.8)
+is_floor = false
+
+[node name="ShelfB" type="StaticBody3D" parent="Shelves"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.25, 1.2)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shelves/ShelfB"]
+shape = SubResource("shape_shelf")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Shelves/ShelfB"]
+mesh = SubResource("mesh_shelf")
+
+[node name="PlacementSurface" type="Node3D" parent="Shelves/ShelfB"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+script = ExtResource("9_surface")
+size = Vector2(1.2, 0.8)
+is_floor = false
+
+[node name="Zones" type="Node3D" parent="."]
+
+[node name="ZoneA" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.5, -1.2)
+script = ExtResource("10_zone")
+zone_data = SubResource("zone_data")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneA"]
+shape = SubResource("shape_zone")
+
+[node name="ZoneB" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.5, 1.2)
+script = ExtResource("10_zone")
+zone_data = SubResource("zone_data")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneB"]
+shape = SubResource("shape_zone")
+
+[node name="ItemA" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, -0.4)
+item_data = SubResource("item_a")
+
+[node name="ItemB" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 0.0)
+item_data = SubResource("item_b")
+
+[node name="ItemC" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 0.4)
+item_data = SubResource("item_c")
+
+[node name="Bucket" parent="." instance=ExtResource("4_bucket")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.5, 0.0)
+
+[node name="Disposition" type="Node" parent="."]
+script = ExtResource("13_layout")
+player_path = NodePath("../Spike/Player")
+
+[node name="StorageService" type="Node" parent="."]
+script = ExtResource("11_storage")
+
+[node name="RoomProgress" type="Node" parent="."]
+script = ExtResource("12_progress")
+room_data = SubResource("room_data_test")
+storage_path = NodePath("../StorageService")
+
+[node name="Autosave" type="Node" parent="."]
+script = ExtResource("14_autosave")
+handle_quit = false
+layout_path = NodePath("../Disposition")
+progress_path = NodePath("../RoomProgress")
+
+[node name="ProgressIndicator" parent="." instance=ExtResource("15_indicator")]
+progress_path = NodePath("../RoomProgress")
