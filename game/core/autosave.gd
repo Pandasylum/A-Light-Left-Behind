@@ -3,12 +3,15 @@ extends Node
 ## Sauvegarde automatique sur événements (décision de Direction du 12/11/2026) : un seul emplacement,
 ## aucun intervalle fixe, aucune sauvegarde manuelle. Déclencheurs : outil rangé
 ## (ToolController.tool_stowed), fin d'une surface à nettoyer (CleaningSurface.surface_finished),
-## fermeture du jeu, request_save() pour les déclencheurs à venir.
+## dépôt validé d'un objet (RoomLayout.item_deposited, chute comprise), fermeture du jeu,
+## request_save() pour les déclencheurs à venir.
 ## Un déclencheur reçu pendant une action d'outil attend sa fin. L'export des faces est étalé sur
 ## plusieurs images (budget export_budget_usec, liste de faces figée au départ) : l'encodage zstd +
 ## base64 des 188 faces du tour coûte 12 à 16 ms d'un bloc sur le fil principal, 0,6 ms au pire par
 ## face. Un déclencheur reçu avant la fin de l'export le reprend du début : une seule écriture, aucun
 ## état perdu. Écriture par SaveService.save_slot_threaded ; résultat relayé par save_completed.
+## Avec un RoomLayout branché, la disposition des objets est figée en une seule image au début de
+## l'export (de nouveau s'il est repris du début) et écrite dans la section « disposition ».
 
 ## Fin de l'écriture de l'emplacement (SaveError du SaveService), émis sur le fil principal.
 signal save_completed(error: int)
@@ -26,10 +29,13 @@ enum Phase { IDLE, WAITING, EXPORTING }
 @export var export_budget_usec: int = 2000
 ## Intercepte la fermeture de la fenêtre pour sauvegarder avant de quitter.
 @export var handle_quit: bool = true
+## Disposition de la pièce (nœud RoomLayout), branchée par setup(). Vide : aucune section « disposition ».
+@export var layout_path: NodePath
 
 var room_root: Node
 var tools: ToolController
 var service: Node
+var layout: RoomLayout ## facultatif (watch_layout) : sans lui, les données écrites sont inchangées
 var slot_id: String = SLOT_ID
 var last_error: int = OK_RESULT ## résultat de la dernière écriture (WRITE_PENDING tant qu'elle est en file)
 
@@ -45,6 +51,8 @@ var _faces: Array = [] # liste figée au début de l'export (non typée : une fa
 var _index: int = 0
 var _entries: Dictionary = {}
 var _stale: bool = false # une action d'outil a eu lieu depuis le début de l'export en cours
+var _layout_section: Dictionary = {} # disposition figée au début de l'export
+var _layout_frozen: bool = false
 
 
 func _ready() -> void:
@@ -83,6 +91,8 @@ func setup(room: Node, tool_controller: ToolController, save_service: Node = nul
 	if room != null:
 		for surface: CleaningSurface in CleaningSurface.room_surfaces(room):
 			watch_surface(surface)
+	if layout == null and not layout_path.is_empty():
+		watch_layout(get_node_or_null(layout_path) as RoomLayout)
 
 
 ## Relie la fin d'une surface à nettoyer à request_save() (idempotent). setup() l'applique à toutes
@@ -90,6 +100,14 @@ func setup(room: Node, tool_controller: ToolController, save_service: Node = nul
 func watch_surface(surface: CleaningSurface) -> void:
 	if not surface.surface_finished.is_connected(_on_surface_finished):
 		surface.surface_finished.connect(_on_surface_finished)
+
+
+## Branche la disposition de la pièce (idempotent) : son dépôt validé devient un déclencheur et sa
+## section est écrite à chaque sauvegarde.
+func watch_layout(room_layout: RoomLayout) -> void:
+	layout = room_layout
+	if layout != null and not layout.item_deposited.is_connected(_on_item_deposited):
+		layout.item_deposited.connect(_on_item_deposited)
 
 
 func is_configured() -> bool:
@@ -109,6 +127,8 @@ func request_save() -> void:
 	triggers_received += 1
 	_faces.clear()
 	_entries = {}
+	_layout_section = {}
+	_layout_frozen = false
 	_phase = Phase.WAITING
 	set_process(true)
 
@@ -125,6 +145,8 @@ func save_and_wait() -> int:
 	# Export en cours repris tel quel, sauf si une action d'outil a pu modifier une face déjà exportée.
 	if _phase != Phase.EXPORTING or _stale:
 		_begin_export()
+	else:
+		_freeze_layout() # export repris tel quel : la disposition écrite est celle de la sortie
 	_export_slice(-1)
 	var queued: int = _write()
 	if queued != OK_RESULT:
@@ -162,6 +184,13 @@ func _begin_export() -> void:
 	_stale = false
 	export_frames = 0
 	_phase = Phase.EXPORTING
+	_freeze_layout()
+
+
+## Fige la disposition de la pièce en une seule image (instantané cohérent malgré l'export étalé).
+func _freeze_layout() -> void:
+	_layout_frozen = is_instance_valid(layout)
+	_layout_section = layout.export_state() if _layout_frozen else {}
 
 
 ## Exporte les faces suivantes de la liste figée jusqu'à épuiser le budget (< 0 : sans limite).
@@ -191,6 +220,8 @@ func _is_exportable(item: Variant) -> bool:
 ## Met l'écriture en file (faces exportées + outils, état des outils lu à cet instant).
 func _write() -> int:
 	var data: Dictionary = {CLEANING_KEY: _entries, ToolSlots.SAVE_KEY: tools.export_tools()}
+	if _layout_frozen:
+		data[LayoutState.SAVE_KEY] = _layout_section
 	_reset()
 	writes_requested += 1
 	last_error = WRITE_PENDING
@@ -206,10 +237,16 @@ func _reset() -> void:
 	_entries = {}
 	_index = 0
 	_stale = false
+	_layout_section = {}
+	_layout_frozen = false
 	set_process(false)
 
 
 func _on_surface_finished(_surface: CleaningSurface) -> void:
+	request_save()
+
+
+func _on_item_deposited(_item: TestItem) -> void:
 	request_save()
 
 

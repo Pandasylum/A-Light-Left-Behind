@@ -62,7 +62,9 @@ func evaluate(item: TestItem) -> bool:
 
 
 ## Chargement : suit chaque objet de la pièce, retrouve la surface porteuse de ceux qui sont déjà
-## posés (aucune n'est mémorisée dans la scène), puis évalue.
+## posés (aucune n'est mémorisée dans la scène), puis évalue. Un objet dont la place vient de la
+## sauvegarde (TestItem.placement_restored, restauré avant cette évaluation) garde son support
+## sauvegardé : aucun rayon vertical pour lui.
 func _evaluate_room() -> void:
 	var room: Node = get_node_or_null(room_path)
 	if room == null:
@@ -70,7 +72,7 @@ func _evaluate_room() -> void:
 		return
 	for item: TestItem in items_under(room):
 		watch_item(item)
-		if item.support_surface == null and item.item_data != null:
+		if item.support_surface == null and item.item_data != null and not item.placement_restored:
 			_find_support(item)
 		evaluate(item)
 

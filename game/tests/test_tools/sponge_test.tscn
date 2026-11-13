@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://data/items/test_small_1.tres" id="6_small"]
 [ext_resource type="Script" path="res://core/autosave.gd" id="7_autosave"]
 [ext_resource type="PackedScene" path="res://ui/menu/pause_menu.tscn" id="8_pause"]
+[ext_resource type="Script" path="res://systems/layout/room_layout.gd" id="9_layout"]
 
 [node name="SpongeTest" type="Node3D"]
 script = ExtResource("1_test")
@@ -22,7 +23,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.75, 0.5, 0.1)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.75, 0.5, 0.6)
 item_data = ExtResource("6_small")
 
+[node name="Disposition" type="Node" parent="."]
+script = ExtResource("9_layout")
+
 [node name="Autosave" type="Node" parent="."]
 script = ExtResource("7_autosave")
+layout_path = NodePath("../Disposition")
 
 [node name="PauseMenu" parent="." instance=ExtResource("8_pause")]
