@@ -143,6 +143,7 @@ Types de saleté et outils :
 - Pondération du pourcentage d'une pièce (décision validée le 2026-11-13, 🟡 provisoire, à réévaluer après essai du vestibule) : le pourcentage combine nettoyage et rangement, avec un poids égal par élément : 1 par surface à nettoyer, 1 par objet suivi pour le rangement. Il n'y a pas de pondération par axe.
   - Exclus du calcul de rangement : les meubles libres (table, palette), dont seule la réparation compte lorsqu'elle est requise ; le seau (outil) ; les découvertes facultatives (voir ci-dessous). La réparation n'est pas comptée en pièce 1.
 - Statut et pourcentage (décision validée le 2026-11-13) : au premier passage à 100 %, le statut « restaurée » est définitif (verrou inchangé, voir §5). Le pourcentage affiché reste calculé en continu : un objet déplacé ou tombé le fait baisser, et il remonte au repose. Il ne se fige pas.
+- 100 % de la lanterne (décision validée le 2026-11-13) : la réparation, l'alimentation et la relance de la lampe font partie du 100 % de la lanterne, comme dernière pièce. Le 100 % de la lanterne se complète donc à la relance de la lampe.
 - Au rechargement, le pourcentage est recalculé depuis la disposition sauvegardée (décision validée le 2026-11-13).
 - Les clés, objets d'histoire et autres découvertes narratives ne sont pas obligatoires pour valider une pièce. Leur suivi est séparé de l'objectif de restauration. Exceptions (décision validée le 2026-11-13) : la clé du tutoriel est obligatoire, car la ceinture qu'elle ouvre est requise pour sortir de la pièce 1 ; la clé de la machinerie est obligatoire pour la séquence de fin (voir « Machinerie »). Aucune autre clé n'est obligatoire.
 - Les pièces déjà restaurées restent accessibles. Le joueur peut y revenir pour modifier leur organisation ou poursuivre l'entretien.
@@ -228,7 +229,7 @@ Types de saleté et outils :
 
 ## 8. Exploration, découvertes et journal ✅
 
-Les découvertes secondaires enrichissent l'univers mais ne bloquent jamais la progression principale.
+Les découvertes secondaires enrichissent l'univers mais ne bloquent jamais la progression principale. La clé de la machinerie n'est pas une découverte secondaire : c'est un jalon de la séquence finale (voir §6 et §11).
 
 Elles peuvent inclure :
 - souvenirs ;
@@ -333,7 +334,13 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 - Aucun contrôle de déplacement ou de regard pendant les cinématiques.
 - Première lecture obligatoire ; après cette première lecture, la cinématique peut être passée avec Échap. Même règle pour toutes les cinématiques.
 - Sous-titres activés par défaut ; HUD masqué.
-- Fin : après avoir rallumé le phare, le protagoniste décide d'y rester comme gardien ; sa pensée fait écho à sa fille.
+- Fin (décision validée le 2026-11-13) :
+  - La première montée à l'échelle déclenche une cinématique, dernière sensation avant l'étape finale.
+  - En haut, la lampe est hors service : il faut la réparer et l'alimenter.
+  - La clé de la machinerie est dans la boîte à outils de l'ancien gardien, dans la lanterne.
+  - Le joueur redescend au N2, ouvre la machinerie, rétablit l'alimentation, puis relance la lampe.
+  - La relance de la lanterne déclenche la fin : le protagoniste décide d'y rester comme gardien ; sa pensée fait écho à sa fille.
+  - Après la cinématique de fin, le joueur peut revenir dans le phare en mode libre (seule la lanterne fonctionne).
 - Après la fin : résumé des pièces terminées, découvertes, succès débloqués et temps total consacré à la restauration.
 - Le résumé reste accessible depuis le menu principal.
 
