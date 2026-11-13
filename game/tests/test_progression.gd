@@ -248,7 +248,7 @@ func _scene_chain() -> void:
 	# Avant la fin du chargement : neutre.
 	_check(not progress.is_evaluated() and progress.percent() == 0 and not progress.is_restored() and not progress.is_complete(),
 			"chargement : RoomProgress neutre avant room_evaluated")
-	_check((indicator.get_node("Panel/Rows/Percent") as Label).text == "progress.pending"
+	_check((indicator.get_node("Panel/Rows/Percent") as Label).text == TranslationServer.translate("progress.pending")
 			and not (indicator.get_node("Panel/Rows/Surfaces") as Label).visible and not (indicator.get_node("Panel/Rows/Items") as Label).visible
 			and not (indicator.get_node("Panel/Rows/Restored") as Label).visible, "chargement : indicateur neutre")
 	await _settle()
@@ -281,15 +281,15 @@ func _scene_chain() -> void:
 	_place(item_b, _shelf(scene, "ShelfA"), 3.6, -1.2)
 	_check(progress.storing_counts() == Vector2i(2, 3) and progress.percent() == 83 and not progress.is_complete() and not progress.is_restored(),
 			"deux objets rangés = 5/6 (83 %), pas de 100 affiché, pas de verrou")
-	_check((indicator.get_node("Panel/Rows/Percent") as Label).text == "progress.room 83 %" and not (indicator.get_node("Panel/Rows/Restored") as Label).visible,
+	_check((indicator.get_node("Panel/Rows/Percent") as Label).text == TranslationServer.translate("progress.room") + " 83 %" and not (indicator.get_node("Panel/Rows/Restored") as Label).visible,
 			"indicateur : 83 %, pas de marque restaurée")
 	_check(autosave.triggers_received == triggers and locks.is_empty(), "avant le verrou : aucune demande de sauvegarde")
 	_place(item_c, _shelf(scene, "ShelfB"), 3.4, 1.2)
 	_check(progress.percent() == 100 and progress.is_complete() and progress.is_restored() and locks == [ROOM_ID],
 			"tout fait = 100 %, complet, verrou posé (un signal lock_posed)")
 	_check(autosave.triggers_received == triggers + 1, "verrou posé = une demande de sauvegarde")
-	_check((indicator.get_node("Panel/Rows/Percent") as Label).text == "progress.room 100 %" and (indicator.get_node("Panel/Rows/Restored") as Label).visible
-			and (indicator.get_node("Panel/Rows/Restored") as Label).text == "progress.restored", "indicateur : 100 % et marque restaurée")
+	_check((indicator.get_node("Panel/Rows/Percent") as Label).text == TranslationServer.translate("progress.room") + " 100 %" and (indicator.get_node("Panel/Rows/Restored") as Label).visible
+			and (indicator.get_node("Panel/Rows/Restored") as Label).text == TranslationServer.translate("progress.restored"), "indicateur : 100 % et marque restaurée")
 	_drain(autosave)
 	_service.call(&"flush")
 	var saved: Dictionary = _saved()
@@ -303,7 +303,7 @@ func _scene_chain() -> void:
 	_place(item_c, _floor(scene), 1.9, 0.4)
 	_check(progress.percent() == 83 and not progress.is_complete() and progress.is_restored() and locks.size() == 1,
 			"objet déplacé après validation : 83 %, verrou conservé")
-	_check((indicator.get_node("Panel/Rows/Percent") as Label).text == "progress.room 83 %" and (indicator.get_node("Panel/Rows/Restored") as Label).visible,
+	_check((indicator.get_node("Panel/Rows/Percent") as Label).text == TranslationServer.translate("progress.room") + " 83 %" and (indicator.get_node("Panel/Rows/Restored") as Label).visible,
 			"indicateur : 83 %, marque restaurée conservée")
 	_place(item_c, _shelf(scene, "ShelfB"), 3.4, 1.2)
 	_check(progress.percent() == 100 and locks.size() == 1 and autosave.triggers_received == triggers,
@@ -375,23 +375,23 @@ func _scene_signals_and_indicator() -> void:
 	var surfaces: Label = indicator.get_node("Panel/Rows/Surfaces")
 	var items: Label = indicator.get_node("Panel/Rows/Items")
 	var percent: Label = indicator.get_node("Panel/Rows/Percent")
-	_check(surfaces.visible and items.visible and surfaces.text == "progress.surfaces 0/3" and items.text == "progress.stored 0/3",
+	_check(surfaces.visible and items.visible and surfaces.text == TranslationServer.translate("progress.surfaces") + " 0/3" and items.text == TranslationServer.translate("progress.stored") + " 0/3",
 			"indicateur : « surfaces a/b » et « objets rangés c/d » au départ")
 	scene.call(&"finish_next_surface")
 	_put(scene.get_node("ItemA"), _shelf(scene, "ShelfA"), 3.2, -1.2)
-	_check(surfaces.text == "progress.surfaces 1/3" and items.text == "progress.stored 1/3" and percent.text == "progress.room 33 %",
+	_check(surfaces.text == TranslationServer.translate("progress.surfaces") + " 1/3" and items.text == TranslationServer.translate("progress.stored") + " 1/3" and percent.text == TranslationServer.translate("progress.room") + " 33 %",
 			"indicateur : reflète les compteurs (1/3, 1/3, 33 %)")
 	_check(not (indicator.get_node("Panel/Rows/Restored") as Label).visible, "indicateur : pas de marque restaurée sans verrou")
 	# Indicateur détaché : neutre.
 	indicator.bind(null)
-	_check(percent.text == "progress.pending" and not surfaces.visible, "indicateur : sans progression = neutre")
+	_check(percent.text == TranslationServer.translate("progress.pending") and not surfaces.visible, "indicateur : sans progression = neutre")
 	indicator.bind(progress)
-	_check(percent.text == "progress.room 33 %" and surfaces.visible, "indicateur : relié de nouveau")
+	_check(percent.text == TranslationServer.translate("progress.room") + " 33 %" and surfaces.visible, "indicateur : relié de nouveau")
 	# Axe inactif : ligne masquée.
 	var cleaning_only: Array[RoomData.Axis] = [CLEANING]
 	progress.room_data.active_axes = cleaning_only
 	progress.refresh()
-	_check(surfaces.visible and not items.visible and percent.text == "progress.room 33 %", "indicateur : axe rangement inactif = ligne masquée (surfaces 1/3)")
+	_check(surfaces.visible and not items.visible and percent.text == TranslationServer.translate("progress.room") + " 33 %", "indicateur : axe rangement inactif = ligne masquée (surfaces 1/3)")
 	await _close(scene)
 
 
@@ -437,7 +437,7 @@ func _scene_save_load() -> void:
 			"retour : pourcentage (83 %%) et verrou identiques (%d %%, %s)" % [progress_b.percent(), str(progress_b.storing_counts())])
 	_check(autosave_b.triggers_received == 0 and not autosave_b.is_busy() and locks_b.is_empty(), "retour : aucune demande de sauvegarde au chargement")
 	var indicator_b: ProgressIndicator = scene_b.get_node("ProgressIndicator")
-	_check((indicator_b.get_node("Panel/Rows/Percent") as Label).text == "progress.room 83 %" and (indicator_b.get_node("Panel/Rows/Restored") as Label).visible,
+	_check((indicator_b.get_node("Panel/Rows/Percent") as Label).text == TranslationServer.translate("progress.room") + " 83 %" and (indicator_b.get_node("Panel/Rows/Restored") as Label).visible,
 			"retour : indicateur à jour (83 %, restaurée)")
 	_place(scene_b.get_node("ItemC"), _shelf(scene_b, "ShelfB"), 3.4, 1.2)
 	_check(progress_b.percent() == 100 and locks_b.is_empty() and autosave_b.triggers_received == 0, "retour : verrou déjà posé, jamais reposé")

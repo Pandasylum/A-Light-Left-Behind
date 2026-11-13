@@ -54,7 +54,7 @@ func _flow() -> void:
 	carry.pick_up(medium.get_node("Interactable"))
 	_check(carry.held_body() == medium and carry.inventory.belt_ref(0) == small_a and not small_a.visible,
 			"MEDIUM en main, SMALL rangé à la ceinture")
-	_check(panel.held_text() == medium.item_data.name_key and panel.row_texts()[1].contains(small_a.item_data.name_key),
+	_check(panel.held_text() == TranslationServer.translate(medium.item_data.name_key) and panel.row_texts()[1].contains(TranslationServer.translate(small_a.item_data.name_key)),
 			"panneau à jour (main et ceinture)")
 	# 3. Tourner, 4. poser le MEDIUM sur la table.
 	_aim_at(player, standing, table_center)
@@ -94,7 +94,7 @@ func _flow() -> void:
 	_check(placement._verdict == PlacementController.Verdict.UNSTABLE, "bord de la table : pose instable (verdict %d)" % placement._verdict)
 	placement.place_held()
 	var msg: Label = player.prompt.get_node("Message")
-	_check(carry.held_body() == null and small_b.get_parent() == placed_root and msg.text == "place.fell",
+	_check(carry.held_body() == null and small_b.get_parent() == placed_root and msg.text == TranslationServer.translate("place.fell"),
 			"l'objet est tombé (%s)" % msg.text)
 	_check(small_b.support_surface != null and small_b.global_position.y < table.top_y(), "objet tombé sous le plateau")
 	await physics_frame
