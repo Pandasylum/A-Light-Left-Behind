@@ -9,4 +9,4 @@ menu.back,Retour,Back
 menu.confirm,Confirmer,Confirm
 menu.cancel,Annuler,Cancel
 menu.save_damaged,Sauvegarde endommagée,Damaged save
-menu.new_game_confirm_damaged,La sauvegarde est endommagée. Une nouvelle partie l'écrasera. Continuer ?,The save is damaged. A new game will overwrite it. Continue?
+menu.new_game_confirm_damaged,La sauvegarde est endommagée. Elle sera conservée à part et une nouvelle partie commencera. Continuer ?,The save is damaged. It will be kept separately and a new game will start. Continue?
