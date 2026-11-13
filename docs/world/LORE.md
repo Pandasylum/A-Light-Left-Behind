@@ -99,8 +99,8 @@ Ils n'ont pas besoin d'explication spectaculaire.
 - Rez-de-chaussée ✅ : vestibule (pièce 1, tutoriel : clé, vieux coffre en bois fermé à clé près de la sortie avec la ceinture dedans, premiers indices sur l'ancien gardien) → atelier → hub ; cuisine et salon autour du hub (salon : canapé, bibliothèque, cheminée, objets personnels).
 - Hub = tour ✅ : elle longe tout le bâtiment et sert de passage commun entre toutes les pièces (N0 à N2). Elle abrite le tableau électrique (électricité générale du phare) et le fût (escalier). Le passage est un support possible de narration environnementale.
 - Premier étage (N1) ✅ : chambre + bureau, une seule grande pièce (lit du gardien ; le bureau est l'ancien espace personnel du gardien).
-- Deuxième étage (N2) ✅ : archives (pièce principale : documents, cartes, registres, souvenirs, meuble à tiroirs) et machinerie (petite pièce, hors des 7 pièces principales, « zone de la lampe » avec la lanterne). La machinerie alimente la lampe uniquement. Elle est fermée à clé et s'ouvre avec la clé trouvée dans la lanterne.
-- Sommet (N3) ✅ : salle de la lanterne (mécanisme optique, lampe). Elle est atteinte par une échelle, avec une cinématique à la première montée. À l'arrivée, la lampe est hors service. La boîte à outils de l'ancien gardien s'y trouve et contient la clé de la machinerie (contenu détaillé 💡 à définir). Séquence validée : réparer la lampe, récupérer la clé, redescendre à la machinerie, rétablir l'alimentation de la lampe : c'est la dernière étape avant la fin.
+- Deuxième étage (N2) ✅ : archives (pièce principale : documents, cartes, registres, souvenirs, meuble à tiroirs) et machinerie (petite pièce, hors des 7 pièces principales, « zone de la lampe » avec la lanterne). La machinerie alimente la lampe uniquement. Elle est fermée à clé et exclue du compteur « le reste ». Toutes ses réparations sont obligatoires pour rétablir le courant de la lampe : son contenu lié aux réparations est vu par tous. Ses notes et découvertes (notes de l'ancien gardien, etc.) restent facultatives.
+- Sommet (N3) ✅ : salle de la lanterne (mécanisme optique, lampe), atteinte par une échelle avec une cinématique à la première montée. À l'arrivée, la lampe est hors service. La boîte à outils de l'ancien gardien s'y trouve, à emplacement fixe et visible, accessible sans courant ; elle contient la clé de la machinerie (jalon de la séquence finale, pas une clé cachée ; contenu détaillé 💡 à définir). Séquence validée : réparer la lampe, récupérer la clé, redescendre à la machinerie, réparer et rétablir l'alimentation, relancer la lampe : la relance déclenche la fin. À la fin, toutes les pièces sont à 100 % (seules les découvertes facultatives peuvent rester incomplètes) ; le joueur reste libre de parcourir le phare, lumière allumée visible.
 - Pièces principales ✅ (7) : hub, atelier, cuisine, salon, chambre + bureau, archives, lanterne.
 - Réparations signatures pouvant toucher le lore : tableau électrique, évier et robinetterie, cheminée, établi, lit du gardien, meuble à tiroirs, mécanisme et lampe.
 - Hors lore pour l'instant : sous-sol, chaufferie, tunnel, cabanon (extension éventuelle).
@@ -121,7 +121,8 @@ Ils n'ont pas besoin d'explication spectaculaire.
 - Aucun écho de la légende dans les objets. Seule exception : sa note de doute, facultative.
 - Les objets racontent ce que les documents ne disent pas. Pas de longues explications.
 - Objets et matériaux cohérents avec les années 1950-60 (pas de téléphone, papier, registres, carnets).
-- Quelques déclencheurs de pensées sur la fille doivent se trouver sur le parcours **obligatoire** (vestibule, salle de la lanterne). Les découvertes facultatives ne dépendent pas les unes des autres.
+- Quelques déclencheurs de pensées sur la fille doivent se trouver sur le parcours **obligatoire** (vestibule, passage commun, machinerie, salle de la lanterne). Les découvertes facultatives ne dépendent pas les unes des autres.
+- Exceptions au caractère facultatif des clés (GDD §6) : la clé du tutoriel et la clé de la machinerie. Le contenu narratif lié aux réparations de la machinerie et à la boîte à outils est vu par tous : il doit rester sobre, sans révélation. Seules les notes et découvertes restent facultatives.
 - Peu de contenu, bien choisi : chaque objet doit être réalisable avec des ressources existantes ou assistées par IA (décision d'Art).
 
 ---
@@ -136,4 +137,3 @@ Ils n'ont pas besoin d'explication spectaculaire.
 6. Fréquence des pensées sur la fille ; type d'objet précis ; déclencheurs sur le parcours obligatoire.
 7. État final de la fille.
 8. Documents, objets et indices par pièce ; annotations du journal ; réactions du nouveau gardien ; cinématiques d'arrivée et de fin.
-9. La clé de la machinerie, trouvée dans la lanterne, est obligatoire pour finir le jeu : cela contredit l'exception unique du GDD §6 (seule la clé du tutoriel est obligatoire). À trancher par Direction.
