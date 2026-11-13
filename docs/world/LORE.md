@@ -96,10 +96,12 @@ Ils n'ont pas besoin d'explication spectaculaire.
 ## 9. Pièces (supports narratifs ; contenu précis non défini)
 
 - Vestibule d'entrée (pièce 1, tutoriel) : clé, vieux coffre en bois fermé à clé près de la sortie (ceinture dedans), premiers indices sur l'ancien gardien.
-- Rez-de-chaussée : vestibule, atelier, hub, cuisine, salon (canapé, bibliothèque, cheminée, objets personnels). Le hub est la tour : elle longe le bâtiment et sert de passage commun (avec le tableau électrique).
-- Premier étage : chambre + bureau, une seule grande pièce (lit du gardien).
-- Deuxième étage : archives + machinerie (documents, cartes, registres, souvenirs, meuble à tiroirs).
-- Sommet : salle de la lanterne (mécanisme optique, lampe), aboutissement du jeu.
+- Rez-de-chaussée ✅ : vestibule (pièce 1, tutoriel : clé, vieux coffre en bois fermé à clé près de la sortie avec la ceinture dedans, premiers indices sur l'ancien gardien) → atelier → hub ; cuisine et salon autour du hub (salon : canapé, bibliothèque, cheminée, objets personnels).
+- Hub = tour ✅ : elle longe tout le bâtiment et sert de passage commun entre toutes les pièces (N0 à N2). Elle abrite le tableau électrique (électricité générale du phare) et le fût (escalier). Le passage est un support possible de narration environnementale.
+- Premier étage (N1) ✅ : chambre + bureau, une seule grande pièce (lit du gardien ; le bureau est l'ancien espace personnel du gardien).
+- Deuxième étage (N2) ✅ : archives (pièce principale : documents, cartes, registres, souvenirs, meuble à tiroirs) et machinerie (petite pièce, hors des 7 pièces principales, « zone de la lampe » avec la lanterne). La machinerie alimente la lampe uniquement. Elle est fermée à clé et s'ouvre avec la clé trouvée dans la lanterne.
+- Sommet (N3) ✅ : salle de la lanterne (mécanisme optique, lampe). Elle est atteinte par une échelle, avec une cinématique à la première montée. À l'arrivée, la lampe est hors service. La boîte à outils de l'ancien gardien s'y trouve et contient la clé de la machinerie (contenu détaillé 💡 à définir). Séquence validée : réparer la lampe, récupérer la clé, redescendre à la machinerie, rétablir l'alimentation de la lampe : c'est la dernière étape avant la fin.
+- Pièces principales ✅ (7) : hub, atelier, cuisine, salon, chambre + bureau, archives, lanterne.
 - Réparations signatures pouvant toucher le lore : tableau électrique, évier et robinetterie, cheminée, établi, lit du gardien, meuble à tiroirs, mécanisme et lampe.
 - Hors lore pour l'instant : sous-sol, chaufferie, tunnel, cabanon (extension éventuelle).
 
@@ -110,7 +112,7 @@ Ils n'ont pas besoin d'explication spectaculaire.
 **Lecture de la chronologie, utile pour dater les indices** (déduite du §2, pas de nouvelle décision) :
 - *Période calme* : quotidien installé, ton posé, entretien, réparations anciennes.
 - *Période des irrégularités* : premières observations, doutes, croquis et mesures de la lumière.
-- *Période de l'intervention* (un à deux mois) : outils sortis, plan à l'atelier, tableau électrique et mécanisme démontés.
+- *Période de l'intervention* (un à deux mois) : outils sortis, plan à l'atelier, mécanisme optique démonté, alimentation de la lampe coupée (machinerie). Le tableau électrique reste le support de l'électricité générale, sans lien avec la coupure de la lampe.
 - *Période d'abandon* (un à deux ans) : poussière, humidité, rouille, rien déplacé.
 
 **À respecter**
@@ -134,3 +136,4 @@ Ils n'ont pas besoin d'explication spectaculaire.
 6. Fréquence des pensées sur la fille ; type d'objet précis ; déclencheurs sur le parcours obligatoire.
 7. État final de la fille.
 8. Documents, objets et indices par pièce ; annotations du journal ; réactions du nouveau gardien ; cinématiques d'arrivée et de fin.
+9. La clé de la machinerie, trouvée dans la lanterne, est obligatoire pour finir le jeu : cela contredit l'exception unique du GDD §6 (seule la clé du tutoriel est obligatoire). À trancher par Direction.
