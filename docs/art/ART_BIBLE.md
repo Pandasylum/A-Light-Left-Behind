@@ -56,7 +56,7 @@ Statut : seul le principe général est validé. Le reste est une proposition �
 La liste et les noms des pièces relèvent du GDD (§6, graphe non figé). Ici, seulement des familles de matériaux.
 - Hall central : pierre, bois, métal, ambiance froide.
 - Cuisine : carrelage, surfaces lavables, faïence.
-- Salle de vie : bois, textiles, mobilier ancien.
+- Salon : bois, textiles, mobilier ancien.
 - Atelier : bois brut, métal, outils, étagères.
 - Chambre : bois sombre, tissus, effets personnels.
 - Archives : bois, papier jauni, étagères, poussière.
