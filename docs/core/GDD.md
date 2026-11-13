@@ -15,6 +15,8 @@ Le GDD décrit le jeu voulu. Les choix techniques détaillés et l'ordre de réa
 
 Le joueur incarne le nouveau gardien du phare. Le départ du précédent gardien est mystérieux ; le joueur en découvre progressivement les raisons à travers les lieux, les objets et les traces laissées derrière lui.
 
+**Cadre narratif (décision validée le 2026-11-13).** Le nouveau gardien a accepté une mission de gardiennage. Il ignorait l'état réel du phare et les circonstances du départ de son prédécesseur. Le phare est officiellement censé être en activité ; en réalité sa lampe est hors service et le bâtiment est abandonné. Ces informations lui ont été cachées avant son arrivée. À son arrivée, le mauvais temps rend tout départ impossible : il doit rester et s'occuper du phare. Sa fille (malade, voir §6 pièce 1) n'apparaît jamais physiquement et n'intervient pas régulièrement par téléphone ou par message : elle existe dans ses pensées. Les circonstances du départ de l'ancien gardien (mort, départ volontaire, fuite, découverte, explication surnaturelle), la cause de la panne de la lampe, la légende du passeur et la chronologie ne sont pas décidées. L'incertitude est préservée ; aucune de ces pistes n'est confirmée.
+
 L'expérience recherchée est calme, immersive, mélancolique et satisfaisante. Le plaisir vient autant de la transformation visible des espaces que de la découverte de leur histoire.
 
 - Plateforme visée : PC uniquement.
@@ -364,6 +366,7 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 - Coffre en bois de la pièce 1 utilisable ensuite comme rangement.
 - Catégorie « objets d'histoire » (clés, documents, souvenirs) hors des règles de rangement, avec un journal ou un inventaire.
 - Mobilité réduite en portant un gros objet.
+- Aucun élément de lore n'est rattaché pour l'instant au sous-sol, à la chaufferie ni au tunnel (décision du 2026-11-13).
 
 ## 15. Points à préciser pendant le prototypage 🟡
 
@@ -428,6 +431,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
     - Fin de surface (décision validée le 2026-11-12 ; 🟡 seuils provisoires) : l'aire sale restante passe sous min(~0,5 m², 10 % de l'aire géométrique de la surface), après avoir été au-dessus. Une surface propre ou déjà sous le seuil au départ est terminée d'office : elle compte dans le 100 % de la pièce, sans retour visuel ni sonore ni autosave.
     - Remarque : avec un maximum de 4 m², 10 % de l'aire reste toujours inférieur à 0,5 m² ; le seuil effectif est donc 10 % de l'aire géométrique de la surface. La formule min(~0,5 m², 10 %) reste inchangée, car elle redevient utile si le maximum augmente.
     - Les modules techniques de 15° ne sont pas des surfaces. Rappel : à ne pas confondre avec les surfaces de pose du rangement (§5).
+31. Lore à écrire par le projet World & Content, à valider avant intégration : légende du passeur, personnalité et chronologie de l'ancien gardien, circonstances de l'abandon, cause de la panne de la lampe, contenu narratif de chaque pièce, textes du journal, sens exact de la décision finale du gardien.
 
 ---
 
