@@ -16,7 +16,7 @@ Le plan est organisé par dépendances et livrables. Les durées ne sont pas est
 - Jeu solo à la première personne, PC uniquement.
 - Déplacement, interaction, nettoyage, réparation, manipulation et rangement.
 - Progression guidée avec embranchements, validation de restauration à 100 % et découvertes facultatives séparées.
-- Jeu de 8 zones jouables : vestibule + 7 pièces principales (hub, cuisine, salle de vie, atelier, chambre, archives, lanterne), produites par étapes.
+- Jeu de 8 zones jouables : vestibule + 7 pièces principales (hub, cuisine, salon, atelier, chambre, archives, lanterne), produites par étapes.
 - Quatre outils de nettoyage (éponge, raclette, serpillière, seau) au vestibule ; réparation (marteau, outil multifonction) et trousse à outils à l'atelier, collé au hub et ouvert, qui fait partie du noyau de départ avec le vestibule ; améliorations = items trouvés dans les pièces suivantes et utilisés à l'atelier.
 - Journal, documents, notes et pensées orales du nouveau gardien.
 - Sauvegarde locale, menus, cinématiques, audio, sous-titres français et retours joueur.

@@ -83,7 +83,7 @@ Aucun son n'est encore produit : tout est « À produire » sauf mention.
 | MEC-01 | Générateur de secours : démarrage, marche | | À produire | | | Atelier. |
 | MEC-02 | Interrupteur / électricité | 🟡 2 | À produire | | | |
 | MEC-03 | Eau : robinet, tuyauterie | | À produire | | | Cuisine. |
-| MEC-04 | Cheminée / feu | Oui | À produire | | | Salle de vie ; contribue à la chaleur intérieure. |
+| MEC-04 | Cheminée / feu | Oui | À produire | | | Salon ; contribue à la chaleur intérieure. |
 | MEC-05 | Engrenages, leviers | | Bloqué | | | Mécanisme de la lanterne non défini. |
 | MEC-06 | Lanterne : rotation, allumage | | Bloqué | | | Moment final ; sera produit en dernier. |
 
