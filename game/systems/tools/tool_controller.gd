@@ -231,8 +231,8 @@ func import_tools(section: Dictionary, catalog: Array[ToolData]) -> bool:
 ## aucun n'est en main ; "" sans emplacement.
 func debug_text() -> String:
 	if state == null:
-		return tr("tool.debug.stowed") if slots.count() > 0 else ""
-	return tr("tool.debug.state") % [
+		return "Outil : rangé" if slots.count() > 0 else ""
+	return "Outil : %s\nSalissure : %d %%\nEfficacité : %.2f (%d %%)\nDernier geste : %.2f ms" % [
 		state.data.id, roundi(state.soil * 100.0), state.effective_efficiency(),
 		roundi(state.efficiency_factor() * 100.0), last_stroke_usec / 1000.0]
 

@@ -68,8 +68,6 @@ place.blocked,L'emplacement est occupé.,The spot is blocked.
 place.fell,L'objet a glissé et est retombé.,The object slipped and fell.
 tool.hand_occupied,Votre main porte déjà un objet.,Your hand is already holding an object.
 tool.sponge,Éponge,Sponge
-tool.debug.stowed,Outil : rangé,Tool: stowed
-tool.debug.state,Outil : %s\nSalissure : %d %%\nEfficacité : %.2f (%d %%)\nDernier geste : %.2f ms,Tool: %s\nSoil: %d %%\nEfficiency: %.2f (%d %%)\nLast stroke: %.2f ms
 item.bucket,Seau,Bucket
 item.test.small_1,Petit objet 1,Small object 1
 item.test.small_2,Petit objet 2,Small object 2
