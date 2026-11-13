@@ -12,6 +12,7 @@ Légende des statuts : ✅ établi (validé) · 🟡 provisoire · 💡 proposit
 - Le bâtiment est le récit. Nettoyer et ranger sont les moyens de le découvrir.
 - **Ton : pas d'horreur. Aucun surnaturel n'est jamais confirmé ; au plus, une ambiguïté légère et sous-entendue, toujours explicable autrement.**
 - Retenue : pas de longues explications, pas de révélations artificielles. Le journal pose parfois plus de questions que de réponses.
+- **La restauration raconte** : bois abîmé → entretenu, métal rouillé → restauré, pierre humide → propre, éclairage froid ou absent → **lumière chaude à l'intérieur**. Le phare commence sombre et s'illumine à mesure de la progression. **L'extérieur reste froid et exposé.**
 
 ## 2. Chronologie approximative ✅
 
