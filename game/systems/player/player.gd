@@ -8,7 +8,7 @@ const STEP_MARGIN: float = 0.005 ## m, marge au-dessus de l'arête franchie
 @export var walk_speed: float = 2.5 ## m/s
 @export var slow_walk_speed: float = 1.2 ## m/s
 @export var slow_walk_toggle: bool = true ## true : walk_slow bascule la marche lente ; false : maintenu
-@export var mouse_sensitivity: float = 0.002 ## rad/pixel
+@export var mouse_sensitivity: float = 0.002 ## rad/pixel, sensibilité de base (multipliée par Settings.look_sensitivity)
 @export var gravity: float = 9.8 ## m/s²
 @export var max_step_height: float = 0.3 ## m, PROVISOIRE ; plus haute marche franchie à pied (0 = désactivé)
 @export var step_smooth_time: float = 0.12 ## s, PROVISOIRE ; durée du lissage de la tête après un step-up (0 = aucun)
@@ -18,12 +18,16 @@ const STEP_MARGIN: float = 0.005 ## m, marge au-dessus de l'arête franchie
 @export var fall_limit_y: float = -10.0 ## m ; sous cette hauteur, retour au départ
 
 @onready var head: Node3D = $Head
+@onready var camera: Camera3D = $Head/Camera3D
 @onready var sensor: InteractionSensor = $Head/InteractionSensor
 @onready var prompt: InteractionPrompt = $InteractionPrompt
 
 ## Caméra figée (lock_camera, bascule) : le regard ne tourne plus, le curseur (masqué) est libre dans la fenêtre.
 var camera_locked: bool = false
 
+var _settings: Node = null ## autoload Settings (null dans un test sans autoloads : réglages d'origine)
+var _sensitivity_factor: float = 1.0 ## réglage Options (Settings.look_sensitivity)
+var _invert_y: bool = false ## réglage Options : axe vertical inversé
 var _skip_motion: bool = false ## ignore le 1er mouvement après le déverrouillage (pas de saut de caméra)
 
 var _start_position: Vector3
@@ -38,6 +42,11 @@ func _ready() -> void:
 	_start_position = global_position
 	_head_rest_y = head.position.y
 	sensor.target_changed.connect(prompt.set_target)
+	# Autoload lu par chemin (pas par identifiant global : les tests en --script compilent ce script avant les autoloads).
+	_settings = get_node_or_null(^"/root/Settings")
+	if _settings != null:
+		_settings.connect(&"changed", _apply_settings)
+	_apply_settings()
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
@@ -165,10 +174,21 @@ func restore_mouse_mode(mode: Input.MouseMode) -> void:
 	Input.mouse_mode = mode
 
 
+## Lit sensibilité, inversion de l'axe vertical et champ de vision dans Settings.
+func _apply_settings() -> void:
+	if _settings == null:
+		return
+	_sensitivity_factor = float(_settings.get(&"look_sensitivity"))
+	_invert_y = bool(_settings.get(&"invert_y"))
+	camera.fov = float(_settings.call(&"camera_vertical_fov"))
+
+
 ## Applique une rotation souris (en pixels) : yaw sur Player, pitch sur Head.
 func look_by(relative: Vector2) -> void:
-	rotate_y(-relative.x * mouse_sensitivity)
-	head.rotation.x = clampf(head.rotation.x - relative.y * mouse_sensitivity, -PITCH_LIMIT, PITCH_LIMIT)
+	var rate: float = mouse_sensitivity * _sensitivity_factor
+	var vertical: float = relative.y if not _invert_y else -relative.y
+	rotate_y(-relative.x * rate)
+	head.rotation.x = clampf(head.rotation.x - vertical * rate, -PITCH_LIMIT, PITCH_LIMIT)
 
 
 ## Vitesse horizontale monde à partir de l'entrée (x = droite, y = arrière) et de l'orientation.
