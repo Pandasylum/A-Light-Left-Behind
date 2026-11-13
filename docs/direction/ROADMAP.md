@@ -74,6 +74,7 @@ Règle : pas de production en série des pièces (phase 7) tant que la vertical 
 - Courant (2026-11-10) : l'atelier se lance avec un générateur de secours ; le personnage indique de chercher l'installation électrique générale en priorité dans le hub, où se trouve le tableau principal et où elle se répare. « Remettre le courant » n'est plus une réparation d'apprentissage de l'atelier.
 - Chaufferie (2026-11-10) : au sous-sol, dans l'extension prévue (trappe vers le tunnel), hors des 7 pièces ; le jeu de base garde le chauffage via la cheminée de la salle de vie et la plomberie de la cuisine.
 - Direction artistique (2026-11-10, principe) : palette commune, variations par pièce, lumière froide puis plus chaude ; détails dans ART_BIBLE.md.
+- Cadre narratif (2026-11-13) : le nouveau gardien ignorait l'état réel du phare (lampe hors service, bâtiment abandonné, informations cachées) et le départ de son prédécesseur ; le mauvais temps l'empêche de repartir ; sa fille n'apparaît jamais et existe dans ses pensées ; départ de l'ancien gardien, panne de la lampe, légende du passeur et chronologie non décidés (incertitude préservée). Aucun lore rattaché au sous-sol, à la chaufferie ni au tunnel. Détails : GDD §1, §14, §15 pt 31.
 
 ## Dépendances à suivre
 
