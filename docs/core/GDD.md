@@ -340,7 +340,7 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
   - La clé de la machinerie est dans la boîte à outils de l'ancien gardien, dans la lanterne.
   - Le joueur redescend au N2, ouvre la machinerie, rétablit l'alimentation, puis relance la lampe.
   - La relance de la lanterne déclenche la fin : le protagoniste décide d'y rester comme gardien ; sa pensée fait écho à sa fille.
-  - Après la cinématique de fin, le joueur reste libre de parcourir et de ranger le phare. La lumière du phare est désormais visible allumée. Toutes les pièces, lanterne et machinerie comprises, sont à 100 % de réparation ; seules les découvertes facultatives peuvent rester incomplètes.
+  - Après la cinématique de fin, le joueur reste libre de parcourir et de ranger le phare. La lumière du phare est désormais visible allumée. Toutes les pièces, lanterne et machinerie comprises, sont à 100 % (tel que défini en §6) ; seules les découvertes facultatives peuvent rester incomplètes.
 - Après la fin : résumé des pièces terminées, découvertes, succès débloqués et temps total consacré à la restauration.
 - Le résumé reste accessible depuis le menu principal.
 
