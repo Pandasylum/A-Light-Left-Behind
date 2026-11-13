@@ -211,3 +211,12 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
+
+## Décisions validées ✅
+
+### 2026-11-13 — Montée de la lanterne : appui long de saut
+- Durée d'appui long : 0,6 s, valeur de données (ressource de réglages), modifiable sans toucher au code.
+- Action dédiée `ladder_skip` dans l'Input Map, liée par défaut à la touche d'interaction, remappable.
+- Anneau de progression pendant l'appui. Si l'appui est relâché avant la fin, l'anneau se vide et la montée continue normalement.
+- Ordre d'exécution : verrou de la trappe, puis règle de la main, puis montée. Si la règle de la main refuse, l'appui long ne démarre pas.
+- Verrous prévus : porte du fût, machinerie, trappe.
