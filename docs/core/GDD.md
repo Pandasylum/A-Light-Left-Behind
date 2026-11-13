@@ -135,8 +135,12 @@ Types de saleté et outils :
 
 - La progression principale suit un ordre défini, avec quelques embranchements.
 - Les pièces se débloquent progressivement ; la campagne reste guidée.
-- Une pièce doit atteindre **100 %** pour valider sa restauration et débloquer la suite prévue. Le 100 % couvre tout ce que la pièce permet de faire avec les mécaniques disponibles à ce stade : la pièce 1 ne compte que le nettoyage et le rangement, sans la réparation ; les pièces suivantes comptent la réparation lorsqu'elle est disponible. La définition technique exacte reste ouverte (§15).
+- Une pièce doit atteindre **100 %** pour valider sa restauration et débloquer la suite prévue. Le 100 % couvre tout ce que la pièce permet de faire avec les mécaniques disponibles à ce stade : la pièce 1 ne compte que le nettoyage et le rangement, sans la réparation ; les pièces suivantes comptent la réparation lorsqu'elle est disponible. La définition du 100 % est précisée ci-dessous.
 - Le seau est un outil exclu du calcul du 100 % d'une pièce (décision validée le 2026-11-11) : il peut rester au sol sans pénalité et n'est jamais « non rangé ».
+- Pondération du pourcentage d'une pièce (décision validée le 2026-11-13, 🟡 provisoire, à réévaluer après essai du vestibule) : le pourcentage combine nettoyage et rangement, avec un poids égal par élément : 1 par surface à nettoyer, 1 par objet suivi pour le rangement. Il n'y a pas de pondération par axe.
+  - Exclus du calcul de rangement : les meubles libres (table, palette), dont seule la réparation compte lorsqu'elle est requise ; le seau (outil) ; les découvertes facultatives (voir ci-dessous). La réparation n'est pas comptée en pièce 1.
+- Statut et pourcentage (décision validée le 2026-11-13) : au premier passage à 100 %, le statut « restaurée » est définitif (verrou inchangé, voir §5). Le pourcentage affiché reste calculé en continu : un objet déplacé ou tombé le fait baisser, et il remonte au repose. Il ne se fige pas.
+- Au rechargement, le pourcentage est recalculé depuis la disposition sauvegardée (décision validée le 2026-11-13).
 - Les clés, objets d'histoire et autres découvertes narratives ne sont pas obligatoires pour valider une pièce. Leur suivi est séparé de l'objectif de restauration. Exception : la clé du tutoriel est obligatoire, car la ceinture qu'elle ouvre est requise pour sortir de la pièce 1.
 - Les pièces déjà restaurées restent accessibles. Le joueur peut y revenir pour modifier leur organisation ou poursuivre l'entretien.
 - Les pièces sont initialement très sales et encombrées.
@@ -365,7 +369,7 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 
 Ces points ne remettent pas en cause les décisions de conception ci-dessus ; ils demandent des choix concrets de production ou des essais :
 
-1. Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.
+1. ~~Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.~~ Pondération et périmètre réglés : voir §6 (décision validée le 2026-11-13, 🟡 provisoire). Reste ouverte : la validation technique robuste, sans faux blocages, à vérifier au prototype.
 2. Graphe des pièces :
    - position du vestibule (pièce 1) par rapport au hub et à l'atelier ;
    - fonctionnement du générateur de secours et emplacement exact du tableau principal dans le hub ;
