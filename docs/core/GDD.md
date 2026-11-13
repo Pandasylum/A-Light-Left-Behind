@@ -306,7 +306,7 @@ Valeurs de départ, à régler après essai.
 - **Affichage** : mode plein écran (fenêtré sans bordure) ou fenêtré ; défaut plein écran. Pas de liste de résolutions : en plein écran, la résolution est celle du bureau ; en fenêtré, la fenêtre est redimensionnable librement et sa taille est mémorisée. Synchronisation verticale : défaut activée. Qualité graphique et luminosité reportées après le vertical slice.
 - **Volumes** : de 0 à 100 %, par pas de 5 ; 0 = muet. Canaux : Général (défaut 80), Musique (70), Ambiances (100), Effets (100). Défauts provisoires.
 - **Touches** : toutes les actions de jeu sont modifiables ; Échap est fixe. Liaison au clavier et aux boutons de la souris, une touche par action ; pas de manette. Si une touche est déjà prise, les deux actions échangent leurs touches (l'autre action reçoit l'ancienne touche). Bouton « Touches par défaut » (rétablit les touches seulement). Touches stockées par position physique.
-- **Autres réglages de jeu** : sensibilité souris de 0,2 à 3,0 (défaut 1,0) ; inversion de l'axe vertical (défaut désactivée) ; champ de vision de 70° à 95° (défaut 80° ; outils en main à tester sur toute la plage) ; langue (voir Langues ci-dessous).
+- **Autres réglages de jeu** : sensibilité souris de 0,2 à 3,0 (défaut 1,0) ; inversion de l'axe vertical (défaut désactivée) ; champ de vision horizontal de 70° à 95° (défaut 80°), exprimé en axe horizontal pour un écran 16:9 de référence (le code le convertit en champ de vision vertical pour Godot) ; plage et défaut sont des valeurs de départ provisoires, à régler après essai ; outils en main à tester sur toute la plage ; langue (voir Langues ci-dessous).
 
 #### Langues (décisions validées le 2026-11-12)
 
