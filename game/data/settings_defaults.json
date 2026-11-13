@@ -1,0 +1,14 @@
+{
+	"fullscreen": true,
+	"vsync": true,
+	"window_size": [1280, 720],
+	"min_window_size": [960, 540],
+	"fallback_language": "en",
+	"volume": {
+		"min": 0,
+		"max": 100,
+		"step": 5,
+		"defaults": { "master": 80, "music": 70, "ambience": 100, "effects": 100 },
+		"buses": { "master": "Master", "music": "Music", "ambience": "Ambience", "effects": "Effects" }
+	}
+}
