@@ -26,10 +26,13 @@ func _ready() -> void:
 	($Tour/Player/ToolController as ToolController).add_tool(tool)
 	# Sauvegarde automatique : pièce = le tour (repère des id de faces), outils = ceux du joueur.
 	($Autosave as Autosave).setup(_tour, $Tour/Player/ToolController as ToolController)
+	# Références prises avant le chargement : un objet restauré en main ou en ceinture change de parent.
+	var bucket: TestItem = $Bucket
+	var item: TestItem = $TestItem
 	_apply_continue()
 	await get_tree().physics_frame
-	_drop_to_floor($Bucket as TestItem)
-	_drop_to_floor($TestItem as TestItem)
+	_drop_to_floor(bucket)
+	_drop_to_floor(item)
 
 
 ## Pose l'objet sur ce qui se trouve sous lui (rayon vertical, couche monde) ; son origine est au
@@ -41,7 +44,7 @@ func _drop_to_floor(item: TestItem) -> void:
 	if hit.is_empty():
 		return
 	if item.placement_restored:
-		return ## place restaurée depuis la sauvegarde : pas de pose initiale
+		return ## place ou portage restauré depuis la sauvegarde : pas de pose initiale
 	item.global_position = (hit["position"] as Vector3) + Vector3.UP * item.item_data.height * 0.5
 	var surface: PlacementSurface = PlacementSurface.of_body(hit["collider"])
 	if surface != null:
@@ -49,7 +52,8 @@ func _drop_to_floor(item: TestItem) -> void:
 
 
 ## « Continuer » (GameFlow.continue_requested) : applique la sauvegarde « partie » à la pièce, aux
-## outils, puis à la disposition des objets (section absente = disposition initiale).
+## outils, puis à la disposition des objets et au portage (section absente = disposition initiale,
+## portage vide). Les outils d'abord : un outil en main est rangé si la main retrouve un objet.
 func _apply_continue() -> void:
 	var data: Dictionary = GameFlow.take_continue_data(get_node_or_null(^"/root/SaveService"))
 	if data.is_empty():

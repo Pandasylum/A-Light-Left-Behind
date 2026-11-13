@@ -10,8 +10,9 @@ extends Node
 ## base64 des 188 faces du tour coûte 12 à 16 ms d'un bloc sur le fil principal, 0,6 ms au pire par
 ## face. Un déclencheur reçu avant la fin de l'export le reprend du début : une seule écriture, aucun
 ## état perdu. Écriture par SaveService.save_slot_threaded ; résultat relayé par save_completed.
-## Avec un RoomLayout branché, la disposition des objets est figée en une seule image au début de
-## l'export (de nouveau s'il est repris du début) et écrite dans la section « disposition ».
+## Avec un RoomLayout branché, la disposition des objets et le portage du joueur sont figés en une
+## seule image au début de l'export (de nouveau s'il est repris du début) et écrits dans la section
+## « disposition ».
 
 ## Fin de l'écriture de l'emplacement (SaveError du SaveService), émis sur le fil principal.
 signal save_completed(error: int)
@@ -123,7 +124,11 @@ func is_busy() -> bool:
 ## la fin de l'action d'outil en cours. Les déclencheurs reçus d'ici la fin de l'export sont
 ## fusionnés en une seule écriture ; un export déjà commencé est repris du début (l'état postérieur
 ## au premier déclencheur n'est jamais perdu).
+## Ignoré pendant la restauration de la disposition (RoomLayout.restoring) : comme pour le
+## chargement des surfaces, aucun déclencheur au chargement (outil rangé par la remise en main comprise).
 func request_save() -> void:
+	if is_instance_valid(layout) and layout.restoring:
+		return
 	triggers_received += 1
 	_faces.clear()
 	_entries = {}

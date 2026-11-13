@@ -120,6 +120,38 @@ func drop_object() -> ItemData:
 	return dropped
 
 
+## Image du portage (sauvegarde) : objet en main et ceinture par emplacement, dans l'ordre exact,
+## avec les références (null = vide). Clés : held, held_ref, belt, belt_refs.
+func export_state() -> Dictionary:
+	return {"held": _held, "held_ref": _held_ref, "belt": _belt.duplicate(), "belt_refs": _belt_refs.duplicate()}
+
+
+## Chargement : remet l'inventaire dans l'état d'une image d'export_state(), aux mêmes emplacements.
+## Mêmes règles que la prise : jamais de FIXED, ceinture de SMALL seulement, dans la capacité.
+## État refusé = rien ne change (false). held_changed / belt_changed sont émis pour chaque
+## emplacement modifié ; cycle_item repart du premier emplacement.
+func import_state(state: Dictionary) -> bool:
+	var held: ItemData = state.get("held") as ItemData
+	var belt: Array = state.get("belt", [])
+	var belt_refs: Array = state.get("belt_refs", [])
+	if held != null and held.category == ItemData.Category.FIXED:
+		return false
+	for slot: int in belt.size():
+		var item: ItemData = belt[slot] as ItemData
+		if item != null and (slot >= _capacity or item.category != ItemData.Category.SMALL):
+			return false
+	for slot: int in _capacity:
+		var item: ItemData = belt[slot] as ItemData if slot < belt.size() else null
+		var ref: Object = belt_refs[slot] as Object if item != null and slot < belt_refs.size() else null
+		if item != _belt[slot] or ref != _belt_refs[slot]:
+			_set_belt(slot, item, ref)
+	var held_ref: Object = state.get("held_ref") as Object if held != null else null
+	if held != _held or held_ref != _held_ref:
+		_set_held(held, held_ref)
+	_cursor = 0
+	return true
+
+
 func _set_held(item: ItemData, ref: Object) -> void:
 	_held = item
 	_held_ref = ref
