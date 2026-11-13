@@ -381,8 +381,8 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 1. ~~Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.~~ Pondération et périmètre réglés : voir §6 (décision validée le 2026-11-13, 🟡 provisoire). Reste ouverte : la validation technique robuste, sans faux blocages, à vérifier au prototype.
 2. Graphe des pièces :
    - ~~position du vestibule (pièce 1) par rapport au hub et à l'atelier~~ ; ~~nombre d'étages~~ ; ~~relation entre le déblocage de l'escalier et celui de la lanterne~~. Réglés : voir §6 « Structure du bâtiment » et « Accès à la lanterne » (décisions validées le 2026-11-13). Restent ouverts : position de la porte extérieure (proposition : côté vestibule), position du tableau électrique dans le passage, portes verrouillées au départ (cuisine, salon), place disponible dans le fût au N2 (à vérifier par Art) ;
-   - fonctionnement du générateur de secours et emplacement exact du tableau principal dans le hub ;
-   - connexion physique entre la pièce 1, l'atelier et le hub, et condition d'ouverture de la première branche ;
+   - fonctionnement du générateur de secours et 🟡 emplacement exact du tableau principal dans le hub ;
+   - condition d'ouverture de la première branche ;
    - définition exacte de « le reste » pour débloquer la lanterne (partiellement réglée : la machinerie en est exclue, §6) ;
    - durée de l'appui long pour passer la montée de l'échelle ;
    - mécanisme de l'évolution de l'atmosphère (globale ou par pièce) ;
