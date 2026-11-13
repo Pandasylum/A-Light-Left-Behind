@@ -96,8 +96,9 @@ Ils n'ont pas besoin d'explication spectaculaire.
 ## 9. Pièces (supports narratifs ; contenu précis non défini)
 
 - Vestibule d'entrée (pièce 1, tutoriel) : clé, vieux coffre en bois fermé à clé près de la sortie (ceinture dedans), premiers indices sur l'ancien gardien.
-- Rez-de-chaussée : hall central (hub, tableau électrique), cuisine, salon (canapé, bibliothèque, cheminée, objets personnels), atelier.
-- Premier étage : chambre (lit du gardien), salle d'archives (documents, cartes, registres, souvenirs, meuble à tiroirs).
+- Rez-de-chaussée : vestibule, atelier, hub, cuisine, salon (canapé, bibliothèque, cheminée, objets personnels). Le hub est la tour : elle longe le bâtiment et sert de passage commun (avec le tableau électrique).
+- Premier étage : chambre + bureau, une seule grande pièce (lit du gardien).
+- Deuxième étage : archives + machinerie (documents, cartes, registres, souvenirs, meuble à tiroirs).
 - Sommet : salle de la lanterne (mécanisme optique, lampe), aboutissement du jeu.
 - Réparations signatures pouvant toucher le lore : tableau électrique, évier et robinetterie, cheminée, établi, lit du gardien, meuble à tiroirs, mécanisme et lampe.
 - Hors lore pour l'instant : sous-sol, chaufferie, tunnel, cabanon (extension éventuelle).
