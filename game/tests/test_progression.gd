@@ -6,6 +6,7 @@ extends SceneTree
 
 const SaveServiceScript: GDScript = preload("res://core/save_service.gd")
 const SCENE: String = "res://tests/test_progression/progression_test.tscn"
+const SPONGE_SCENE: String = "res://tests/test_tools/sponge_test.tscn"
 const RANGEMENT_SCENE: String = "res://tests/test_rangement/rangement_test.tscn"
 const SAVE_DIR: String = "user://test_saves_progression/"
 const SHADER: String = "res://systems/cleaning/pierre_nettoyable.gdshader"
@@ -33,6 +34,7 @@ func _run() -> void:
 	await _scene_carried_and_stacked()
 	await _scene_signals_and_indicator()
 	await _scene_save_load()
+	await _sponge_load()
 	await _greybox()
 	await _synthetic_room()
 	_close_service()
@@ -166,8 +168,12 @@ func _clear_saves() -> void:
 
 
 func _open(continue_game: bool = false) -> Node3D:
+	return _open_scene(SCENE, continue_game)
+
+
+func _open_scene(path: String, continue_game: bool) -> Node3D:
 	GameFlow.continue_requested = continue_game
-	var scene: Node3D = (load(SCENE) as PackedScene).instantiate() as Node3D
+	var scene: Node3D = (load(path) as PackedScene).instantiate() as Node3D
 	root.add_child(scene)
 	return scene
 
@@ -404,13 +410,27 @@ func _scene_save_load() -> void:
 	scene.queue_free()
 	await process_frame
 
+	# Chargement sans import_state : le verrou reste à faux, RoomProgress ne lit jamais l'emplacement
+	# (la scène de vérification importe nettoyage, outils et disposition mais pas la progression :
+	# l'appel à import_state est fait ici, comme le fait sponge_test.gd).
+	var scene_n: Node3D = _open(true)
+	await _settle()
+	var progress_n: RoomProgress = scene_n.get_node("RoomProgress")
+	_check(progress_n.is_evaluated() and not progress_n.is_restored() and progress_n.percent() == 83
+			and (scene_n.get_node("Autosave") as Autosave).triggers_received == 0,
+			"chargement sans import_state : verrou à faux malgré la section du fichier, pourcentage recalculé, aucune demande")
+	scene_n.queue_free()
+	await process_frame
+
+	# Chargement avec la section : le verrou est appliqué par import_state.
 	var scene_b: Node3D = _open(true)
 	var progress_b: RoomProgress = scene_b.get_node("RoomProgress")
 	var autosave_b: Autosave = scene_b.get_node("Autosave")
 	var locks_b: Array[StringName] = []
 	progress_b.lock_posed.connect(func(id: StringName) -> void: locks_b.append(id))
-	_check(progress_b.is_restored() and not progress_b.is_evaluated() and progress_b.percent() == 0,
-			"retour : verrou lu à la création, mais indicateur neutre jusqu'à room_evaluated")
+	_check(not progress_b.is_restored(), "chargement : verrou à faux avant import_state")
+	_check(progress_b.import_state(saved.get(ProgressSave.SAVE_KEY, {})) and progress_b.is_restored() and not progress_b.is_evaluated()
+			and progress_b.percent() == 0, "chargement avec la section : verrou appliqué, indicateur neutre jusqu'à room_evaluated")
 	await _settle()
 	_check(not GameFlow.continue_requested and progress_b.is_evaluated() and progress_b.percent() == 83 and progress_b.is_restored()
 			and progress_b.cleaning_counts() == Vector2i(3, 3) and progress_b.storing_counts() == Vector2i(2, 3),
@@ -424,28 +444,22 @@ func _scene_save_load() -> void:
 	scene_b.queue_free()
 	await process_frame
 
-	# Section absente (ancien format), pièce incomplète : aucune pièce restaurée.
-	var data: Dictionary = saved.duplicate(true)
-	data.erase(ProgressSave.SAVE_KEY)
-	_check(_service.call("save_slot", Autosave.SLOT_ID, data) == 0, "section absente : fichier réécrit sans « progression »")
-	var scene_c: Node3D = _open(true)
-	await _settle()
-	var progress_c: RoomProgress = scene_c.get_node("RoomProgress")
-	_check(progress_c.is_evaluated() and not progress_c.is_restored() and progress_c.percent() == 83, "section absente : aucune pièce restaurée, pourcentage recalculé")
-	scene_c.queue_free()
-	await process_frame
-
-	# Section illisible, puis version inconnue : ignorée (avertissement au journal), pièce incomplète = non restaurée.
-	var broken: Dictionary = {"illisible": "texte", "version inconnue": {"version": 99, ProgressSave.ROOMS_KEY: {String(ROOM_ID): true}},
-			"entrée illisible": {"version": 1, ProgressSave.ROOMS_KEY: {String(ROOM_ID): "oui"}}}
-	for label: String in broken:
-		data[ProgressSave.SAVE_KEY] = broken[label]
-		_check(_service.call("save_slot", Autosave.SLOT_ID, data) == 0, "section %s : fichier réécrit" % label)
+	# Section absente (ancien format, acceptée sans avertissement), illisible ou de version inconnue
+	# (rejetées, avertissement au journal) : verrou à faux, pièce incomplète, aucune demande de sauvegarde.
+	var cases: Dictionary = {
+		"absente": [{}, true],
+		"illisible": ["texte", false],
+		"de version inconnue": [{"version": 99, ProgressSave.ROOMS_KEY: {String(ROOM_ID): true}}, false],
+		"à entrée illisible": [{"version": 1, ProgressSave.ROOMS_KEY: {String(ROOM_ID): "oui"}}, false],
+	}
+	for label: String in cases:
 		var scene_d: Node3D = _open(true)
-		await _settle()
 		var progress_d: RoomProgress = scene_d.get_node("RoomProgress")
-		_check(progress_d.is_evaluated() and not progress_d.is_restored() and progress_d.percent() == 83
-				and (scene_d.get_node("Autosave") as Autosave).triggers_received == 0, "section %s : ignorée, aucune pièce restaurée, aucune demande" % label)
+		var accepted: bool = progress_d.import_state((cases[label] as Array)[0])
+		await _settle()
+		_check(accepted == (cases[label] as Array)[1] and progress_d.is_evaluated() and not progress_d.is_restored() and progress_d.percent() == 83
+				and (scene_d.get_node("Autosave") as Autosave).triggers_received == 0,
+				"section %s : verrou à faux, pourcentage recalculé, aucune demande" % label)
 		scene_d.queue_free()
 		await process_frame
 
@@ -455,29 +469,60 @@ func _scene_save_load() -> void:
 	await _settle()
 	_complete_room(scene_e)
 	(scene_e.get_node("Autosave") as Autosave).save_and_wait()
-	var complete_data: Dictionary = _saved().duplicate(true)
+	var complete_section: Dictionary = (scene_e.get_node("RoomProgress") as RoomProgress).export_state()
 	scene_e.queue_free()
 	await process_frame
-	complete_data.erase(ProgressSave.SAVE_KEY)
-	_check(_service.call("save_slot", Autosave.SLOT_ID, complete_data) == 0, "pièce complète sans section : fichier réécrit")
 	var scene_f: Node3D = _open(true)
 	var progress_f: RoomProgress = scene_f.get_node("RoomProgress")
 	var autosave_f: Autosave = scene_f.get_node("Autosave")
 	var locks_f: Array[StringName] = []
 	progress_f.lock_posed.connect(func(id: StringName) -> void: locks_f.append(id))
+	progress_f.import_state({})
 	await _settle()
 	_check(progress_f.percent() == 100 and progress_f.is_restored() and locks_f.is_empty() and autosave_f.triggers_received == 0 and not autosave_f.is_busy(),
 			"pièce complète sans section : verrou posé au chargement, sans signal ni demande de sauvegarde")
-	_check(progress_f.export_state()[ProgressSave.ROOMS_KEY] == {String(ROOM_ID): true} and kept_section[ProgressSave.ROOMS_KEY] == {String(ROOM_ID): true},
+	_check(progress_f.export_state()[ProgressSave.ROOMS_KEY] == {String(ROOM_ID): true} and complete_section[ProgressSave.ROOMS_KEY] == {String(ROOM_ID): true},
 			"pièce complète sans section : le verrou sera écrit à la prochaine sauvegarde")
-	# Nouvelle partie : l'emplacement existant n'est pas lu.
+	# Nouvelle partie : rien n'est chargé.
 	scene_f.queue_free()
 	await process_frame
 	var scene_g: Node3D = _open(false)
 	await _settle()
 	var progress_g: RoomProgress = scene_g.get_node("RoomProgress")
-	_check(progress_g.percent() == 0 and not progress_g.is_restored(), "nouvelle partie : verrou de l'ancienne sauvegarde ignoré")
+	_check(progress_g.percent() == 0 and not progress_g.is_restored(), "nouvelle partie : aucun verrou")
 	await _close(scene_g)
+	_clear_saves()
+
+
+## Scène de jeu provisoire (sponge_test.tscn) : sponge_test.gd importe la section « progression » du
+## fichier par RoomProgress.import_state, comme les autres sections.
+func _sponge_load() -> void:
+	var cases: Dictionary = {
+		"section présente": [ProgressSave.make_section({"sponge_test": true}), true],
+		"section absente": [null, false],
+		"section illisible": ["texte", false],
+		"version inconnue": [{"version": 99, ProgressSave.ROOMS_KEY: {"sponge_test": true}}, false],
+	}
+	for label: String in cases:
+		var data: Dictionary = {Autosave.CLEANING_KEY: {}}
+		var section: Variant = (cases[label] as Array)[0]
+		if section != null:
+			data[ProgressSave.SAVE_KEY] = section
+		_check(_service.call("save_slot", Autosave.SLOT_ID, data) == 0, "scène de jeu, %s : fichier écrit" % label)
+		var scene: Node3D = _open_scene(SPONGE_SCENE, true)
+		await _settle()
+		var progress: RoomProgress = scene.get_node("RoomProgress")
+		_check(progress.is_evaluated() and progress.is_restored() == (cases[label] as Array)[1]
+				and (scene.get_node("Autosave") as Autosave).triggers_received == 0 and not GameFlow.continue_requested,
+				"scène de jeu, %s : verrou %s, aucune demande de sauvegarde" % [label, "posé" if (cases[label] as Array)[1] else "à faux"])
+		scene.queue_free()
+		await process_frame
+	# Nouvelle partie : la section du fichier n'est pas lue.
+	_service.call("save_slot", Autosave.SLOT_ID, {Autosave.CLEANING_KEY: {}, ProgressSave.SAVE_KEY: ProgressSave.make_section({"sponge_test": true})})
+	var fresh: Node3D = _open_scene(SPONGE_SCENE, false)
+	await _settle()
+	_check(not (fresh.get_node("RoomProgress") as RoomProgress).is_restored(), "scène de jeu, nouvelle partie : aucun verrou")
+	await _close(fresh)
 	_clear_saves()
 
 
@@ -637,7 +682,6 @@ func _synthetic_room() -> void:
 	room_data.active_axes = axes
 	var progress: RoomProgress = RoomProgress.new()
 	progress.room_data = room_data
-	progress.read_continue_slot = false
 	room.add_child(progress)
 	var changes: Array[int] = [0]
 	var locks: Array[StringName] = []
@@ -671,7 +715,6 @@ func _synthetic_room() -> void:
 	_surface(holder2, "S2", _face(room2, "P2", -1))
 	var progress2: RoomProgress = RoomProgress.new()
 	progress2.room_data = room_data
-	progress2.read_continue_slot = false
 	room2.add_child(progress2)
 	var locks2: Array[StringName] = []
 	progress2.lock_posed.connect(func(id: StringName) -> void: locks2.append(id))
@@ -682,7 +725,6 @@ func _synthetic_room() -> void:
 	root.add_child(room3)
 	var progress3: RoomProgress = RoomProgress.new()
 	progress3.room_data = room_data
-	progress3.read_continue_slot = false
 	room3.add_child(progress3)
 	progress3.finish_loading()
 	_check(progress3.percent() == 0 and not progress3.is_complete() and not progress3.is_restored(), "synthétique : total à zéro = 0 %, jamais complet, pas de verrou")

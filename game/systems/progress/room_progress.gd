@@ -11,6 +11,8 @@ extends Node
 ## chargement ne déclenche rien. Section « progression » : ProgressSave.
 ## Chargement : tant que StorageService n'a pas émis room_evaluated (après l'import du nettoyage et la
 ## restauration de la disposition et du portage), RoomProgress reste neutre (is_evaluated() faux).
+## La scène de jeu applique la section « progression » par import_state, comme les autres sections ;
+## sans cet appel, le verrou reste à faux (RoomProgress ne lit jamais l'emplacement lui-même).
 
 ## Un compteur, le pourcentage, l'état d'évaluation ou le verrou a changé (jamais pour rien).
 signal changed
@@ -22,9 +24,6 @@ signal lock_posed(room_id: StringName)
 @export var room_path: NodePath = ^".."
 ## StorageService de la pièce (état « rangé » et liste des objets). Vide : aucun objet compté.
 @export var storage_path: NodePath
-## « Continuer » : lit la section « progression » de l'emplacement de l'Autosave au démarrage de la
-## scène (GameFlow.continue_requested, lu sans être consommé : la scène de jeu le consomme ensuite).
-@export var read_continue_slot: bool = true
 
 var _storage: StorageService
 var _evaluated: bool = false
@@ -40,8 +39,6 @@ func _ready() -> void:
 		_storage.stored_changed.connect(_on_stored_changed)
 		_storage.room_evaluated.connect(finish_loading)
 	watch_surfaces()
-	if read_continue_slot and GameFlow.continue_requested:
-		_read_continue_slot()
 
 
 ## Relie la fin de chaque surface de la pièce (idempotent) ; à rappeler pour une surface ajoutée plus tard.
@@ -125,15 +122,6 @@ func import_state(section: Variant) -> bool:
 	if added and _evaluated:
 		_update(false, true)
 	return true
-
-
-func _read_continue_slot() -> void:
-	var service: Node = get_node_or_null(^"/root/SaveService")
-	if service == null:
-		return
-	var loaded: Dictionary = service.call(&"load_slot", Autosave.SLOT_ID)
-	if loaded["ok"]:
-		import_state((loaded["data"] as Dictionary).get(ProgressSave.SAVE_KEY, {}))
 
 
 func _on_surface_finished(_surface: CleaningSurface) -> void:
