@@ -13,6 +13,8 @@ extends Node
 ## Avec un RoomLayout branché, la disposition des objets et le portage du joueur sont figés en une
 ## seule image au début de l'export (de nouveau s'il est repris du début) et écrits dans la section
 ## « disposition ».
+## Avec un RoomProgress branché, la pose du verrou « restaurée » (RoomProgress.lock_posed, jamais au
+## chargement) est un déclencheur de plus, et sa section « progression » est écrite à chaque sauvegarde.
 
 ## Fin de l'écriture de l'emplacement (SaveError du SaveService), émis sur le fil principal.
 signal save_completed(error: int)
@@ -32,11 +34,14 @@ enum Phase { IDLE, WAITING, EXPORTING }
 @export var handle_quit: bool = true
 ## Disposition de la pièce (nœud RoomLayout), branchée par setup(). Vide : aucune section « disposition ».
 @export var layout_path: NodePath
+## Progression de la pièce (nœud RoomProgress), branchée par setup(). Vide : aucune section « progression ».
+@export var progress_path: NodePath
 
 var room_root: Node
 var tools: ToolController
 var service: Node
 var layout: RoomLayout ## facultatif (watch_layout) : sans lui, les données écrites sont inchangées
+var progress: RoomProgress ## facultatif (watch_progress) : sans lui, les données écrites sont inchangées
 var slot_id: String = SLOT_ID
 var last_error: int = OK_RESULT ## résultat de la dernière écriture (WRITE_PENDING tant qu'elle est en file)
 
@@ -94,6 +99,8 @@ func setup(room: Node, tool_controller: ToolController, save_service: Node = nul
 			watch_surface(surface)
 	if layout == null and not layout_path.is_empty():
 		watch_layout(get_node_or_null(layout_path) as RoomLayout)
+	if progress == null and not progress_path.is_empty():
+		watch_progress(get_node_or_null(progress_path) as RoomProgress)
 
 
 ## Relie la fin d'une surface à nettoyer à request_save() (idempotent). setup() l'applique à toutes
@@ -109,6 +116,14 @@ func watch_layout(room_layout: RoomLayout) -> void:
 	layout = room_layout
 	if layout != null and not layout.item_deposited.is_connected(_on_item_deposited):
 		layout.item_deposited.connect(_on_item_deposited)
+
+
+## Branche la progression de la pièce (idempotent) : la pose du verrou « restaurée » devient un
+## déclencheur et sa section est écrite à chaque sauvegarde.
+func watch_progress(room_progress: RoomProgress) -> void:
+	progress = room_progress
+	if progress != null and not progress.lock_posed.is_connected(_on_lock_posed):
+		progress.lock_posed.connect(_on_lock_posed)
 
 
 func is_configured() -> bool:
@@ -227,6 +242,8 @@ func _write() -> int:
 	var data: Dictionary = {CLEANING_KEY: _entries, ToolSlots.SAVE_KEY: tools.export_tools()}
 	if _layout_frozen:
 		data[LayoutState.SAVE_KEY] = _layout_section
+	if is_instance_valid(progress):
+		data[ProgressSave.SAVE_KEY] = progress.export_state() # verrous : jamais retirés, lus à l'écriture
 	_reset()
 	writes_requested += 1
 	last_error = WRITE_PENDING
@@ -252,6 +269,10 @@ func _on_surface_finished(_surface: CleaningSurface) -> void:
 
 
 func _on_item_deposited(_item: TestItem) -> void:
+	request_save()
+
+
+func _on_lock_posed(_room_id: StringName) -> void:
 	request_save()
 
 

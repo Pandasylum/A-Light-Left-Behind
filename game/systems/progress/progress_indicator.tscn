@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://systems/progress/progress_indicator.gd" id="1_indicator"]
+
+[node name="ProgressIndicator" type="CanvasLayer"]
+script = ExtResource("1_indicator")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -110.0
+offset_top = 12.0
+offset_right = 110.0
+offset_bottom = 100.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="Rows" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Percent" type="Label" parent="Panel/Rows"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Surfaces" type="Label" parent="Panel/Rows"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Items" type="Label" parent="Panel/Rows"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Restored" type="Label" parent="Panel/Rows"]
+layout_mode = 2
+horizontal_alignment = 1

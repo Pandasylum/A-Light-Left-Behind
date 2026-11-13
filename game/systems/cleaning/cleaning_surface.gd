@@ -17,7 +17,6 @@ extends Node
 signal surface_finished(surface: CleaningSurface)
 
 const GROUP: StringName = &"cleaning_surfaces"
-const DEBUG_LOG: bool = true # temporaire, à retirer avec le retour visuel
 ## Voile de fin de surface (Direction 2026-11-12, valeurs provisoires) : shader d'Art en next_pass.
 const VEIL_DURATION: float = 1.4
 const VEIL_PEAK: float = 0.12
@@ -88,14 +87,11 @@ func _on_face_stroked() -> void:
 	if _finished or remaining_dirty_area() > threshold():
 		return
 	_finished = true
-	var area_at_finish: float = remaining_dirty_area() # avant finish_now (log temporaire)
 	# Le reste se finit automatiquement (GDD §4) : chaque face passe par la fin de geste existante,
 	# état propre écrit de façon synchrone avant l'émission (l'Autosave exporte des faces propres).
 	for face: CleanableFace in faces:
 		if is_instance_valid(face):
 			face.finish_now()
-	if DEBUG_LOG:
-		print("surface finie : ", get_path(), " aire=", area_at_finish, " seuil=", threshold())
 	_play_veil()
 	surface_finished.emit(self)
 

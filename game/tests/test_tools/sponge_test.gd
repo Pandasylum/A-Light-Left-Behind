@@ -53,7 +53,7 @@ func _drop_to_floor(item: TestItem) -> void:
 
 ## « Continuer » (GameFlow.continue_requested) : applique la sauvegarde « partie » à la pièce, aux
 ## outils, puis à la disposition des objets et au portage (section absente = disposition initiale,
-## portage vide). Les outils d'abord : un outil en main est rangé si la main retrouve un objet.
+## portage vide), puis aux verrous de progression (section absente = aucune pièce restaurée). Les outils d'abord : un outil en main est rangé si la main retrouve un objet.
 func _apply_continue() -> void:
 	var data: Dictionary = GameFlow.take_continue_data(get_node_or_null(^"/root/SaveService"))
 	if data.is_empty():
@@ -63,3 +63,4 @@ func _apply_continue() -> void:
 		var catalog: Array[ToolData] = [tool]
 		($Tour/Player/ToolController as ToolController).import_tools(data[ToolSlots.SAVE_KEY], catalog)
 	($Disposition as RoomLayout).restore(data.get(LayoutState.SAVE_KEY, {}))
+	($RoomProgress as RoomProgress).import_state(data.get(ProgressSave.SAVE_KEY, {}))
