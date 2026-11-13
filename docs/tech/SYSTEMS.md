@@ -1,7 +1,7 @@
 # SYSTEMS — carte du code
 
 Statut : projet Godot initialisé dans `game/` (2026-11-10), squelette sans gameplay.
-Mis à jour par Claude Code à chaque PR touchant l'architecture. 75 lignes maximum (valeurs provisoires : TECHNICAL.md, PHASE1_CHECKLIST.md).
+Mis à jour par Claude Code à chaque PR touchant l'architecture. 100 lignes maximum (valeurs provisoires : TECHNICAL.md, PHASE1_CHECKLIST.md).
 Format d'une entrée : `chemin` — rôle en une ligne — dépendances principales.
 
 ## Systèmes
@@ -57,10 +57,10 @@ Couches de collision : 1 monde, 2 joueur, 3 interactifs (valeur de masque 4).
 `game/systems/tools/tool_controller.gd` — ToolController (enfant de Player) : add_tool/take_out/stow_tool/toggle_tool (action equip_tool), rinse_at(seau), nettoyage par use_primary, export_tools/import_tools, signaux tool_stowed et action_finished, is_action_active/cancel_action — ToolSlots, ToolState, CleanableFace, Player, CarryController, InteractionSensor, Bucket
 `game/props/bucket.tscn` + `.gd` + `game/data/items/bucket.tres` — Bucket (extends TestItem, couche 3) : seau MEDIUM jamais en ceinture, rinçage via ToolController.rinse_at — test_item.gd, ItemData
 `game/tests/test_tools/sponge_test.tscn` + `.gd` — scène de vérification NON OFFICIELLE : cleaning_tour.tscn + éponge, seau, TestItem, Autosave (user://saves/partie.json), RoomLayout, StorageService, RoomProgress, ProgressIndicator ; ordre de Continuer : nettoyage, outils, disposition et portage, progression — cleaning_tour.tscn, bucket.tscn, test_item.tscn, sponge.tres, autosave.gd, room_layout.gd, room_progress.gd
-`game/systems/layout/layout_state.gd` — LayoutState (RefCounted) : section « disposition » (SAVE_KEY, SAVE_VERSION 1, provisoire) = objets posés + portage, make_entry/make_section, parse -> Plan — ItemData
+`game/systems/layout/layout_state.gd` — LayoutState (RefCounted) : section « disposition » (SAVE_KEY, SAVE_VERSION 1, provisoire) = objets posés + portage, make_entry/make_section, parse -> Plan ; format : voir TECHNICAL.md, Sauvegarde — ItemData
 `game/systems/layout/room_layout.gd` — RoomLayout (Node de pièce, pas d'autoload) : attribue layout_id, export_state(), restore(section), signal item_deposited, propriété restoring — LayoutState, TestItem, PlacementSurface, StorageService, Player, CarryController, ToolController
 `game/tests/test_disposition.gd` — LayoutState, CarryInventory, rangement_test.tscn + seau, sponge_test.tscn — layout_*.gd, autosave.gd ; test : `tools/godot.sh --headless --path game --script res://tests/test_disposition.gd` ; `game/tests/test_autosave_surface.gd` — déclencheur « fin de surface » de l'Autosave — autosave.gd, cleaning_surface.gd ; test : `tools/godot.sh --headless --path game --script res://tests/test_autosave_surface.gd`
-`game/systems/progress/progress_formula.gd` — ProgressFormula (RefCounted, statique) : SEUL fichier de la formule de progression (🟡 provisoire, GDD §5-§6) ; compute() -> Result — RoomData, ItemData ; `game/systems/progress/progress_save.gd` — ProgressSave (RefCounted) : section « progression » (SAVE_KEY, SAVE_VERSION 1), make_section/parse -> Plan — aucune
+`game/systems/progress/progress_formula.gd` — ProgressFormula (RefCounted, statique) : SEUL fichier de la formule de progression (🟡 provisoire, GDD §5-§6) ; compute() -> Result — RoomData, ItemData ; `game/systems/progress/progress_save.gd` — ProgressSave (RefCounted) : section « progression » (SAVE_KEY, SAVE_VERSION 1), make_section/parse -> Plan ; format : voir TECHNICAL.md, Sauvegarde — aucune
 `game/systems/progress/room_progress.gd` — RoomProgress (Node de pièce, pas d'autoload) : compteurs, percent(), is_complete(), verrou « restaurée », signaux changed et lock_posed, export_state/import_state — ProgressFormula, ProgressSave, CleaningSurface, StorageService
 `game/systems/progress/progress_indicator.tscn` + `.gd` — ProgressIndicator (CanvasLayer, provisoire) : pourcentage, surfaces, objets rangés, marque « restaurée » ; libellés tr(progress.*) — RoomProgress
 `game/tests/test_progression.gd` + `test_progression/progression_test.tscn` — formule, section, chaîne en scène (mini-pièce NON OFFICIELLE, touche F8), verrou, sauvegarde — room_progress.gd, autosave.gd ; test : `tools/godot.sh --headless --path game --script res://tests/test_progression.gd`
