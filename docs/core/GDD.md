@@ -289,22 +289,31 @@ La narration repose notamment sur les documents et notes écrites ainsi que sur 
 - Pas de message de bienvenue au premier lancement.
 - Les crédits sont accessibles depuis le menu principal uniquement.
 
-### Menu pause, options et recommencer (décision validée le 2026-11-12)
+### Menu pause, options et réinitialisation de la partie (décision validée le 2026-11-12)
 
 - Écran-titre : Nouvelle partie (remplacée par Continuer dès qu'une sauvegarde existe), Options, Quitter.
 - Pause en jeu : Reprendre, Options, Retour au menu principal, Quitter.
-- Options : identiques à l'écran-titre et en pause. Contenu : mapping des touches, affichage, volumes, langue, puis Recommencer (en rouge). Le libellé de chaque langue est affiché dans sa propre langue (Français, English).
-- Recommencer : alerte de validation dont le choix par défaut est « Annuler ». Efface la sauvegarde sans modifier les réglages, puis ramène à l'écran-titre, qui affiche alors Nouvelle partie.
+- Options : identiques entre l'écran-titre et la pause, sauf la ligne « Réinitialiser la partie ». Contenu : touches, affichage, volumes, autres réglages de jeu, langue, puis Réinitialiser la partie (en rouge). Le libellé de chaque langue est affiché dans sa propre langue (Français, English).
+- Réinitialiser la partie (libellé français, en rouge) : disponible uniquement dans les Options ouvertes depuis l'écran-titre, absente de la pause, grisée s'il n'y a aucune sauvegarde. Alerte de validation dont le choix par défaut est « Annuler ». Efface le fichier de sauvegarde principal et le fichier .bak sans modifier les réglages, puis ramène à l'écran-titre, qui affiche alors Nouvelle partie. Le texte de l'alerte reste un point ouvert.
 - Si la sauvegarde est illisible, l'écran-titre l'indique (« sauvegarde endommagée ») ; Nouvelle partie reste disponible avec confirmation, la sauvegarde endommagée étant mise de côté sans être effacée.
 - Pas de réinitialisation des réglages pour l'instant.
 - Retour au menu principal et Quitter sauvegardent la partie. Si une action d'outil est en cours, elle se termine ou s'annule proprement avant.
+
+#### Contenu des Options (décisions validées le 2026-11-13)
+
+Valeurs de départ, à régler après essai.
+
+- **Affichage** : mode plein écran (fenêtré sans bordure) ou fenêtré ; défaut plein écran. Pas de liste de résolutions : en plein écran, la résolution est celle du bureau ; en fenêtré, la fenêtre est redimensionnable librement et sa taille est mémorisée. Synchronisation verticale : défaut activée. Qualité graphique et luminosité reportées après le vertical slice.
+- **Volumes** : de 0 à 100 %, par pas de 5 ; 0 = muet. Canaux : Général (défaut 80), Musique (70), Ambiances (100), Effets (100). Défauts provisoires.
+- **Touches** : toutes les actions de jeu sont modifiables ; Échap est fixe. Liaison au clavier et aux boutons de la souris, une touche par action ; pas de manette. Si une touche est déjà prise, les deux actions échangent leurs touches (l'autre action reçoit l'ancienne touche). Bouton « Touches par défaut » (rétablit les touches seulement). Touches stockées par position physique.
+- **Autres réglages de jeu** : sensibilité souris de 0,2 à 3,0 (défaut 1,0) ; inversion de l'axe vertical (défaut désactivée) ; champ de vision de 70° à 95° (défaut 80° ; outils en main à tester sur toute la plage) ; langue (voir Langues ci-dessous).
 
 #### Langues (décisions validées le 2026-11-12)
 
 - Langues au lancement : fr, en.
 - Langue de référence : fr. Les textes sont écrits en français, l'anglais est une traduction relue.
 - Premier lancement : le jeu suit la langue du système ; si elle n'est pas supportée, il passe en en.
-- Le joueur peut changer la langue dans Options ; le changement s'applique immédiatement, sans redémarrage, et le choix est mémorisé dans les réglages (il n'est pas effacé par Recommencer).
+- Le joueur peut changer la langue dans Options ; le changement s'applique immédiatement, sans redémarrage, et le choix est mémorisé dans les réglages (il n'est pas effacé par Réinitialiser la partie).
 - Une langue ajoutée plus tard doit rester possible sans modification du code.
 - Aucune langue non latine prévue pour l'instant ; si l'une est ajoutée plus tard, la police devra être revue (Art).
 
