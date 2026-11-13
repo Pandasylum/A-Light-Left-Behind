@@ -51,6 +51,19 @@ Vérification automatique : `tools/check_project.sh` (Godot headless Linux, vers
 Couches de collision (2026-11-10). Couche 1 : monde (sol, murs, meubles). Couche 2 : joueur (masque 1). Les couches suivantes seront ajoutées ici au fur et à mesure.
 Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (masque 4). Le raycast d’interaction lit les couches 1 et 3, portée 2,0 m (provisoire).
 
+- ✅ Décision de Direction (2026-11-13, provisoire) : la sauvegarde conserve la disposition de tous les objets libres de chaque pièce : position, angle autour de la verticale, posture, support. Le seau est inclus, bien qu'exclu du 100 %.
+- ✅ Portage (2026-11-13, provisoire) : la sauvegarde inclut l'objet en main et les objets à la ceinture. Au chargement, le joueur retrouve exactement son portage d'avant la sauvegarde (même objet en main, mêmes objets à la ceinture).
+- ✅ Un objet porté est sauvegardé une seule fois, dans le portage, jamais en plus dans une pièce. Chaque objet est identifié par un identifiant stable.
+- ✅ Au rechargement, les objets reprennent leur place sauvegardée et le pourcentage de la pièce se recalcule depuis cet état. Le verrou « restaurée » reste inchangé (déjà sauvegardé).
+- 🟡 Format (2026-11-13, proposition d'Engineering, à valider) : section « disposition » du SaveService, à côté de « nettoyage » et « outils », avec sa propre version. Section absente = disposition initiale de la scène.
+- 🟡 Objets de pièce : un enregistrement par objet libre (identifiant, position absolue dans la pièce, angle, posture, support = identifiant de la surface porteuse ou « sol »). La posture vaut « à plat » tant que le lot 2 n'existe pas, mais le champ est réservé.
+- 🟡 Portage : main et ceinture par emplacement, identifiés par l'identifiant stable. La capacité de ceinture reste celle du joueur.
+- 🟡 Identifiant stable : chemin depuis la racine de la pièce, comme l'id des surfaces à nettoyer, pas l'id d'ItemData.
+- 🟡 Restauration : meubles libres, puis objets posés, puis reconstruction des charges depuis le support sauvegardé, puis portage. L'état « rangé » est évalué après la restauration complète.
+- 🟡 Incohérences : section illisible, objet à la fois porté et en pièce, ou portage supérieur à la capacité de ceinture = disposition initiale + avertissement dans le journal (comme pour « outils »). Entrée inconnue ou support introuvable : cette entrée seule est ignorée.
+- 🟡 Déclencheur : dépôt validé (chute comprise) et prise, par la demande de sauvegarde existante de l'Autosave, qui fusionne les demandes rapprochées. Pas d'optimisation de l'export des faces : à reconsidérer après mesure en playtest.
+- 🟡 Coût estimé : environ 100 octets par objet, négligeable devant les masques de nettoyage.
+
 ## Autosave (décidé le 2026-11-12) 🟡 — partiellement implémenté
 - Sauvegarde sur événements plus sortie. Aucun intervalle fixe, aucune sauvegarde manuelle, un seul emplacement.
 - Rangement d'un outil (12/11/2026) : l'outil remis à son emplacement déclenche une sauvegarde, avec son état. Implémenté : `Autosave`, `request_save()` pour les déclencheurs à venir.
@@ -127,6 +140,11 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Pinceau et limites de panneau (décision Direction, 2026-11-12, 🟡 provisoire) : le geste reste envoyé à toutes les faces à portée, y compris à travers une limite de panneau ou de face. Une frange propre de largeur au plus égale au rayon du pinceau sur le panneau voisin est acceptée. Pas de filtrage sur la face visée. À réévaluer après l’entité Surface (option : limiter aux seules limites de surface). Vérifié le 2026-11-12 (tests/test_fin_surface_frange.gd, pire cas : tous les voisins nettoyés à fond le long de toutes les limites, rayon 0,15, dose 100 par limite) : la frange enlève 43,7 % de l’aire sale d’un panneau de noyau et 56 % d’une face de mur ; il reste 5 à 6 fois le seuil de fin (0,96 m² pour 0,17 m² ; 0,62 m² pour 0,11 m²). Aucune surface ne démarre sous son seuil. Bande fragile estimée : saleté initiale entre le seuil et ≈ 0,30 m² (panneau) ou ≈ 0,26 m² (mur). L’aire sale restante additionne les couches saleté et mousse alors que le seuil se calcule sur l’aire de la face : à trancher avec l’entité Surface.
 
 
+- ✅ Surface terminée d'office (2026-11-13) : propre, ou sous le seuil au départ, ou au chargement. Aucun signal ; le résidu sous le seuil reste visible ; aucun changement visuel.
+- 🟡 Pic de création des grilles fines à la fin d'une grande surface (2026-11-13) : non traité. À mesurer en playtest sur GPU réel.
+- ✅ Fin de surface pendant un voile de fin déjà en cours (2026-11-13) : ignorée.
+- ✅ Seuil de fin et aire géométrique (2026-11-13) : le seuil est comparé à l'aire géométrique de la surface, alors que la somme saleté + mousse vaut 127 à 141 % de cette aire. Lecture littérale du GDD, laissée telle quelle. 🟡 Réglage à faire en playtest.
+
 ## Outil éponge ✅ (2026-11-11)
 - ToolData : ressource de données (couches nettoyées, rayon, efficacité, perte maximale, salissure par m², portée). Instance de l'éponge : game/data/tools/sponge.tres.
 - Efficacité effective = efficacité de base × (1 − salissure × perte maximale). Plancher de 10 % : invariant du code (GDD §7), pas un réglage.
@@ -152,6 +170,13 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Lecture : projection cylindrique monde, déjà décidée pour la pierre et les masques (angle absolu), et non UV1 d'instance : l'UV1 du module (15° dans le .glb témoin) repart à u = 0 à chaque instance, donc ne parcourt que le début de la tuile. L'origine de l'angle monde est fixée par Engineering à la première intégration du noyau, alignée sur les limites de panneau géométriques du maillage (Direction, 2026-11-12) ; la couture de la texture d'Art tombe déjà sur une limite de panneau. Vérifié dans Godot le 2026-11-12 (essai tests/test_fin_surface/noyau_panneaux.tscn, 12 panneaux) : projection cylindrique monde retenue, N = 1, uv_echelle = (1, 3,1416/2,16). Origine de l'angle = axe +X monde ; les limites de panneau tombent aux angles k × 90° (u = k/4). Contrainte de montage : noyau à l'axe de la tour, tourné par multiples de 90°. Variante UV1 non retenue.
 - Si lecture par UV1 (non retenue) 🟡 non testée dans Godot : échelle UV (1/3,1416 ; 1/2,16), et décalage de v de 1 − 1/2,16 (≈ 0,537) à cause de l'inversion v = 1 − hauteur de l'export glTF.
 - 24 pans par anneau : provisoire 🟡 (Direction, 2026-11-12).
+
+## Rangement (GDD §5) 🟡 (proposition d'Engineering, 2026-11-13, plan en lots)
+- 🟡 Lot 1 : zones de rangement en scène (Area3D + ZoneData), critère « objet rangé » testable, signal de changement d'état. Interrogation par requêtes à la pose et à la reprise (pas de body_entered). Ni posture imposée, ni comptage par pièce, ni verrou du 100 %. État dérivé du monde, jamais sauvegardé.
+- 🟡 Lot de persistance de la disposition (nouveau, entre le lot 1 et le lot 3) : voir Sauvegarde, « disposition et portage ».
+- 🟡 Lot 2 : posture imposée par la zone, avec les contraintes (a) et (b) déjà écrites plus haut. Bloqué par GDD §15 point 3.
+- 🟡 Lot 3 : comptage par pièce, pourcentage, verrou « restaurée » au premier 100 %, indicateur de progression. Dépend du lot 1 et de la persistance.
+- GDD §15 points 3 (postures par objet et par zone) et 19 (liste des zones par catégorie) restent ouverts. Le lot 1 tourne sur des zones de test.
 
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
