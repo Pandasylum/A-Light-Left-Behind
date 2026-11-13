@@ -15,6 +15,7 @@ Format d'une entrée : `chemin` — rôle en une ligne — dépendances principa
 ## Scènes
 `game/core/game_flow.gd` — GameFlow (RefCounted, statique) : slot_state EMPTY/CONTINUABLE/DAMAGED, title_entries, continue_requested + take_continue_data, TITLE_SCENE/GAME_SCENE (provisoire : sponge_test.tscn) — SaveService ; test : `tools/godot.sh --headless --path game --script res://tests/test_menu_flow.gd`
 `game/ui/menu/` — title_screen.tscn (SCÈNE PRINCIPALE), pause_menu.tscn (action `pause_menu`, instancié dans sponge_test.tscn), options_screen.tscn (vide) ; libellés tr(clé) menu.* — GameFlow, Autosave, Player
+`game/data/ui.csv` — table de traduction UI (clés,fr,en ; repli en), enregistrée dans [internationalization] de project.godot ; clés menu.* — aucune
 `game/core/main.tscn` — ancienne scène principale (plus lancée par défaut) — greybox.tscn ; `game/rooms/test/greybox.tscn` — pièce grise de test (sol 10x10, supports et 11 objets de test, caméra fixe) — player.tscn, test_item.tscn
 `game/systems/player/player.gd` + `player.tscn` — Player (CharacterBody3D) : marche, regard souris, step-up, remise au départ sous fall_limit_y, camera_locked ; couche 2, masque 1 — Input Map
 `Player.camera_locked` / `set_camera_locked()` — action lock_camera (C), regard figé, curseur confiné ; relâché par ToolController.set_tool_held(false) / on_held_item_changed — Input Map

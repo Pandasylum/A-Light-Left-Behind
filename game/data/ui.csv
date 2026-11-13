@@ -1,0 +1,12 @@
+clés,fr,en
+menu.new_game,Nouvelle partie,New game
+menu.continue,Continuer,Continue
+menu.options,Options,Options
+menu.quit,Quitter,Quit
+menu.resume,Reprendre,Resume
+menu.main_menu,Retour au menu,Back to main menu
+menu.back,Retour,Back
+menu.confirm,Confirmer,Confirm
+menu.cancel,Annuler,Cancel
+menu.save_damaged,Sauvegarde endommagée,Damaged save
+menu.new_game_confirm_damaged,La sauvegarde est endommagée. Elle sera conservée à part et une nouvelle partie commencera. Continuer ?,The save is damaged. It will be kept separately and a new game will start. Continue?
