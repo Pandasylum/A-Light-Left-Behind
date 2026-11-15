@@ -34,12 +34,12 @@ Repères : étage de 3,0 m, hub de 2,3 m de large, tour de 5,9 m de diamètre et
 ### Source et fioul
 
 - Un groupe électrogène diesel est installé dans l’**atelier**, loin des chambres.
-- Le fioul vient d’une **cuve extérieure**, près de la porte de l’atelier. Un tuyau la relie au groupe à travers le mur.
+- Le fioul vient d’une **cuve extérieure**, contre le mur sud de l’atelier. Un tuyau la relie au groupe à travers le mur.
 - La **cave** garde du fioul de secours en bidons, ainsi que des vivres.
 
 ### Distribution
 
-- Quand le groupe démarre, il alimente **l’atelier seul**, par un circuit direct en amont du tableau. Le reste du bâtiment reste éteint.
+- Quand le groupe démarre, il alimente **l’atelier et le vestibule**, par un circuit direct en amont du tableau. Le vestibule garde une ampoule, hors service tant que le groupe est arrêté ; elle s’allume au démarrage du groupe. Le reste du bâtiment reste éteint.
 - Le **tableau à fusibles** est dans le **hub N0**, dans le sas en béton (la partie collée à la tour), sur le mur nord. Le sas date de l’électrification, d’où l’emplacement du tableau et de la colonne montante. Un câble le relie au groupe en traversant le mur de l’atelier. Les fusibles sont grillés ou absents : il faut les remplacer.
 - Une fois les fusibles remplacés, une **colonne montante** (câbles apparents) alimente le hub, N1 et N2.
 - Chaque étage a un **coupe-circuit** (N1, N2). Le courant se rétablit donc étage par étage.
@@ -65,7 +65,7 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 
 ## Séquence de remise en marche
 
-1. **Relancer le groupe** dans l’atelier : seul l’atelier s’allume.
+1. **Relancer le groupe** dans l’atelier : l’atelier et le vestibule s’allument.
 2. **Accéder au hub** et trouver le tableau.
 3. **Remplacer les fusibles** : le courant revient au hub, à N1 et à N2.
 4. **Monter à la lampe** : tout est éteint et en panne. La machinerie est en cours de bricolage, et le courant de N5 est coupé.
@@ -130,7 +130,7 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 
 | Pièce | Électricité et feu | Eau | Évacuation |
 | --- | --- | --- | --- |
-| Vestibule | Une ampoule | — | — |
+| Vestibule | Une ampoule, alimentée en direct par le groupe (éteinte à l’arrêt) | — | — |
 | Atelier | Groupe électrogène, fioul, trappe du sous-sol | — | — |
 | Cabanon (extérieur) | Bois et charbon pour la cuisinière | — | — |
 | Monte-charge (extérieur) | Treuil à manivelle, câble et wagonnet sur rails (pas d’électricité) | — | — |
@@ -162,5 +162,3 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 - **Sentier et muret** : à corriger dans les plans v12 (le sentier doit rejoindre la porte du vestibule, le muret doit être au bord du rocher).
 - **Fosse et puisard** : les plans les inversent dans la v12 pour que les WC soient au-dessus de la fosse (le texte du présent document reste inchangé).
 - **Portes verrouillées de N0** (fût, cuisine, salle d’eau, WC) : à documenter.
-- **Cuve de fioul** : décrite « près de la porte de l’atelier » alors que l’atelier n’a pas de porte extérieure ; à préciser.
-- **Ampoule du vestibule** : son alimentation est à préciser, le câble commençant à l’atelier.
