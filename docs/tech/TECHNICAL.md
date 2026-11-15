@@ -209,6 +209,14 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - 🟡 2026-11-13, limite connue : dans la scène de jeu provisoire (`sponge_test`), aucun objet ne déclare le rangement. Le pourcentage ne porte donc que sur les surfaces. L'axe rangement est couvert par la scène de vérification de la progression. Les vrais objets déclareront le rangement avec le vestibule.
 - ✅ 2026-11-13 : cas limites couverts par les tests : objet déplacé après validation, objet tombé, objet empilé sur un non-support, meuble déplacé avec ou sans charge, retour dans la pièce après sauvegarde et chargement.
 
+## Chaîne de déverrouillage ✅ (2026-11-15)
+- ✅ Module de données et de logique pure, sans scène, sans porte, sans interface, non branché au jeu. `UnlockStep` (id, zones requises, accès ouverts) et `UnlockChain` (les 6 étapes) dans `game/data/` ; données dans `game/data/unlock/unlock_chain.tres` ; `UnlockEvaluator` (`game/systems/progress/`, RefCounted, statique) est le seul endroit de la règle.
+- ✅ `UnlockEvaluator.evaluate(chain, zones_restaurées)` renvoie les étapes complètes et les accès ouverts. Une étape est complète quand toutes ses zones requises sont restaurées ; elle ne dépend pas des étapes précédentes (la tour compte dès qu'elle est à 100 %, quel que soit l'ordre de pose des verrous). Une étape sans zone requise n'est jamais complète. Identifiants inconnus et doublons ignorés.
+- ✅ Identifiants de zones (snake_case) : vestibule ; atelier ; hub_n0, cuisine, salle_d_eau, wc ; salon, chambre, hub_n1 ; archives_bureau, hub_n2, tour_n0_n4 ; n5, n6, lanterne. Accès ouverts : étape 1 `atelier` ; étape 2 `hub_n0`, `cuisine`, `salle_d_eau`, `wc` ; étape 3 `porte_fut_n0` ; étape 4 `acces_n2` ; étape 5 `trappe_n4_n5` ; étape 6 `fin_du_jeu`.
+- 🟡 Identifiants `porte_fut_n0`, `acces_n2`, `trappe_n4_n5`, `fin_du_jeu` provisoires. Pour l'atelier et les pièces de l'étape 2, l'accès porte l'identifiant de la zone.
+- ✅ Direction, 2026-11-15 : `acces_n2` provisoire accepté, à confirmer à la construction des portes du fût. Il désigne la porte du fût de N2, verrouillée jusqu'à l'étape 4. La porte du fût de N1 n'a aucun verrou : elle est ouverte dès que la tour est déverrouillée (étape 3).
+- ✅ Test : `test_unlock_chain.gd`.
+
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
 
@@ -224,7 +232,7 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 
 ### 2026-11-15 — Refonte du phare : impacts techniques
 - ✅ Décisions de Direction : chaîne de déverrouillage en 6 étapes. Escalier N0-N4 (72 marches), puis trois échelles de 3 m ; règles d'échelle inchangées. Mécanique de montée = point ouvert : rien à implémenter avant décision. Plus de montée d'ambiance ni de cinématique. Le nombre de pièces principales n'est plus 7 et n'est pas redéfini. Cotes : étage 3,0 m, tour 5,9 m de diamètre, pilier 0,7 m de rayon, portes 0,9 x 2,1 m. Électricité et eau = repères, aucun système.
-- 🟡 Proposition d'Engineering : la chaîne de déverrouillage sera une ressource de données (étapes, identifiants de RoomData requis, verrous ouverts). L'état d'une étape se déduit des verrous « restaurée » déjà sauvegardés, sans nouvelle section de sauvegarde. Non implémenté.
+- ✅ Chaîne de déverrouillage en ressource de données (Direction, 2026-11-15) : étapes, identifiants de RoomData requis, verrous ouverts. L'état d'une étape se déduit des verrous « restaurée » déjà sauvegardés, sans nouvelle section de sauvegarde. Voir « Chaîne de déverrouillage ».
 - ✅ Zones de la chaîne de déverrouillage (Direction, 2026-11-15, à inscrire dans GDD §6) : 1 vestibule ; 2 atelier ; 3 hub N0, cuisine, salle d'eau, WC ; 4 salon, chambre, hub N1 ; 5 archives + bureau (une zone), hub N2, tour N0-N4 ; 6 N5, N6, lanterne (trois zones). Le sas appartient au hub de son niveau. La tour N0-N4 est une zone unique (fût rond, escalier, paliers, N3 et N4, sans les sas), un seul RoomData, un seul verrou « restaurée ».
 - 🟡 Proposition d'Engineering : la tour est une scène unique, sas exclus, pour que son pourcentage se recalcule d'un bloc. Les verrous d'accès (porte du fût, trappe) et les verrous de comptage (« restaurée ») restent distincts dans la ressource d'étapes.
 - ✅ Comptage de la tour (Direction, 2026-11-15) : la tour compte dès qu'elle est à 100 %, même avant l'étape 5. Son verrou « restaurée » se pose à ce moment et reste définitif. Ses surfaces ne sont jamais désactivées avant l'étape 4. La trappe N4 vers N5 se déverrouille quand toutes les zones de l'étape 5 (tour, archives + bureau, hub N2) ont leur verrou « restaurée », dans n'importe quel ordre.
