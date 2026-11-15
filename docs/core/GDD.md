@@ -395,9 +395,10 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 
 1. ~~Définition technique du 100 % de nettoyage, de réparation et de rangement, avec une validation robuste qui évite les faux blocages.~~ Pondération et périmètre réglés : voir §6 (décision validée le 2026-11-13, 🟡 provisoire). Reste ouverte : la validation technique robuste, sans faux blocages, à vérifier au prototype.
 2. Graphe des pièces :
-   - ~~position du vestibule (pièce 1) par rapport au hub et à l'atelier~~ ; ~~nombre d'étages~~ ; ~~relation entre le déblocage de l'escalier et celui de la lanterne~~. Réglés : voir §6 « Structure du bâtiment » et « Accès à la lanterne » (décisions validées le 2026-11-13). Reste ouvert : position du tableau électrique dans le passage ;
-   - fonctionnement du générateur de secours et 🟡 emplacement exact du tableau principal dans le hub ;
-   - condition d'ouverture de la première branche ;
+   - ~~position du vestibule (pièce 1) par rapport au hub et à l'atelier~~ ; ~~nombre d'étages~~ ; ~~relation entre le déblocage de l'escalier et celui de la lanterne~~. Réglés : voir §6 « Structure du bâtiment » et « Accès à la lanterne » (décisions validées le 2026-11-13). ~~position du tableau électrique dans le passage~~ Réglé : dans le sas en béton du hub N0, sur le mur nord, voir docs/core/PHARE_RESEAUX.md (décision validée le 2026-11-15) ;
+   - fonctionnement du générateur de secours ;
+   - ~~emplacement exact du tableau principal dans le hub~~ Réglé : dans le sas en béton du hub N0, sur le mur nord, voir docs/core/PHARE_RESEAUX.md (décision validée le 2026-11-15) ;
+   - ~~condition d'ouverture de la première branche~~ Réglée : chaîne de déverrouillage en 6 étapes (§6, décision validée le 2026-11-15) ;
    - ~~définition exacte de « le reste » pour débloquer la lanterne~~ Réglé : chaîne de déverrouillage en 6 étapes (§6, décision validée le 2026-11-15) ;
    - 🟡 nombre de pièces principales après la refonte du phare (n'est plus 7, non redéfini ; décision du 2026-11-15) ;
    - 🟡 mécanique des échelles (montée automatique ou manuelle, transition éventuelle) ;
