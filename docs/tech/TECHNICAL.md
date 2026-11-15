@@ -99,6 +99,39 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Provisoire : la scène de jeu lancée depuis le titre est `sponge_test.tscn`, à remplacer par la vraie scène de jeu.
 - À faire (non fait, ne pas présenter comme acquis) : table de traduction (les boutons affichent encore des clés brutes, ex. `menu.new_game`) ; lot Options.
 
+## Traduction ✅ (13/11/2026)
+- Langues : fr (référence) et en, décidées par Direction le 12/11/2026.
+- Un seul CSV `game/data/ui.csv`, colonnes `clés,fr,en`, importé comme ressource de traduction et déclaré dans les paramètres du projet. Langue de repli : en.
+- Au premier lancement, le jeu suit la langue du système (en si elle n'est pas supportée). Le choix du joueur n'est enregistré que s'il change la langue.
+- Clés au format `domaine.élément[.sous-élément]`, en minuscules. Aucune cellule vide.
+- Ajouter une langue = ajouter une colonne au CSV et une ligne dans `game/data/languages.json`.
+- `tools/check_project.sh` échoue si une clé trouvée dans `game/` manque dans `ui.csv`, mais seulement pour les domaines déjà présents et sans voir les clés construites dynamiquement.
+- Les tests comparent à `TranslationServer.translate(clé)`, jamais à un texte en dur.
+- Dette connue : le texte de debug du ToolController et le panneau d'inventaire provisoire restent en dur. 🟡 Les textes sont provisoires.
+
+## Réglages (Options) ✅ (13/11/2026)
+- Décisions de Direction du 13/11/2026, validées le 13/11/2026.
+- L'autoload `Settings` (`core/settings.gd`) lit et écrit `user://settings.cfg`. Défauts, bornes et pas dans `game/data/settings_defaults.json`.
+- Fichier absent, illisible ou valeur hors bornes = défaut. Valeur dans les bornes mais hors pas = arrondie au pas. Un fichier illisible est écrasé à la prochaine écriture.
+- Écriture atomique, à la fermeture de l'écran Options et à la sortie du jeu.
+- Affichage : plein écran non exclusif (défaut) ou fenêtré ; taille de fenêtre mémorisée ; minimum 960 × 540 (🟡 provisoire) ; synchro verticale activée par défaut.
+- Volumes : quatre canaux (Master = Général, Music, Ambience, Effects), 0 à 100, pas de 5, 0 = muet. Défauts 80, 70, 100, 100 (🟡 provisoires). Disposition des canaux dans `game/default_bus_layout.tres`.
+
+## Commandes et caméra ✅ (13/11/2026)
+- Toutes les actions de jeu sont modifiables ; liste dans `game/data/controls_actions.json` (`journal_open` retirée tant que le journal n'existe pas). Échap est fixe.
+- Clavier et souris, une touche par action, molette non assignable, pas de manette.
+- Touches enregistrées par position physique (`physical_keycode`), seuls les écarts dans la section `[controls]`. Touche déjà prise = échange. « Touches par défaut » ne remet à zéro que les touches.
+- Sensibilité de la souris : multiplicateur de 0,2 à 3,0 (1,0 = comportement d'origine), pas de 0,1 (🟡 provisoire). Inversion de l'axe vertical, désactivée par défaut.
+- Champ de vision de 70 à 95°, défaut 80°, entendu en horizontal pour un écran 16:9 de référence. Le code le convertit en champ vertical pour Godot (80° horizontal vaut environ 50,5° vertical). L'ancien défaut était 75° vertical.
+- 🟡 Valeurs de départ, à régler après essai.
+- À vérifier à l'écran : les objets portés sont sous `Head/HandAnchor`, à côté de la caméra, donc sensibles au champ de vision.
+
+## Réinitialiser la partie ✅ (12 et 13/11/2026)
+- Décisions de Direction des 12 et 13/11/2026.
+- Disponible seulement dans les Options ouvertes depuis l'écran-titre, jamais depuis la pause. Grisée sans sauvegarde (fichier principal ou `.bak` absent). Bouton rouge avec alerte de validation, « Annuler » par défaut.
+- Supprime le fichier principal et le `.bak` lisibles, sans toucher aux réglages. Un fichier illisible n'est jamais supprimé : il est renommé en `.corrompu`, sans écraser un `.corrompu` existant.
+- Limite connue (15/11/2026) : après une réinitialisation, un ancien `.corrompu` peut faire réapparaître l'avertissement « sauvegarde endommagée » jusqu'à la prochaine « Nouvelle partie ».
+
 ## Décisions de Direction ✅ (source : Direction 2026-11-10)
 - Verrou du 100 % : booléen « restaurée » par pièce, posé au premier passage à 100 %, sauvegardé, jamais retiré. Le pourcentage affiché reflète l'état réel ; un axe ajouté plus tard ne retire pas le statut.
 - Rangement : zones souples par catégorie. Un objet est rangé s'il est posé (ni tenu, ni au sol) dans une zone qui accepte sa catégorie.
