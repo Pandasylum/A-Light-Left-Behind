@@ -69,6 +69,14 @@ place.fell,L'objet a glissé et est retombé.,The object slipped and fell.
 tool.hand_occupied,Votre main porte déjà un objet.,Your hand is already holding an object.
 tool.sponge,Éponge,Sponge
 item.bucket,Seau,Bucket
+item.cle,Clé,Key
+item.boite_vis,Boîte à vis,Screw box
+item.bobine_ficelle,Bobine de ficelle,Twine spool
+item.gants_travail,Gants de travail,Work gloves
+item.tasse_emaillee,Tasse émaillée,Enamel mug
+item.bottes_reparees,Bottes réparées,Repaired boots
+item.cire_plie,Ciré plié,Folded oilskin
+item.coffre,Coffre,Chest
 item.test.small_1,Petit objet 1,Small object 1
 item.test.small_2,Petit objet 2,Small object 2
 item.test.small_3,Petit objet 3,Small object 3

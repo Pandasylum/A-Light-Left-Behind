@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/item_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"bottes_reparees"
+name_key = "item.bottes_reparees"
+category = 1
+footprint = Vector2(0.45, 0.45)
+height = 0.3
+tracks_storing = true
