@@ -1,10 +1,10 @@
 # Phare — gestion de l’électricité et de l’eau
 
-Document de référence pour *A Light Left Behind*. Il rassemble les choix faits pour l’électricité, le fioul, le feu, l’eau et l’évacuation. Il suit les plans 2D et 3D v11.
+Document de référence pour *A Light Left Behind*. Il rassemble les choix faits pour l’électricité, le fioul, le feu, l’eau et l’évacuation. Il suit les plans 2D et 3D v12 (en cours de mise à jour).
 
 ## Principe général
 
-Le phare a été abandonné dans les années 60 ou 70. Il a été automatisé : on a gardé les installations lourdes, puis on a retiré le gardien. L’ancienne mécanique à poids existe toujours, doublée d’un moteur électrique plus récent. Il n’y a pas d’eau courante : tout passe par des pompes à bras. Le joueur remet les réseaux en marche un par un.
+Le phare a été rénové à l’arrivée de l’électricité (vers 1950). Son système de lampe a été remplacé par un système électrique ; il reste des vestiges de l’ancien système mécanique à poids (poids, manivelle, coffre). Le système n’est pas totalement autonome : le groupe électrogène doit être ravitaillé et rechargé, donc un gardien était sur place. L’ancien gardien a pu participer à la rénovation et connaissait bien le nouveau système. Aujourd’hui plus rien ne fonctionne. Il n’y a pas d’eau courante : tout passe par des pompes à bras. Le joueur remet les réseaux en marche un par un.
 
 Repères : étage de 3,0 m, hub de 2,3 m de large, tour de 5,9 m de diamètre et de 21 m de haut, posée sur un rocher de 14 m, pilier central de 0,7 m de rayon, portes de 0,9 × 2,1 m.
 
@@ -13,9 +13,9 @@ Repères : étage de 3,0 m, hub de 2,3 m de large, tour de 5,9 m de diamètre et
 - **N0** : vestibule, atelier, fût de la tour, cuisine, salle d’eau, WC. Le hub longe tout le bâtiment au nord. La partie collée à la tour (le sas) est en béton, ajoutée vers 1950.
 - **N1** : salon (au-dessus de la cuisine) et chambre (au-dessus de la salle d’eau).
 - **N2** : archives et bureau en une seule grande pièce.
-- **N3** : étage vide ajouté dans la tour, avec une dalle et une trémie d’escalier pour pouvoir l’aménager plus tard.
-- **N4** : étage vide ajouté dans la tour, avec une dalle et une trémie d’escalier.
-- **N5** (ancien N3) : salle de remontée. L’ancien système est en partie visible et hors service : poids dans son tube, manivelle, coffre en bois qui cache le tambour et les engrenages. On y trouve aussi les batteries et le coffret avec son chargeur.
+- **N3** : niveau de la tour traversé par le seul escalier colimaçon, sans plancher.
+- **N4** : niveau de la tour traversé par le seul escalier colimaçon, sans plancher. L’escalier s’arrête ici ; trois échelles de 3 m prennent le relais (N4 vers N5, N5 vers N6, N6 vers la lanterne).
+- **N5** (ancien N3) : salle de remontée, avec un sol complet et une trappe pour l’échelle. Elle regroupe coffret, chargeur, batteries, poids dans son tube, manivelle et coffre en bois. L’ancien système est en partie visible et hors service : poids dans son tube, manivelle, coffre en bois qui cache le tambour et les engrenages. On y trouve aussi les batteries et le coffret avec son chargeur.
 - **N6** (ancien N4) : demi-disque sous la lanterne (engrenages, régulateur, moteur d’optique).
 - **Lanterne** : lentille, bain de mercure, lampe.
 - **Sous-sol** : galerie technique, cave, citerne, fosse, puisard, puits des poids, salle murée. Il est taillé dans le rocher et révélé plus tard dans le jeu.
@@ -23,7 +23,7 @@ Repères : étage de 3,0 m, hub de 2,3 m de large, tour de 5,9 m de diamètre et
 ## Rocher, hauteur et matériaux
 
 - **Rocher** : le bâtiment est posé sur un îlot entièrement en roche, haut de 14 m : ni terre ni herbe, un plateau de roc nivelé avec un muret de pierre au bord. La référence est le phare de Tévennec, seule maison-phare construite en pleine mer en France, où la maison est collée à la tour. Le sous-sol est taillé dans le roc.
-- **Hauteur** : la tour fait 21 m (N0 à N6), plus la lanterne. Avec le rocher, le feu est à environ 36 m au-dessus de la mer. L’escalier en colimaçon monte de N0 à N5 (90 marches), puis deux échelles mènent à N6 et à la lanterne.
+- **Hauteur** : la tour fait 21 m (N0 à N6), plus la lanterne. Avec le rocher, le feu est à environ 36 m au-dessus de la mer. L’escalier en colimaçon monte de N0 à N4 (72 marches). Puis trois échelles de 3 m : N4 vers N5, N5 vers N6, N6 vers la lanterne. Il n’y a pas de séquence d’ambiance dédiée à la montée : le joueur découvre la hauteur en regardant par les ouvertures pendant la montée.
 - **Débarcadère** : un simple ponton en bois ne tiendrait pas par mer agitée. On accoste à un quai en pierre, abrité par un môle, à environ 3 m au-dessus de l’eau, avec des échelles de quai en fer et des bollards. Un abri à bateaux est taillé dans la falaise. De là, un escalier d’environ 64 marches, en quatre volées coupées de paliers, monte jusqu’au sentier qui mène à la porte du vestibule. Un monte-charge (câble, treuil à manivelle et wagonnet sur rails) longe l’escalier, du quai à un petit local de treuil en haut. Il monte le fioul, le bois, le charbon et les vivres. Le treuil est manuel : le câble est rouillé et à remplacer, ce qui peut servir d’objet de jeu. Le rejet des eaux usées est de l’autre côté du rocher.
 - **Pierre** : les murs de la maison, de l’aile et de la tour sont en pierre.
 - **Béton** : le sas de la tour (la partie du hub collée à la tour, de N0 à N2) est en béton, ajouté vers 1950 avec l’électrification, pour circuler à l’abri. La terrasse au-dessus du socle de la tour est aussi en béton, avec un petit rebord.
@@ -71,8 +71,8 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 4. **Monter à la lampe** : tout est éteint et en panne. La machinerie est en cours de bricolage, et le courant de N5 est coupé.
 5. **Trouver la clé** de la machinerie dans la boîte à outils de la lanterne.
 6. **Ouvrir la cage grillagée et réparer la machinerie** (N6).
-7. **Remettre le coffret de N5** et activer le chargeur : le moteur redémarre et les batteries à plat se rechargent.
-8. La **lampe se rallume**.
+7. **Remettre le coffret de N5** : le moteur redémarre.
+8. **Recharger les batteries** (chargeur activé) : action à faire avant l’allumage de la lampe (provisoire). Puis la **lampe se rallume**.
 
 À chaque étape, il y a un point de panne que le joueur peut réparer : fusibles, coupe-circuit d’étage, coffret de N5, chargeur, moteur d’optique, lampe.
 
@@ -80,7 +80,7 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 
 ### Eau de pluie
 
-- Les **toits** (aile, bâtiment principal et terrasse en béton) captent la pluie, via les gouttières le long des bords.
+- Les **toits** (aile, bâtiment principal et terrasse en béton) captent la pluie, via les gouttières le long des bords. Actuellement, seules les gouttières du côté nord collectent ; les pans sud n’ont pas de descente.
 - Deux **descentes** : l’une au coin est du bâtiment, l’autre contre le mur de la tour, côté aile. La terrasse en béton se vide par une gouttière le long de son bord ouest, qui rejoint cette seconde descente.
 - Les descentes se rejoignent dans la **galerie technique**, dans un **collecteur**.
 - Le collecteur passe par un **décanteur** (dans la galerie) avant la citerne. Il retient feuilles, sable et mousse. Le joueur peut le nettoyer ou le trouver bouché.
@@ -88,7 +88,7 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 
 ### Citerne
 
-- Citerne voûtée, taillée dans le rocher, dans le sous-sol, sous la cuisine. L’ordre de grandeur, d’après le modèle 3D, est d’une trentaine de m³. Il n’y a pas de puits sur un îlot de roche : la pluie est la seule source d’eau douce.
+- Citerne voûtée, taillée dans le rocher, dans le sous-sol, sous la cuisine. L’ordre de grandeur, d’après le modèle 3D, est d’une trentaine de m³. Il n’y a pas de puits sur un îlot de roche : pas de puits ; la pluie fournit le volume d’eau du quotidien ; des livraisons par bateau ou hélicoptère complètent.
 - **Trou d’homme** depuis la galerie, et **regard** dans le sol de la cuisine pour la vérifier d’en haut.
 - Le **trop-plein** part vers la mer par la conduite commune.
 
@@ -141,7 +141,7 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 | Salon (N1) | Cheminée sur la souche commune | — | — |
 | Chambre (N1) | Une ampoule, radio | Broc et cuvette | Seau, vidé à la main |
 | Archives + bureau (N2) | Ampoule nue, lampe de bureau | — | Évent de la chute |
-| Tour N3 et N4 (nouveaux) | Rien (étages vides pour le moment) | — | — |
+| Tour N3 et N4 (nouveaux) | Rien, pas de plancher | — | — |
 | Tour N5 | Coffret (disjoncteur) avec chargeur, batteries à plat, poids dans son tube, manivelle et coffre en bois qui cache le treuil (ancien système, hors service) | — | — |
 | Tour N6 | Moteur d’optique, régulateur (derrière une cage grillagée) | — | Gargouilles |
 | Lanterne | Lampe, boîte à outils avec la clé | — | — |
@@ -155,7 +155,12 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 - **État du poids et du moteur** : le gardien a-t-il laissé le moteur débranché, ou le poids en bas ? À décider pour l’histoire.
 - **Salle murée** : ce qu’elle contient.
 
-* **Étages N3 et N4** : vides pour le moment.
 * **Rocher et débarcadère** : décidés, voir la section « Rocher, hauteur et matériaux ». Reste à placer précisément le quai et à confirmer la direction de la mer.
 
-- **Chargeur et lampe** : à confirmer si la lampe a besoin de batteries chargées pour s’allumer, ou si le chargeur sert seulement de secours en cas de coupure du groupe.
+- **Chargeur et lampe** (décision provisoire) : recharger les batteries (chargeur activé) est une action à faire avant l’allumage de la lampe.
+- **Confort de montée** : si le confort de montée l’exige, retirer un étage reste possible (non décidé).
+- **Sentier et muret** : à corriger dans les plans v12 (le sentier doit rejoindre la porte du vestibule, le muret doit être au bord du rocher).
+- **Fosse et puisard** : les plans les inversent dans la v12 pour que les WC soient au-dessus de la fosse (le texte du présent document reste inchangé).
+- **Portes verrouillées de N0** (fût, cuisine, salle d’eau, WC) : à documenter.
+- **Cuve de fioul** : décrite « près de la porte de l’atelier » alors que l’atelier n’a pas de porte extérieure ; à préciser.
+- **Ampoule du vestibule** : son alimentation est à préciser, le câble commençant à l’atelier.
