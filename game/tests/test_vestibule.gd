@@ -81,9 +81,31 @@ func _run() -> void:
 			"table : SMALL et MEDIUM rangés, LARGE refusé, total inchangé (%s)" % str(progress.storing_counts()))
 	_put(coffre, _support(scene, "Palette"), -3.5, 1.5)
 	_check(storage.is_stored(coffre) and progress.storing_counts() == Vector2i(3, ITEMS), "palette : LARGE rangé (%s)" % str(progress.storing_counts()))
-	_check(_zone_count(scene) == 6 and _count_nodes(scene, ^"Furniture") == 5, "6 zones comptées (basse, table, palette, 2 murales, zone du tableau), 5 meubles non suivis")
+	_check(_zone_count(scene) == 7 and _count_nodes(scene, ^"Furniture") == 7, "7 zones comptées (basse, table, palette, 2 murales, meuble à bottes, zone du tableau), 7 meubles non suivis")
 	for furniture: Node in scene.get_node("Furniture").get_children():
 		_check(not (furniture is TestItem) and not furniture.has_node("StorageZone"), "meuble non compté : " + furniture.name)
+
+	# Meuble à bottes (MEDIUM seule) : accepte un MEDIUM, refuse SMALL et LARGE. Banc : rien ne s'y pose.
+	var mb_zone: StorageZone = scene.get_node("Zones/ZoneMeubleBottes")
+	_check(mb_zone.zone_data.id == &"vestibule_meuble_bottes" and mb_zone.zone_data.accepted_categories == [ItemData.Category.MEDIUM],
+			"meuble à bottes : zone vestibule_meuble_bottes, MEDIUM seule")
+	var mb_surf: PlacementSurface = _support(scene, "MeubleBottes")
+	var mb_shape: BoxShape3D = (mb_zone.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
+	_check(is_equal_approx(mb_surf.global_position.y, 0.55) and is_equal_approx(mb_surf.size.x, 0.86) and is_equal_approx(mb_surf.size.y, 0.36)
+			and is_equal_approx(mb_shape.size.x, 0.86) and is_equal_approx(mb_shape.size.z, 0.36), "meuble à bottes : surface et zone = dessus du .glb moins marge 0,02 m")
+	_put(bottes, mb_surf, 1.4, 2.5)
+	_check(storage.is_stored(bottes), "meuble à bottes : MEDIUM accepté")
+	_put(cle, mb_surf, 1.2, 2.5)
+	_put(coffre, mb_surf, 1.6, 2.5)
+	_check(not storage.is_stored(cle) and not storage.is_stored(coffre), "meuble à bottes : SMALL et LARGE refusés")
+	var banc: StaticBody3D = scene.get_node("Furniture/Banc")
+	_check(PlacementSurface.of_body(banc) == null and not banc.has_node("StorageZone"), "banc : ni surface de pose ni zone")
+	for z: Node in scene.get_node("Zones").get_children():
+		_check(not (z as StorageZone).contains_point(banc.global_position + Vector3(0.0, 0.3, 0.0)), "banc : aucune zone ne le recouvre : " + z.name)
+	# Retour à l'état de départ du test.
+	_put(cle, _support(scene, "Table"), -3.5, -1.5)
+	_put(bottes, _support(scene, "Table"), -3.2, -1.5)
+	_put(coffre, _support(scene, "Palette"), -3.5, 1.5)
 
 	# Meubles .glb (15/11/2026, hauteurs de l'art provisoires) : surfaces et zones alignées sur le dessus,
 	# dimensions horizontales (capacités) inchangées, Visuel des étagères murales pivoté de 90°.
