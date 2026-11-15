@@ -1,0 +1,324 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://rooms/vestibule/vestibule.gd" id="1_scene"]
+[ext_resource type="PackedScene" path="res://tests/test_cleaning/cleaning_spike.tscn" id="2_spike"]
+[ext_resource type="PackedScene" path="res://props/test_item.tscn" id="3_item"]
+[ext_resource type="PackedScene" path="res://props/bucket.tscn" id="4_bucket"]
+[ext_resource type="Resource" path="res://data/tools/sponge.tres" id="5_sponge"]
+[ext_resource type="Script" path="res://data/item_data.gd" id="6_item_data"]
+[ext_resource type="Script" path="res://data/zone_data.gd" id="7_zone_data"]
+[ext_resource type="Script" path="res://data/room_data.gd" id="8_room_data"]
+[ext_resource type="Script" path="res://systems/placement/placement_surface.gd" id="9_surface"]
+[ext_resource type="Script" path="res://systems/storage/storage_zone.gd" id="10_zone"]
+[ext_resource type="Script" path="res://systems/storage/storage_service.gd" id="11_storage"]
+[ext_resource type="Script" path="res://systems/progress/room_progress.gd" id="12_progress"]
+[ext_resource type="Script" path="res://systems/layout/room_layout.gd" id="13_layout"]
+[ext_resource type="Script" path="res://core/autosave.gd" id="14_autosave"]
+[ext_resource type="PackedScene" path="res://systems/progress/progress_indicator.tscn" id="15_indicator"]
+[ext_resource type="PackedScene" path="res://ui/menu/pause_menu.tscn" id="16_pause"]
+
+[sub_resource type="Resource" id="room_data_vestibule"]
+script = ExtResource("8_room_data")
+id = &"vestibule"
+name_key = "room.vestibule"
+active_axes = Array[int]([0, 2])
+
+[sub_resource type="Resource" id="item_small_1"]
+script = ExtResource("6_item_data")
+id = &"test_small_1"
+name_key = "item.test.small_1"
+category = 0
+footprint = Vector2(0.12, 0.12)
+height = 0.1
+tracks_storing = true
+
+[sub_resource type="Resource" id="item_small_2"]
+script = ExtResource("6_item_data")
+id = &"test_small_2"
+name_key = "item.test.small_2"
+category = 0
+footprint = Vector2(0.15, 0.15)
+height = 0.2
+tracks_storing = true
+
+[sub_resource type="Resource" id="item_small_3"]
+script = ExtResource("6_item_data")
+id = &"test_small_3"
+name_key = "item.test.small_3"
+category = 0
+footprint = Vector2(0.18, 0.18)
+height = 0.12
+tracks_storing = true
+
+[sub_resource type="Resource" id="item_small_4"]
+script = ExtResource("6_item_data")
+id = &"test_small_4"
+name_key = "item.test.small_4"
+category = 0
+footprint = Vector2(0.21, 0.21)
+height = 0.25
+tracks_storing = true
+
+[sub_resource type="Resource" id="item_small_5"]
+script = ExtResource("6_item_data")
+id = &"test_small_5"
+name_key = "item.test.small_5"
+category = 0
+footprint = Vector2(0.24, 0.24)
+height = 0.15
+tracks_storing = true
+
+[sub_resource type="Resource" id="zone_data_basse"]
+script = ExtResource("7_zone_data")
+id = &"vestibule_etagere_basse"
+accepted_categories = Array[int]([0])
+
+[sub_resource type="Resource" id="zone_data_murale"]
+script = ExtResource("7_zone_data")
+id = &"vestibule_etagere_murale"
+accepted_categories = Array[int]([0])
+
+[sub_resource type="BoxShape3D" id="shape_wall_ns"]
+size = Vector3(10.4, 3, 0.2)
+[sub_resource type="BoxMesh" id="mesh_wall_ns"]
+size = Vector3(10.4, 3, 0.2)
+[sub_resource type="BoxShape3D" id="shape_wall_ew"]
+size = Vector3(0.2, 3, 10)
+[sub_resource type="BoxMesh" id="mesh_wall_ew"]
+size = Vector3(0.2, 3, 10)
+[sub_resource type="BoxShape3D" id="shape_table"]
+size = Vector3(1.2, 0.75, 0.8)
+[sub_resource type="BoxMesh" id="mesh_table"]
+size = Vector3(1.2, 0.75, 0.8)
+[sub_resource type="BoxShape3D" id="shape_pallet"]
+size = Vector3(1.2, 0.15, 1.0)
+[sub_resource type="BoxMesh" id="mesh_pallet"]
+size = Vector3(1.2, 0.15, 1.0)
+[sub_resource type="BoxShape3D" id="shape_basse"]
+size = Vector3(1.2, 0.5, 0.8)
+[sub_resource type="BoxMesh" id="mesh_basse"]
+size = Vector3(1.2, 0.5, 0.8)
+[sub_resource type="BoxShape3D" id="shape_murale"]
+size = Vector3(0.4, 0.05, 1.0)
+[sub_resource type="BoxMesh" id="mesh_murale"]
+size = Vector3(0.4, 0.05, 1.0)
+[sub_resource type="BoxShape3D" id="shape_zone_basse"]
+size = Vector3(1.2, 0.8, 0.8)
+[sub_resource type="BoxShape3D" id="shape_zone_murale"]
+size = Vector3(0.4, 0.6, 1.0)
+
+[node name="Vestibule" type="Node3D"]
+script = ExtResource("1_scene")
+tool = ExtResource("5_sponge")
+
+[node name="Spike" parent="." instance=ExtResource("2_spike")]
+sectors = 0
+wall_rings = 0
+core_rings = 0
+steps = 2
+build_surfaces = true
+prewarm_radius = 0.0
+
+[node name="Walls" type="Node3D" parent="."]
+
+[node name="North" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, -5.1)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/North"]
+shape = SubResource("shape_wall_ns")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/North"]
+mesh = SubResource("mesh_wall_ns")
+
+[node name="South" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 5.1)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/South"]
+shape = SubResource("shape_wall_ns")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/South"]
+mesh = SubResource("mesh_wall_ns")
+
+[node name="East" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.1, 1.4, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/East"]
+shape = SubResource("shape_wall_ew")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/East"]
+mesh = SubResource("mesh_wall_ew")
+
+[node name="West" type="StaticBody3D" parent="Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.1, 1.4, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/West"]
+shape = SubResource("shape_wall_ew")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/West"]
+mesh = SubResource("mesh_wall_ew")
+
+[node name="Furniture" type="Node3D" parent="."]
+
+[node name="Table" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.375, -1.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/Table"]
+shape = SubResource("shape_table")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/Table"]
+mesh = SubResource("mesh_table")
+
+[node name="PlacementSurface" type="Node3D" parent="Furniture/Table"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
+script = ExtResource("9_surface")
+size = Vector2(1.2, 0.8)
+is_floor = false
+
+[node name="Palette" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.075, 1.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/Palette"]
+shape = SubResource("shape_pallet")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/Palette"]
+mesh = SubResource("mesh_pallet")
+
+[node name="PlacementSurface" type="Node3D" parent="Furniture/Palette"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+script = ExtResource("9_surface")
+size = Vector2(1.2, 1.0)
+is_floor = false
+
+[node name="EtagereBasse" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.25, -1.2)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/EtagereBasse"]
+shape = SubResource("shape_basse")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/EtagereBasse"]
+mesh = SubResource("mesh_basse")
+
+[node name="PlacementSurface" type="Node3D" parent="Furniture/EtagereBasse"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+script = ExtResource("9_surface")
+size = Vector2(1.2, 0.8)
+is_floor = false
+
+[node name="EtagereMuraleA" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.4, -3.0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/EtagereMuraleA"]
+shape = SubResource("shape_murale")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/EtagereMuraleA"]
+mesh = SubResource("mesh_murale")
+
+[node name="PlacementSurface" type="Node3D" parent="Furniture/EtagereMuraleA"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+script = ExtResource("9_surface")
+size = Vector2(0.4, 1.0)
+is_floor = false
+
+[node name="EtagereMuraleB" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.4, 3.0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/EtagereMuraleB"]
+shape = SubResource("shape_murale")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/EtagereMuraleB"]
+mesh = SubResource("mesh_murale")
+
+[node name="PlacementSurface" type="Node3D" parent="Furniture/EtagereMuraleB"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+script = ExtResource("9_surface")
+size = Vector2(0.4, 1.0)
+is_floor = false
+
+[node name="Zones" type="Node3D" parent="."]
+
+[node name="ZoneEtagereBasse" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.5, -1.2)
+script = ExtResource("10_zone")
+zone_data = SubResource("zone_data_basse")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneEtagereBasse"]
+shape = SubResource("shape_zone_basse")
+
+[node name="ZoneEtagereMuraleA" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.65, -3.0)
+script = ExtResource("10_zone")
+zone_data = SubResource("zone_data_murale")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneEtagereMuraleA"]
+shape = SubResource("shape_zone_murale")
+
+[node name="ZoneEtagereMuraleB" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.65, 3.0)
+script = ExtResource("10_zone")
+zone_data = SubResource("zone_data_murale")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneEtagereMuraleB"]
+shape = SubResource("shape_zone_murale")
+
+[node name="Item1" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, -0.8)
+item_data = SubResource("item_small_1")
+
+[node name="Item2" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, -0.4)
+item_data = SubResource("item_small_2")
+
+[node name="Item3" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 0.0)
+item_data = SubResource("item_small_3")
+
+[node name="Item4" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 0.4)
+item_data = SubResource("item_small_4")
+
+[node name="Item5" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 0.8)
+item_data = SubResource("item_small_5")
+
+[node name="Bucket" parent="." instance=ExtResource("4_bucket")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.5, 0.0)
+
+[node name="Disposition" type="Node" parent="."]
+script = ExtResource("13_layout")
+player_path = NodePath("../Spike/Player")
+
+[node name="StorageService" type="Node" parent="."]
+script = ExtResource("11_storage")
+
+[node name="RoomProgress" type="Node" parent="."]
+script = ExtResource("12_progress")
+room_data = SubResource("room_data_vestibule")
+storage_path = NodePath("../StorageService")
+
+[node name="Autosave" type="Node" parent="."]
+script = ExtResource("14_autosave")
+layout_path = NodePath("../Disposition")
+progress_path = NodePath("../RoomProgress")
+
+[node name="ProgressIndicator" parent="." instance=ExtResource("15_indicator")]
+progress_path = NodePath("../RoomProgress")
+
+[node name="PauseMenu" parent="." instance=ExtResource("16_pause")]

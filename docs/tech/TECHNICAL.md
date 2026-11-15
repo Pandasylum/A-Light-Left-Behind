@@ -250,6 +250,10 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - ✅ Direction, 2026-11-15 : `acces_n2` provisoire accepté, à confirmer à la construction des portes du fût. Il désigne la porte du fût de N2, verrouillée jusqu'à l'étape 4. La porte du fût de N1 n'a aucun verrou : elle est ouverte dès que la tour est déverrouillée (étape 3).
 - ✅ Test : `test_unlock_chain.gd`.
 
+## Vestibule de test ✅ (décision de Direction, 2026-11-15)
+- ✅ 15/11/2026 : le vestibule en blocage gris (`game/rooms/vestibule/vestibule.tscn`) est la scène de jeu provisoire ; `GameFlow.GAME_SCENE` pointe dessus (au lieu de sponge_test.tscn). Contenu de test uniquement avec l'existant : 3 surfaces à nettoyer (cleaning_spike réduit), table et palette (supports, non comptés au rangement), étagère basse et 2 étagères murales (zones SMALL), 5 objets suivis, seau non suivi.
+- 🟡 Les 5 objets suivis sont des copies d'ItemData dans la scène (test_small_1 à 5, mêmes id, catégorie, emprise et hauteur, avec `tracks_storing = true`) : aucun .tres de test ne déclare l'axe rangement. Ces copies divergent des .tres et sont à resynchroniser s'ils évoluent.
+
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
 
