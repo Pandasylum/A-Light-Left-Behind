@@ -18,6 +18,9 @@ Légende des statuts : ✅ établi (validé) · 🟡 provisoire · 💡 proposit
 
 - Époque : milieu du XXᵉ siècle (années 1950-60). Pas de téléphone, objets et matériaux de l'époque.
 - Le phare est construit au début du XXᵉ siècle.
+- Vers 1950, le phare est rénové à l'arrivée de l'électricité. Le système de lampe est remplacé ; il reste des vestiges mécaniques de l'ancien système (poids, manivelle, coffre).
+- Le groupe électrogène doit être ravitaillé et rechargé : un gardien était donc présent sur place.
+- ❓ L'ancien gardien a pu participer à la rénovation et connaître le nouveau système (possible, non établi).
 - L'ancien gardien reste dans ce phare **trois à huit ans**.
 - Première période **calme**, puis les **irrégularités de la lumière** apparaissent au milieu de son séjour.
 - Il coupe l'alimentation de la lampe pour intervenir ; **un à deux mois** s'écoulent avant son départ.
@@ -98,10 +101,10 @@ Ils n'ont pas besoin d'explication spectaculaire.
 - Vestibule d'entrée (pièce 1, tutoriel) : clé, vieux coffre en bois fermé à clé près de la sortie (ceinture dedans), premiers indices sur l'ancien gardien.
 - Rez-de-chaussée ✅ : vestibule (pièce 1, tutoriel : clé, vieux coffre en bois fermé à clé près de la sortie avec la ceinture dedans, premiers indices sur l'ancien gardien) → atelier → hub ; cuisine et salon autour du hub (salon : canapé, bibliothèque, cheminée, objets personnels).
 - Hub = tour ✅ : elle longe tout le bâtiment et sert de passage commun entre toutes les pièces (N0 à N2). Elle abrite le tableau électrique (électricité générale du phare) et le fût (escalier). Le passage est un support possible de narration environnementale.
-- Premier étage (N1) ✅ : chambre + bureau, une seule grande pièce (lit du gardien ; le bureau est l'ancien espace personnel du gardien).
-- Deuxième étage (N2) ✅ : archives (pièce principale : documents, cartes, registres, souvenirs, meuble à tiroirs) et machinerie (petite pièce, hors des 7 pièces principales, « zone de la lampe » avec la lanterne). La machinerie alimente la lampe uniquement. Elle est fermée à clé et exclue du compteur « le reste ». Toutes ses réparations sont obligatoires pour rétablir le courant de la lampe : son contenu lié aux réparations est vu par tous. Ses notes et découvertes (notes de l'ancien gardien, etc.) restent facultatives.
-- Sommet (N3) ✅ : salle de la lanterne (mécanisme optique, lampe), atteinte par une échelle avec une cinématique à la première montée. À l'arrivée, la lampe est hors service. La boîte à outils de l'ancien gardien s'y trouve, à emplacement fixe et visible, accessible sans courant ; elle contient la clé de la machinerie (jalon de la séquence finale, pas une clé cachée ; contenu détaillé 💡 à définir). Séquence validée : réparer la lampe, récupérer la clé, redescendre à la machinerie, réparer et rétablir l'alimentation, relancer la lampe : la relance déclenche la fin. À la fin, toutes les pièces sont à 100 % (seules les découvertes facultatives peuvent rester incomplètes) ; le joueur reste libre de parcourir le phare, lumière allumée visible.
-- Pièces principales ✅ (7) : hub, atelier, cuisine, salon, chambre + bureau, archives, lanterne.
+- Premier étage (N1) ✅ : salon et chambre (lit du gardien).
+- Deuxième étage (N2) ✅ : archives et bureau en une seule grande pièce (documents, cartes, registres, souvenirs, meuble à tiroirs ; le bureau est l'ancien espace personnel du gardien).
+- Sommet (N5, N6 et lanterne) ✅ : salle de remontée (N5), machinerie (N6, sous la lanterne) et salle de la lanterne (mécanisme optique, lampe), atteinte par une échelle avec une cinématique à la première montée. À l'arrivée, la lampe est hors service. La machinerie est derrière une cage grillagée fermée à clé ; la clé est dans la boîte à outils de la lanterne. Elle alimente la lampe uniquement et est exclue du compteur « le reste ». Toutes ses réparations sont obligatoires pour rétablir le courant de la lampe : son contenu lié aux réparations est vu par tous. Ses notes et découvertes (notes de l'ancien gardien, etc.) restent facultatives. La boîte à outils de l'ancien gardien s'y trouve, à emplacement fixe et visible, accessible sans courant ; elle contient la clé de la machinerie (jalon de la séquence finale, pas une clé cachée ; contenu détaillé 💡 à définir). Séquence validée : réparer la lampe, récupérer la clé, redescendre à la machinerie, réparer et rétablir l'alimentation, relancer la lampe : la relance déclenche la fin. À la fin, toutes les pièces sont à 100 % (seules les découvertes facultatives peuvent rester incomplètes) ; le joueur reste libre de parcourir le phare, lumière allumée visible.
+- Pièces principales ✅ : hub, atelier, cuisine, salon, chambre, archives et bureau, lanterne.
 - Réparations signatures pouvant toucher le lore : tableau électrique, évier et robinetterie, cheminée, établi, lit du gardien, meuble à tiroirs, mécanisme et lampe.
 - Hors lore pour l'instant : sous-sol, chaufferie, tunnel, cabanon (extension éventuelle).
 
@@ -112,7 +115,7 @@ Ils n'ont pas besoin d'explication spectaculaire.
 **Lecture de la chronologie, utile pour dater les indices** (déduite du §2, pas de nouvelle décision) :
 - *Période calme* : quotidien installé, ton posé, entretien, réparations anciennes.
 - *Période des irrégularités* : premières observations, doutes, croquis et mesures de la lumière.
-- *Période de l'intervention* (un à deux mois) : outils sortis, plan à l'atelier, mécanisme optique démonté, alimentation de la lampe coupée (machinerie). Le tableau électrique reste le support de l'électricité générale, sans lien avec la coupure de la lampe.
+- *Période de l'intervention* (un à deux mois) : outils sortis, plan à l'atelier, mécanisme optique démonté, alimentation de la lampe coupée (machinerie). Le tableau électrique (hub N0) est relié, par la colonne montante, au coffret de N5, au moteur d'optique de N6 puis à la lampe : la coupure de la lampe passe par ce circuit.
 - *Période d'abandon* (un à deux ans) : poussière, humidité, rouille, rien déplacé.
 
 **À respecter**
