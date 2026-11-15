@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://data/item_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+id = &"gants_travail"
+name_key = "item.gants_travail"
+category = 0
+footprint = Vector2(0.27, 0.27)
+height = 0.06
+tracks_storing = true

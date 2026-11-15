@@ -1,5 +1,5 @@
 extends SceneTree
-## Vestibule (blocage gris) : chargement, GAME_SCENE, comptage surfaces + 9 objets suivis (ItemData .tres), table et palette
+## Vestibule (blocage gris) : chargement, GAME_SCENE, comptage surfaces + 10 objets suivis (7 SMALL, 2 MEDIUM, 1 LARGE ; ItemData .tres), table et palette
 ## zones comptées (meubles non comptés), verrou « restaurée » à 100 % et conservé après sauvegarde/rechargement.
 ## Lancer : tools/godot.sh --headless --path game --script res://tests/test_vestibule.gd
 
@@ -7,7 +7,7 @@ const SaveServiceScript: GDScript = preload("res://core/save_service.gd")
 const SCENE: String = "res://rooms/vestibule/vestibule.tscn"
 const SAVE_DIR: String = "user://test_saves_vestibule/"
 const SURFACES: int = 3
-const ITEMS: int = 9
+const ITEMS: int = 10
 const SWEEP_RADIUS: float = 0.15
 const SWEEP_STEP: float = 0.1
 const SWEEP_SEGMENTS: int = 8
@@ -42,20 +42,28 @@ func _run() -> void:
 	_check(started_stored == 0 and progress.storing_counts().x == 0 and progress.percent() == 0,
 			"scène neuve : 0 objet suivi rangé (%d), 0 objet compté, 0 %%" % started_stored)
 
+	# Comptage par taille : 7 SMALL, 2 MEDIUM, 1 LARGE, tous suivis, 10 ItemData utilisés ; PorteSortie présent.
+	var by_size: Array[int] = [0, 0, 0]
+	for tracked: Node in (scene.get_node("StorageService") as StorageService).tracked_items():
+		if (tracked as TestItem).item_data.tracks_storing:
+			by_size[(tracked as TestItem).item_data.category] += 1
+	_check(by_size == [7, 2, 1], "objets suivis par taille : SMALL 7, MEDIUM 2, LARGE 1 (%s)" % str(by_size))
+	_check(scene.get_node("PorteSortie") is Marker3D, "repère PorteSortie présent")
+
 	# Table (SMALL/MEDIUM) et palette (SMALL/MEDIUM/LARGE) : zones comptées ; les meubles eux-mêmes ne comptent pas.
 	var storage: StorageService = scene.get_node("StorageService")
-	var item1: TestItem = scene.get_node("Item1")
-	var item8: TestItem = scene.get_node("Item8")
-	var item9: TestItem = scene.get_node("Item9")
-	_check(item1.item_data == load("res://data/items/test_small_1.tres") and item9.item_data == load("res://data/items/test_large_1.tres"),
-			"les objets utilisent les .tres (plus de copies locales)")
-	_put(item1, _support(scene, "Table"), -3.5, -1.5)
-	_put(item8, _support(scene, "Table"), -3.2, -1.5)
-	_put(item9, _support(scene, "Table"), -3.8, -1.5)
-	_check(storage.is_stored(item1) and storage.is_stored(item8) and not storage.is_stored(item9) and progress.storing_counts() == Vector2i(2, ITEMS),
+	var cle: TestItem = scene.get_node("Cle")
+	var bottes: TestItem = scene.get_node("Bottes")
+	var coffre: TestItem = scene.get_node("Coffre")
+	_check(cle.item_data == load("res://data/items/cle.tres") and coffre.item_data == load("res://data/items/coffre.tres"),
+			"les objets utilisent les .tres de game/data/items/")
+	_put(cle, _support(scene, "Table"), -3.5, -1.5)
+	_put(bottes, _support(scene, "Table"), -3.2, -1.5)
+	_put(coffre, _support(scene, "Table"), -3.8, -1.5)
+	_check(storage.is_stored(cle) and storage.is_stored(bottes) and not storage.is_stored(coffre) and progress.storing_counts() == Vector2i(2, ITEMS),
 			"table : SMALL et MEDIUM rangés, LARGE refusé, total inchangé (%s)" % str(progress.storing_counts()))
-	_put(item9, _support(scene, "Palette"), -3.5, 1.5)
-	_check(storage.is_stored(item9) and progress.storing_counts() == Vector2i(3, ITEMS), "palette : LARGE rangé (%s)" % str(progress.storing_counts()))
+	_put(coffre, _support(scene, "Palette"), -3.5, 1.5)
+	_check(storage.is_stored(coffre) and progress.storing_counts() == Vector2i(3, ITEMS), "palette : LARGE rangé (%s)" % str(progress.storing_counts()))
 	_check(_zone_count(scene) == 5 and _count_nodes(scene, ^"Furniture") == 5, "5 zones comptées (basse, table, palette, 2 murales), 5 meubles non suivis")
 	for furniture: Node in scene.get_node("Furniture").get_children():
 		_check(not (furniture is TestItem) and not furniture.has_node("StorageZone"), "meuble non compté : " + furniture.name)
@@ -66,14 +74,16 @@ func _run() -> void:
 	while _finish_next_surface(scene):
 		pass
 	_check(progress.cleaning_counts() == Vector2i(SURFACES, SURFACES) and not progress.is_restored(), "surfaces finies, verrou pas encore posé")
-	_put(item1, _support(scene, "EtagereBasse"), 3.2, -1.2)
-	_put(scene.get_node("Item2"), _support(scene, "EtagereBasse"), 3.6, -1.2)
-	_put(scene.get_node("Item3"), _support(scene, "EtagereMuraleA"), 4.75, -3.0)
-	_put(scene.get_node("Item4"), _support(scene, "EtagereMuraleB"), 4.75, 2.8)
-	_put(scene.get_node("Item5"), _support(scene, "EtagereMuraleB"), 4.75, 3.2)
-	_put(scene.get_node("Item6"), _support(scene, "Table"), -3.8, -1.5)
-	_check(progress.percent() < 100 and not progress.is_restored(), "8 objets sur 9 rangés : < 100 %%, verrou à faux (%d %%)" % progress.percent())
-	_put(scene.get_node("Item7"), _support(scene, "Palette"), -3.0, 1.5)
+	_put(cle, _support(scene, "EtagereBasse"), 3.0, -1.2)
+	_put(scene.get_node("BoiteVis1"), _support(scene, "EtagereBasse"), 3.3, -1.2)
+	_put(scene.get_node("BoiteVis2"), _support(scene, "EtagereBasse"), 3.6, -1.2)
+	_put(scene.get_node("BoiteVis3"), _support(scene, "EtagereBasse"), 3.9, -1.2)
+	_put(scene.get_node("Bobine"), _support(scene, "EtagereMuraleA"), 4.75, -3.0)
+	_put(scene.get_node("Gants"), _support(scene, "EtagereMuraleB"), 4.75, 2.8)
+	_put(scene.get_node("Tasse"), _support(scene, "EtagereMuraleB"), 4.75, 3.2)
+	_put(bottes, _support(scene, "Table"), -3.8, -1.5)
+	_check(progress.percent() < 100 and not progress.is_restored(), "9 objets sur 10 rangés : < 100 %%, verrou à faux (%d %%)" % progress.percent())
+	_put(scene.get_node("Cire"), _support(scene, "Table"), -3.2, -1.5)
 	_check(progress.percent() == 100 and progress.is_restored() and locks == [&"vestibule"], "100 %% : verrou posé une seule fois")
 	_check((scene.get_node("Autosave") as Autosave).save_and_wait() == 0, "sauvegarde écrite")
 	var saved: Dictionary = _saved()
