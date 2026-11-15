@@ -13,6 +13,9 @@ extends Node3D
 ## d'un objet ordinaire : un objet posé dessus est non rangé.
 @export var is_declared_support: bool = true
 
+## Zone de rangement qui couvre cette surface (lien minimal, sert à lire la posture imposée). Null : hors zone, posture à plat.
+@export var zone: StorageZone = null
+
 
 ## Surface (enfant PlacementSurface) du corps donné, ou null.
 static func of_body(body: Object) -> PlacementSurface:
@@ -23,6 +26,13 @@ static func of_body(body: Object) -> PlacementSurface:
 		if child is PlacementSurface:
 			return child
 	return null
+
+
+## Posture imposée par la zone à cette catégorie ; à plat hors zone.
+func posture_for(category: ItemData.Category) -> ItemData.Posture:
+	if zone == null or zone.zone_data == null:
+		return ItemData.Posture.A_PLAT
+	return zone.zone_data.posture_for(category)
 
 
 ## Point monde -> coordonnées locales (x, z) sur la surface.

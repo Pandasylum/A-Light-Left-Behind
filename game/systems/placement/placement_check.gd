@@ -4,7 +4,7 @@ extends RefCounted
 ## (grille régulière) ; un échantillon est soutenu s'il tombe dans la surface réduite de la marge au bord.
 ## Marge et couverture minimale viennent de PlacementRules (valeurs provisoires).
 
-enum Status { OK, UNSUPPORTED }
+enum Status { OK, UNSUPPORTED, POSTURE_REFUSED }
 
 const SAMPLES_PER_AXIS: int = 10
 
@@ -32,13 +32,26 @@ static func can_stack(top: ItemData.Category, bottom: ItemData.Category) -> bool
 	return allowed.has(bottom)
 
 
+## Vrai si l'objet supporte la posture (fonction pure). Hors zone la posture est à plat ; une zone peut
+## imposer ACCROCHE (ZoneData.postures_imposees).
+static func supports_posture(data: ItemData, posture: ItemData.Posture) -> bool:
+	return data.postures_supportees.has(posture)
+
+
 func _init(placement_rules: PlacementRules = null) -> void:
 	rules = placement_rules if placement_rules != null else PlacementRules.new()
 
 
-## Cas général : empreinte de l'objet, lacet monde, centre de pose (monde), surface (dans l'arbre).
+## Cas général : objet, lacet monde, centre de pose (monde), surface (dans l'arbre). La posture est celle que la
+## surface impose (zone) ; la forme de pose en est dérivée (PoseShape). Posture non supportée : POSTURE_REFUSED.
 func evaluate(data: ItemData, yaw: float, center: Vector3, surface: PlacementSurface) -> Outcome:
-	return evaluate_local(data.footprint, surface.to_local_yaw(yaw), surface.to_local_xz(center), surface.size)
+	var posture: ItemData.Posture = surface.posture_for(data.category)
+	if not supports_posture(data, posture):
+		var refused: Outcome = Outcome.new()
+		refused.status = Status.POSTURE_REFUSED
+		return refused
+	var shape: PoseShape = PoseShape.of(data, posture)
+	return evaluate_local(shape.footprint, surface.to_local_yaw(yaw), surface.to_local_xz(center), surface.size)
 
 
 ## Version pure, en repère local de la surface : lacet local, centre (x, z) local, étendue de la surface.

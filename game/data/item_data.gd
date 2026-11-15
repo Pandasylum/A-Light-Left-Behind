@@ -5,6 +5,9 @@ extends Resource
 ## Catégorie de taille/rôle. FIXED : objet immobile (jamais rangeable).
 enum Category { SMALL, MEDIUM, LARGE, FIXED }
 
+## Posture d'un objet rangé (énumération minimale, Direction 2026-11-15, provisoire) : à plat ou accroché.
+enum Posture { A_PLAT, ACCROCHE }
+
 ## Identifiant stable de l'objet.
 @export var id: StringName = &""
 ## Clé de traduction du nom affiché.
@@ -14,6 +17,8 @@ enum Category { SMALL, MEDIUM, LARGE, FIXED }
 @export var footprint: Vector2 = Vector2(0.3, 0.3)
 ## Hauteur de l'objet, en mètres (> 0).
 @export var height: float = 0.3
+## Postures que l'objet supporte. footprint et height décrivent la posture « à plat » ; les autres sont dérivées (PoseShape).
+@export var postures_supportees: Array[Posture] = [Posture.A_PLAT]
 ## Orientations autorisées (identifiants). Vide = orientation unique.
 @export var allowed_orientations: Array[StringName] = []
 ## Axes de progression suivis pour cet objet.
@@ -35,6 +40,8 @@ func validate() -> PackedStringArray:
 		errors.append("emprise non strictement positive")
 	if height <= 0.0:
 		errors.append("hauteur non strictement positive")
+	if postures_supportees.is_empty():
+		errors.append("aucune posture supportée")
 	if category == Category.FIXED and tracks_storing:
 		errors.append("un objet FIXED ne suit pas l'axe rangement")
 	if provides_support and category != Category.MEDIUM and category != Category.LARGE:
