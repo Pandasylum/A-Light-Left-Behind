@@ -60,7 +60,9 @@ func _run() -> void:
 			"les objets utilisent les .tres de game/data/items/")
 	# Art : chaque objet a un visuel .glb (pas de boîte de test), collision et surface conformes à l'ItemData.
 	for item: Node in scene.get_children():
-		if not (item is TestItem) or item.name == &"Bucket":
+		# Exclusions codées en dur (visuel .glb absent) : le seau ; le tableau du phare, dont le .glb d'Art n'est
+		# pas livré. À RETIRER (TableauPhare) à la livraison du .glb d'Art.
+		if not (item is TestItem) or item.name == &"Bucket" or item.name == &"TableauPhare":
 			continue
 		var it: TestItem = item
 		var data: ItemData = it.item_data
@@ -158,6 +160,8 @@ func _run() -> void:
 	await process_frame
 
 	await _tableau()
+	await _tableau_persistence(true)
+	await _tableau_persistence(false)
 	_close_service()
 	print("test_vestibule : ", "OK" if _failures == 0 else "%d échec(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
@@ -292,6 +296,51 @@ func _tableau() -> void:
 	_check(tableau.support_surface == wall and storage.is_stored(tableau) and progress.percent() == hung_percent,
 			"raccrochage : rangé, pourcentage remonté (%d %%)" % progress.percent())
 	scene.queue_free()
+	await process_frame
+
+
+## Sauvegarde → rechargement du tableau, sur la vraie zone murale : accroché (même transform, toujours rangé, même
+## nombre d'objets rangés) ou tombé à plat (rechargé à plat, non rangé). Champ « rotation » écrit dans l'entrée.
+func _tableau_persistence(hung: bool) -> void:
+	var tag: String = "accroché" if hung else "tombé à plat"
+	var scene: Node3D = _open(false)
+	await _settle()
+	var tableau: TestItem = scene.get_node("TableauPhare")
+	var wall: PlacementSurface = _wall(scene)
+	var anchor: Vector3 = Vector3(0.0, 1.5, -5.0)
+	var floor_surface: PlacementSurface = tableau.support_surface
+	_hang(tableau, wall, anchor)
+	if not hung: # chute : posé au sol, à plat, au même endroit qu'après une chute
+		tableau.on_picked_up()
+		tableau.global_transform = Transform3D(Basis.IDENTITY, Vector3(0.5, tableau.item_data.height * 0.5, -4.0))
+		tableau.on_placed(floor_surface)
+	await physics_frame
+	var storage: StorageService = scene.get_node("StorageService")
+	var stored_before: int = (scene.get_node("RoomProgress") as RoomProgress).storing_counts().x
+	var transform_before: Transform3D = tableau.global_transform
+	_check(storage.is_stored(tableau) == hung, "persistance (%s) : état de départ" % tag)
+	_check((scene.get_node("Autosave") as Autosave).save_and_wait() == 0, "persistance (%s) : sauvegarde écrite" % tag)
+	var entry: Dictionary = {}
+	for raw: Variant in (_saved().get("disposition", {}) as Dictionary).get("objets", []):
+		if (raw as Dictionary)["id"] == "TableauPhare":
+			entry = raw
+	_check(entry.has("rotation") and (entry["rotation"] as Array).size() == 4, "persistance (%s) : champ « rotation » écrit" % tag)
+	scene.queue_free()
+	await process_frame
+
+	var reloaded: Node3D = _open(true)
+	await _settle()
+	var again: TestItem = reloaded.get_node("TableauPhare")
+	_check(again.global_transform.is_equal_approx(transform_before), "persistance (%s) : même transform (%s)" % [tag, str(again.global_transform)])
+	var storage_again: StorageService = reloaded.get_node("StorageService")
+	for i: int in 5:
+		await physics_frame
+	var stored_after: int = (reloaded.get_node("RoomProgress") as RoomProgress).storing_counts().x
+	_check(storage_again.is_stored(again) == hung and stored_after == stored_before,
+			"persistance (%s) : rangé = %s, même nombre d'objets rangés (%d)" % [tag, str(hung), stored_before])
+	_check(again.global_basis.y.is_equal_approx(Vector3(0.0, 0.0, 1.0)) == hung and again.global_basis.y.is_equal_approx(Vector3.UP) == not hung,
+			"persistance (%s) : %s" % [tag, "face contre le mur (axe horizontal conservé)" if hung else "à plat"])
+	reloaded.queue_free()
 	await process_frame
 
 

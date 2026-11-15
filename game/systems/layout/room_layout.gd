@@ -86,7 +86,8 @@ func export_state() -> Dictionary:
 		if support.is_empty() or not local.is_finite():
 			push_warning(LOG_PREFIX + "objet « %s » non sauvegardé (support hors de la pièce ou position non finie)." % item.layout_id)
 			continue
-		objects.append(LayoutState.make_entry(item.layout_id, local.origin, local.basis.get_euler().y, support, posture_of(item)))
+		objects.append(LayoutState.make_entry(item.layout_id, local.origin, local.basis.get_euler().y, support, posture_of(item),
+				local.basis.get_rotation_quaternion()))
 	return LayoutState.make_section(objects, held, belt)
 
 
@@ -110,7 +111,10 @@ func restore(section: Variant) -> bool:
 	var from_room: Transform3D = _room_transform()
 	for placement: Dictionary in plan.positioning_order():
 		var body: TestItem = _items[placement["id"]]
-		body.global_transform = from_room * Transform3D(Basis(Vector3.UP, placement["angle"]), placement["position"])
+		var basis: Basis = Basis(Vector3.UP, placement["angle"])
+		if placement["rotation"] is Quaternion: # champ présent : il fait foi
+			basis = Basis(placement["rotation"])
+		body.global_transform = from_room * Transform3D(basis, placement["position"])
 	for placement: Dictionary in plan.placements:
 		var item: TestItem = _items[placement["id"]]
 		_postures[placement["id"]] = placement["posture"]
