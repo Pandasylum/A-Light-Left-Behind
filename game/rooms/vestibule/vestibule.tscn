@@ -11,6 +11,10 @@
 [ext_resource type="PackedScene" path="res://props/cire_plie.tscn" id="scn_cire_plie"]
 [ext_resource type="PackedScene" path="res://props/coffre.tscn" id="scn_coffre"]
 [ext_resource type="PackedScene" path="res://props/bucket.tscn" id="4_bucket"]
+[ext_resource type="PackedScene" path="res://assets/meubles/table.glb" id="glb_table"]
+[ext_resource type="PackedScene" path="res://assets/meubles/palette.glb" id="glb_palette"]
+[ext_resource type="PackedScene" path="res://assets/meubles/etagere_basse.glb" id="glb_basse"]
+[ext_resource type="PackedScene" path="res://assets/meubles/etagere_murale.glb" id="glb_murale"]
 [ext_resource type="Resource" path="res://data/tools/sponge.tres" id="5_sponge"]
 [ext_resource type="Resource" path="res://data/items/cle.tres" id="6_cle"]
 [ext_resource type="Resource" path="res://data/items/boite_vis.tres" id="6_boite_vis"]
@@ -67,20 +71,12 @@ size = Vector3(0.2, 3, 10)
 size = Vector3(0.2, 3, 10)
 [sub_resource type="BoxShape3D" id="shape_table"]
 size = Vector3(1.2, 0.75, 0.8)
-[sub_resource type="BoxMesh" id="mesh_table"]
-size = Vector3(1.2, 0.75, 0.8)
 [sub_resource type="BoxShape3D" id="shape_pallet"]
-size = Vector3(1.2, 0.15, 1.0)
-[sub_resource type="BoxMesh" id="mesh_pallet"]
-size = Vector3(1.2, 0.15, 1.0)
+size = Vector3(1.2, 0.144, 1.0)
 [sub_resource type="BoxShape3D" id="shape_basse"]
-size = Vector3(1.2, 0.5, 0.8)
-[sub_resource type="BoxMesh" id="mesh_basse"]
-size = Vector3(1.2, 0.5, 0.8)
+size = Vector3(1.2, 0.7, 0.8)
 [sub_resource type="BoxShape3D" id="shape_murale"]
-size = Vector3(0.4, 0.05, 1.0)
-[sub_resource type="BoxMesh" id="mesh_murale"]
-size = Vector3(0.4, 0.05, 1.0)
+size = Vector3(0.4, 0.03, 1.0)
 [sub_resource type="BoxShape3D" id="shape_zone_basse"]
 size = Vector3(1.2, 0.8, 0.8)
 [sub_resource type="BoxShape3D" id="shape_zone_table"]
@@ -158,8 +154,7 @@ collision_mask = 0
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/Table"]
 shape = SubResource("shape_table")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/Table"]
-mesh = SubResource("mesh_table")
+[node name="Visuel" parent="Furniture/Table" instance=ExtResource("glb_table")]
 
 [node name="PlacementSurface" type="Node3D" parent="Furniture/Table"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, 0)
@@ -168,69 +163,67 @@ size = Vector2(1.2, 0.8)
 is_floor = false
 
 [node name="Palette" type="StaticBody3D" parent="Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.075, 1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.072, 1.5)
 collision_layer = 1
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/Palette"]
 shape = SubResource("shape_pallet")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/Palette"]
-mesh = SubResource("mesh_pallet")
+[node name="Visuel" parent="Furniture/Palette" instance=ExtResource("glb_palette")]
 
 [node name="PlacementSurface" type="Node3D" parent="Furniture/Palette"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.072, 0)
 script = ExtResource("9_surface")
 size = Vector2(1.2, 1.0)
 is_floor = false
 
 [node name="EtagereBasse" type="StaticBody3D" parent="Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.25, -1.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.35, -1.2)
 collision_layer = 1
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/EtagereBasse"]
 shape = SubResource("shape_basse")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/EtagereBasse"]
-mesh = SubResource("mesh_basse")
+[node name="Visuel" parent="Furniture/EtagereBasse" instance=ExtResource("glb_basse")]
 
 [node name="PlacementSurface" type="Node3D" parent="Furniture/EtagereBasse"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 script = ExtResource("9_surface")
 size = Vector2(1.2, 0.8)
 is_floor = false
 
 [node name="EtagereMuraleA" type="StaticBody3D" parent="Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.4, -3.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.41, -3.0)
 collision_layer = 1
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/EtagereMuraleA"]
 shape = SubResource("shape_murale")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/EtagereMuraleA"]
-mesh = SubResource("mesh_murale")
+[node name="Visuel" parent="Furniture/EtagereMuraleA" instance=ExtResource("glb_murale")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0, 0)
 
 [node name="PlacementSurface" type="Node3D" parent="Furniture/EtagereMuraleA"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
 script = ExtResource("9_surface")
 size = Vector2(0.4, 1.0)
 is_floor = false
 
 [node name="EtagereMuraleB" type="StaticBody3D" parent="Furniture"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.4, 3.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.41, 3.0)
 collision_layer = 1
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/EtagereMuraleB"]
 shape = SubResource("shape_murale")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Furniture/EtagereMuraleB"]
-mesh = SubResource("mesh_murale")
+[node name="Visuel" parent="Furniture/EtagereMuraleB" instance=ExtResource("glb_murale")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 0, 0)
 
 [node name="PlacementSurface" type="Node3D" parent="Furniture/EtagereMuraleB"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.025, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
 script = ExtResource("9_surface")
 size = Vector2(0.4, 1.0)
 is_floor = false
@@ -238,7 +231,7 @@ is_floor = false
 [node name="Zones" type="Node3D" parent="."]
 
 [node name="ZoneEtagereBasse" type="Area3D" parent="Zones"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.5, -1.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.4, 0.7, -1.2)
 script = ExtResource("10_zone")
 zone_data = SubResource("zone_data_basse")
 
@@ -254,7 +247,7 @@ zone_data = SubResource("zone_data_table")
 shape = SubResource("shape_zone_table")
 
 [node name="ZonePalette" type="Area3D" parent="Zones"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.15, 1.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.144, 1.5)
 script = ExtResource("10_zone")
 zone_data = SubResource("zone_data_palette")
 
