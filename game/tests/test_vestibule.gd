@@ -140,10 +140,17 @@ func _run() -> void:
 		_check(is_equal_approx(furn.global_position.y + cshape.size.y * 0.5, row[0]), "collision boîte : dessus = dessus du modèle : " + fname)
 		_check(is_equal_approx(surf.size.x, row[2].x) and is_equal_approx(surf.size.y, row[2].y), "surface de pose : emprise inchangée : " + fname)
 		if is_wall:
-			var bois: MeshInstance3D = visuel.find_child("bois", true, false)
-			var box: AABB = bois.global_transform * bois.get_aabb()
-			_check(is_equal_approx(box.size.x, 0.4) and is_equal_approx(box.size.z, 1.0) and is_equal_approx(visuel.rotation.x, 0.0) and is_equal_approx(visuel.rotation.z, 0.0),
-					"Visuel pivoté de 90° autour de la verticale (0,4 en X, 1,0 en Z), surface et zone non pivotées : " + fname)
+			# Emprise monde de tous les maillages du .glb (indépendant des noms de nœuds internes).
+			var box: AABB
+			var first: bool = true
+			for m: Node in visuel.find_children("*", "MeshInstance3D", true, false):
+				var mi: MeshInstance3D = m as MeshInstance3D
+				var b: AABB = mi.global_transform * mi.get_aabb()
+				box = b if first else box.merge(b)
+				first = false
+			_check(not first, "Visuel : au moins un maillage : " + fname)
+			_check(box.size.x < box.size.z and box.size.z <= 1.0 + 0.001 and box.size.x <= 0.4 + 0.001 and is_equal_approx(visuel.rotation.x, 0.0) and is_equal_approx(visuel.rotation.z, 0.0),
+					"Visuel pivoté de 90° autour de la verticale (long axe en Z, emprise dans la zone 0,4 × 1,0), surface et zone non pivotées : " + fname)
 			_check(surf.global_transform.basis.is_equal_approx(Basis()) and zone.global_transform.basis.is_equal_approx(Basis()), "surface et zone sans rotation : " + fname)
 			# Plaque verticale des équerres côté -Z du modèle : doit viser le mur est (+X).
 			_check((visuel.global_transform.basis * Vector3(0.0, 0.0, -1.0)).is_equal_approx(Vector3.RIGHT), "côté mur des équerres vers +X : " + fname)
