@@ -17,6 +17,8 @@
 [ext_resource type="PackedScene" path="res://assets/meubles/palette.glb" id="glb_palette"]
 [ext_resource type="PackedScene" path="res://assets/meubles/etagere_basse.glb" id="glb_basse"]
 [ext_resource type="PackedScene" path="res://assets/meubles/etagere_murale.glb" id="glb_murale"]
+[ext_resource type="PackedScene" path="res://assets/meubles/meuble_a_bottes.glb" id="glb_bottes"]
+[ext_resource type="PackedScene" path="res://assets/meubles/banc.glb" id="glb_banc"]
 [ext_resource type="Resource" path="res://data/tools/sponge.tres" id="5_sponge"]
 [ext_resource type="Resource" path="res://data/items/cle.tres" id="6_cle"]
 [ext_resource type="Resource" path="res://data/items/boite_vis.tres" id="6_boite_vis"]
@@ -71,6 +73,11 @@ postures_imposees = Dictionary[int, int]({
 1: 1
 })
 
+[sub_resource type="Resource" id="zone_data_meuble_bottes"]
+script = ExtResource("7_zone_data")
+id = &"vestibule_meuble_bottes"
+accepted_categories = Array[int]([1])
+
 [sub_resource type="BoxShape3D" id="shape_wall_ns"]
 size = Vector3(10.4, 3, 0.2)
 [sub_resource type="BoxMesh" id="mesh_wall_ns"]
@@ -95,6 +102,12 @@ size = Vector3(1.2, 0.8, 0.8)
 size = Vector3(1.2, 0.8, 1.0)
 [sub_resource type="BoxShape3D" id="shape_zone_murale"]
 size = Vector3(0.4, 0.6, 1.0)
+[sub_resource type="BoxShape3D" id="shape_meuble_bottes"]
+size = Vector3(0.9, 0.55, 0.4)
+[sub_resource type="BoxShape3D" id="shape_banc"]
+size = Vector3(1.2, 0.45, 0.35)
+[sub_resource type="BoxShape3D" id="shape_zone_meuble_bottes"]
+size = Vector3(0.86, 0.8, 0.36)
 [sub_resource type="BoxShape3D" id="shape_zone_tableau"]
 size = Vector3(0.6, 0.5, 0.1)
 
@@ -240,6 +253,34 @@ script = ExtResource("9_surface")
 size = Vector2(0.4, 1.0)
 is_floor = false
 
+[node name="MeubleBottes" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.275, 2.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/MeubleBottes"]
+shape = SubResource("shape_meuble_bottes")
+
+[node name="Visuel" parent="Furniture/MeubleBottes" instance=ExtResource("glb_bottes")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.275, 0)
+
+[node name="PlacementSurface" type="Node3D" parent="Furniture/MeubleBottes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.275, 0)
+script = ExtResource("9_surface")
+size = Vector2(0.86, 0.36)
+is_floor = false
+
+[node name="Banc" type="StaticBody3D" parent="Furniture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.55, 0.225, -2.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Furniture/Banc"]
+shape = SubResource("shape_banc")
+
+[node name="Visuel" parent="Furniture/Banc" instance=ExtResource("glb_banc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.225, 0)
+
 [node name="Zones" type="Node3D" parent="."]
 
 [node name="ZoneEtagereBasse" type="Area3D" parent="Zones"]
@@ -281,6 +322,14 @@ zone_data = SubResource("zone_data_murale")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneEtagereMuraleB"]
 shape = SubResource("shape_zone_murale")
+
+[node name="ZoneMeubleBottes" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.55, 2.5)
+script = ExtResource("10_zone")
+zone_data = SubResource("zone_data_meuble_bottes")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneMeubleBottes"]
+shape = SubResource("shape_zone_meuble_bottes")
 
 [node name="ZoneMuraleTableau" type="Area3D" parent="Zones"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -5.0)
