@@ -35,6 +35,7 @@ Repères : étage de 3,0 m, hub de 2,3 m de large, tour de 5,9 m de diamètre et
 
 - Un groupe électrogène diesel est installé dans l’**atelier**, loin des chambres.
 - Le fioul vient d’une **cuve extérieure**, contre le mur sud de l’atelier. Un tuyau la relie au groupe à travers le mur.
+- **Décision du 2026-11-15** : la cuve est déjà pleine. Le groupe démarre sans geste de ravitaillement, sans bidon et sans mécanique de fioul. Une **jauge de niveau**, visible sur le groupe à l’atelier, indique « bas mais suffisant ». Elle est fixe, ne baisse jamais et n’est pas un compteur ; aucune pénalité ni pression de gestion. Ni la jauge ni le carnet de marche ne datent le dernier ravitaillement, et le sort de l’ancien gardien reste ouvert. Le ravitaillement du groupe n’est pas jouable (extérieur non jouable, sous-sol hors contenu).
 - La **cave** garde du fioul de secours en bidons, ainsi que des vivres.
 
 ### Distribution
