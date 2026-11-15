@@ -30,6 +30,7 @@
 [ext_resource type="Resource" path="res://data/items/coffre.tres" id="6_coffre"]
 [ext_resource type="Script" path="res://data/zone_data.gd" id="7_zone_data"]
 [ext_resource type="Script" path="res://data/room_data.gd" id="8_room_data"]
+[ext_resource type="Script" path="res://data/wall_zone_rules.gd" id="17_wall_rules"]
 [ext_resource type="Script" path="res://systems/placement/placement_surface.gd" id="9_surface"]
 [ext_resource type="Script" path="res://systems/storage/storage_zone.gd" id="10_zone"]
 [ext_resource type="Script" path="res://systems/storage/storage_service.gd" id="11_storage"]
@@ -73,6 +74,9 @@ postures_imposees = Dictionary[int, int]({
 1: 1
 })
 
+[sub_resource type="Resource" id="wall_zone_rules"]
+script = ExtResource("17_wall_rules")
+
 [sub_resource type="Resource" id="zone_data_meuble_bottes"]
 script = ExtResource("7_zone_data")
 id = &"vestibule_meuble_bottes"
@@ -108,12 +112,13 @@ size = Vector3(0.9, 0.55, 0.4)
 size = Vector3(1.2, 0.45, 0.35)
 [sub_resource type="BoxShape3D" id="shape_zone_meuble_bottes"]
 size = Vector3(0.86, 0.8, 0.36)
-[sub_resource type="BoxShape3D" id="shape_zone_tableau"]
-size = Vector3(0.6, 0.5, 0.1)
 
 [node name="Vestibule" type="Node3D"]
 script = ExtResource("1_scene")
 tool = ExtResource("5_sponge")
+wall_rules = SubResource("wall_zone_rules")
+wall_zone_data = SubResource("zone_data_tableau")
+wall_cuts = Array[NodePath]([NodePath("Furniture/EtagereMuraleA"), NodePath("Furniture/EtagereMuraleB"), NodePath("PorteSortie")])
 
 [node name="Spike" parent="." instance=ExtResource("2_spike")]
 sectors = 0
@@ -330,21 +335,6 @@ zone_data = SubResource("zone_data_meuble_bottes")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneMeubleBottes"]
 shape = SubResource("shape_zone_meuble_bottes")
-
-[node name="ZoneMuraleTableau" type="Area3D" parent="Zones"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -5.0)
-script = ExtResource("10_zone")
-zone_data = SubResource("zone_data_tableau")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneMuraleTableau"]
-shape = SubResource("shape_zone_tableau")
-
-[node name="PlacementSurface" type="Node3D" parent="Zones/ZoneMuraleTableau" node_paths=PackedStringArray("zone")]
-script = ExtResource("9_surface")
-size = Vector2(0.6, 0.5)
-is_floor = false
-is_wall = true
-zone = NodePath("..")
 
 [node name="Cle" parent="." instance=ExtResource("scn_cle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.025, 0.0)
