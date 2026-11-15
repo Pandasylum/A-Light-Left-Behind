@@ -15,7 +15,7 @@ Repères : étage de 3,0 m, hub de 2,3 m de large, tour de 5,9 m de diamètre et
 - **N2** : archives et bureau en une seule grande pièce.
 - **N3** : niveau de la tour traversé par le seul escalier colimaçon, sans plancher.
 - **N4** : niveau de la tour traversé par le seul escalier colimaçon, sans plancher. L’escalier s’arrête ici ; trois échelles de 3 m prennent le relais (N4 vers N5, N5 vers N6, N6 vers la lanterne).
-- **N5** (ancien N3) : salle de remontée, avec un sol complet et une trappe pour l’échelle. Elle regroupe coffret, chargeur, batteries, poids dans son tube, manivelle et coffre en bois. L’ancien système est en partie visible et hors service : poids dans son tube, manivelle, coffre en bois qui cache le tambour et les engrenages. On y trouve aussi les batteries et le coffret avec son chargeur.
+- **N5** (ancien N3) : salle de remontée, avec un sol complet et une trappe pour l’échelle. Elle regroupe coffret, chargeur, batteries, poids dans son tube, manivelle et coffre en bois. L’ancien système est en partie visible et hors service : poids dans son tube, manivelle, coffre en bois qui cache le tambour et les engrenages. On y trouve aussi les batteries et le coffret avec son chargeur. État actuel : le poids est remonté en haut de son tube, mais il n’est plus utilisé ; seul le disjoncteur du coffret est coupé, le moteur d’optique reste branché.
 - **N6** (ancien N4) : demi-disque sous la lanterne (engrenages, régulateur, moteur d’optique).
 - **Lanterne** : lentille, bain de mercure, lampe.
 - **Sous-sol** : galerie technique, cave, citerne, fosse, puisard, puits des poids, salle murée. Il est taillé dans le rocher et révélé plus tard dans le jeu.
@@ -54,8 +54,8 @@ Repères : étage de 3,0 m, hub de 2,3 m de large, tour de 5,9 m de diamètre et
 
 ### Machinerie : ancien et nouveau
 
-- **Ancien système** : un poids descend dans le pilier central et entraîne les engrenages de N6. On le remonte à la manivelle, au treuil de N5, toutes les quelques heures.
-- **Nouveau système** : un moteur électrique fait tourner l’optique à la place du poids. La manivelle et le poids sont restés comme secours. Le tambour et les engrenages de l’ancien système sont cachés dans un coffre en bois à N5 : on voit la manivelle et le poids, le reste n’a jamais été retiré.
+- **Ancien système** : un poids descend dans le pilier central et entraîne les engrenages de N6. On le remonte à la manivelle, au treuil de N5, toutes les quelques heures. État actuel : le poids est remonté en haut de son tube à N5 et n’est pas utilisé.
+- **Nouveau système** : un moteur électrique fait tourner l’optique à la place du poids. La manivelle et le poids sont restés comme secours. État actuel : le moteur d’optique est branché ; seul le disjoncteur du coffret de N5 est coupé. Le tambour et les engrenages de l’ancien système sont cachés dans un coffre en bois à N5 : on voit la manivelle et le poids, le reste n’a jamais été retiré.
 - La lampe était à pétrole ou à vapeur, puis elle est devenue une grosse ampoule électrique. Seul le moteur d’optique est récent.
 - Les poids descendent dans le pilier central jusqu’au **puits** du sous-sol.
 
@@ -152,7 +152,6 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 - **Verrou de la machinerie** : décidé, une cage grillagée avec une porte fermée à clé autour des engrenages de N6 ; il reste à régler sa forme exacte. L’échelle de la lanterne passe à côté. Le joueur voit la machinerie fermée, trouve la clé dans la boîte à outils, puis redescend.
 - **Direction de la mer** : la grille de la galerie est à l’est et le rejet part vers le sud-est, du côté opposé au quai (sud-ouest). À confirmer sur le terrain.
 - **Stockage du bois et du charbon : cabanon extérieur (décidé)**.
-- **État du poids et du moteur** : le gardien a-t-il laissé le moteur débranché, ou le poids en bas ? À décider pour l’histoire.
 - **Salle murée** : ce qu’elle contient.
 
 * **Rocher et débarcadère** : décidés, voir la section « Rocher, hauteur et matériaux ». Reste à placer précisément le quai et à confirmer la direction de la mer.
