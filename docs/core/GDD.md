@@ -156,6 +156,22 @@ Types de saleté et outils :
   - Le hub est le point central de circulation. Plusieurs portes donnent accès aux pièces ; certaines sont verrouillées et se débloquent progressivement. Le hub doit lui-même être restauré. L'escalier central, dans le fût, s'ouvre sur le hub par la porte du fût ; elle est déverrouillée quand l'étape 3 de la chaîne est à 100 % (voir « Chaîne de déverrouillage »).
   - L'atelier est collé au hub, ouvert et facilement accessible. Il sert de tutoriel.
   - Chaîne de déverrouillage (décision validée le 2026-11-15 ; règle du 100 % inchangée) : chaque étape se déverrouille quand la précédente est à 100 %. (1) Vestibule. (2) Atelier. (3) Hub N0, cuisine, salle d'eau et WC : à 100 %, la porte du fût de N0 se déverrouille, donc la tour et l'accès à N1. (4) Salon, chambre et hub N1 : à 100 %, N2 s'ouvre. (5) Archives, bureau, hub N2 et tour de N0 à N4 (escalier, paliers, sas) : à 100 %, la trappe de l'échelle N4 vers N5 se déverrouille. (6) N5, N6 et lanterne : à 100 %, fin du jeu. La clé de la machinerie reste dans la boîte à outils de la lanterne.
+  - Zones de la chaîne (règles validées le 2026-11-15) : une zone correspond à un RoomData et à un verrou « restaurée ». Une zone compte dans une seule étape. Le sas est la partie du hub collée à la tour : il appartient au hub de son niveau. « Tour N0-N4 » est une zone unique, le fût rond (escalier, paliers, N3 et N4), sans les sas ; elle est accessible dès l'étape 3 mais ne compte qu'à l'étape 5. Ce nombre de zones (15) n'est pas le nombre de pièces principales, qui reste un point ouvert (§15).
+    - Étape 1 : vestibule.
+    - Étape 2 : atelier.
+    - Étape 3 : hub N0 (avec son sas).
+    - Étape 3 : cuisine.
+    - Étape 3 : salle d'eau.
+    - Étape 3 : WC.
+    - Étape 4 : salon.
+    - Étape 4 : chambre.
+    - Étape 4 : hub N1 (avec son sas).
+    - Étape 5 : archives + bureau (une seule zone).
+    - Étape 5 : hub N2 (avec son sas).
+    - Étape 5 : tour N0-N4 (fût rond, sans les sas).
+    - Étape 6 : salle de remontée (N5).
+    - Étape 6 : machinerie (N6).
+    - Étape 6 : lanterne.
   - Liste des pièces (décisions validées le 2026-11-10, révisées le 2026-11-13 puis le 2026-11-15). Rez-de-chaussée (N0) : vestibule (pièce 1, hors des pièces principales), atelier, hub (passage commun au nord, avec le sas de la tour en béton), cuisine, salle d'eau, WC. Le hub est la tour (voir « Structure du bâtiment »). Niveau 1 (N1) : salon (au-dessus de la cuisine) et chambre (au-dessus de la salle d'eau). Niveau 2 (N2) : archives et bureau en une seule grande pièce. La tour compte 7 niveaux (N0 à N6) plus la lanterne : N3 et N4 sont des niveaux sans plancher, traversés par l'escalier ; N5 est la salle de remontée (sol complet, trappe d'échelle) ; N6 contient la machinerie (voir ci-dessous). Salle de la lanterne : dernière zone, au sommet, cœur du phare et conclusion de la restauration. Cette liste remplace « chambre + bureau réunis » (N1) et « archives + machinerie » (N2) (décisions validées le 2026-11-15).
   - Structure du bâtiment (décisions validées le 2026-11-13) : la maison est accolée à la tour. La tour est le hub commun : le passage longe tout le bâtiment, au nord, avec le sas de la tour en béton de N0 à N2. Le fût (cage d'escalier, rayon 2,0 m) se trouve dans ce passage. Le passage existe aux niveaux 0, 1 et 2, et la porte du fût relie le fût au passage à N0, N1 et N2. Ordre au rez-de-chaussée : vestibule → atelier → hub, l'atelier étant à côté du hub (cela remplace l'ordre de la maquette lore).
   - Machinerie (décision validée le 2026-11-13, emplacement révisé le 2026-11-15) : au N6, dans une cage grillagée fermée à clé. Elle forme la « zone de la lampe » avec la lanterne. Elle est verrouillée : il faut une clé (la clé de la machinerie, prise dans la boîte à outils de la lanterne). Toutes ses réparations sont obligatoires pour rétablir le courant (décision validée le 2026-11-13) : elles font partie du lot final avec la lanterne et comptent dans la progression. Les découvertes facultatives (notes de l'ancien gardien, etc.) n'entrent pas dans le compteur de progression. Ses réparations font partie de l'étape 6 de la chaîne de déverrouillage (§6), non des étapes précédentes : elles ne deviennent possibles qu'après l'ouverture de la trappe N4 vers N5.
