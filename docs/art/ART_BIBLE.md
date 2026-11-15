@@ -1,6 +1,6 @@
 # ART BIBLE — A Light Left Behind
 
-Propriétaire : projet Art Direction & Assets. Dernière mise à jour : 2026-11-12 (seuil du fût).
+Propriétaire : projet Art Direction & Assets. Dernière mise à jour : 2026-11-15 (cotes du fût, plan v12).
 Statut : direction de travail NON OFFICIELLE jusqu'au test de style.
 Légende : ✅ validé · 🟡 à décider
 
@@ -102,6 +102,7 @@ Deuxième vague : carrelage / faïence, papier jauni, verre.
 
 ## 2026-11-11 — Modules du fût : règle d'export et tuilage
 
+⚠ Valeurs géométriques (rayons, 24 marches, 15°, étage 4,32 m, module 2,16 m) REMPLACÉES le 2026-11-15 par la section « Fût : cotes du plan v12 » ci-dessous. La règle d'export (points 1 à 9) et le principe de tuilage restent valables.
 Origine : demande Engineering (masque d'état par face en UV2, SurfaceMapping cylindre).
 Validé Direction : escalier central hélicoïdal ; marche 1,5 m ; 24 marches par tour. Validé développeur : tuilage N = 12.
 Statut : règle d'export validée pour les modules témoins. Style OFFICIEL depuis le 2026-11-12 (test bois validé, voir section 2026-11-12). Modules vérifiés dans les .glb par Engineering ; import Godot pas encore testé.
@@ -177,6 +178,30 @@ Décision (validée développeur, 2026-11-12) : l'entrée se fait par une ouvert
 - Largeur de passage : à confirmer (corde réelle d'un tronçon de 30° à R = 2,0 m ≈ 1,035 m, jambages compris). 🟡
 - Sortie par le haut : module et sol vers la sortie à définir. 🟡
 - Même règle d'export que les autres modules du fût (section « Modules du fût »).
+
+## 2026-11-15 — Fût : cotes du plan v12 (validé développeur)
+
+Décision (validée développeur, 2026-11-15) : le plan v12 (docs/core/plans/) fait foi pour les cotes de la tour. Le GDD §6 (« rayon 2,0 m ») est à aligner par Direction.
+
+### Cotes (source : code du plan 3D v12)
+- Rayon intérieur R = 2,2 m ; rayon extérieur 2,95 m (mur de 0,75 m) ; pilier central 0,7 m de rayon, plein à l'œil de N0 à N4 (creux à l'intérieur pour les poids, grille à N5, porte du puits au sous-sol).
+- Étage 3,0 m ; tour de 7 niveaux (N0 à N6) = 21 m ; lanterne : rayon 1,7 m, vitrage 2,4 m.
+- Escalier colimaçon de N0 à N4 : 18 marches par tour (20° chacune), 72 marches, hauteur de marche 0,1667 m. Largeur utile 1,5 m (de 0,7 à 2,2 m, marche scellée 0,1 m dans le mur). Giron : 0,24 m côté pilier, 0,77 m côté mur.
+- Portes 0,9 × 2,1 m. Échelles de 3 m (N4→N5, N5→N6, N6→lanterne ; cave).
+
+### Propositions pour le kit de modules 🟡 (à confirmer avec Engineering)
+- Tronçon de mur de 10° (36 par tour), arc 0,384 m : une marche = 2 tronçons, une tuile de pierre (N = 12) = 3 tronçons, une ouverture de 30° = 3 tronçons (corde 1,14 m, porte de 0,9 m).
+- Module de hauteur 1,5 m (moitié d'étage). Tuile mur : 13,82 / 12 = 1,152 m. Pilier : une tuile par tour, 4,40 m de circonférence.
+- Règle d'export inchangée ; la valeur de θ et la hauteur du module sont des paramètres du script. Nouvel export et test de correspondance Engineering obligatoires.
+- Tronçon de mur avec fente (ébrasement) à ajouter : N3 et N4 montrent l'extérieur.
+- Module « sas » dédié (béton, plan, 5,9 × 2,3 m, trois niveaux N0 à N2, porte du fût incluse), pas un tronçon de fût découpé.
+
+### Matériau béton (sas et terrasse, ajoutés vers 1950) 🟡
+- Base CC0 simplifiée (niveau 2), même chaîne que bois et métal. « Sale » = humidité et coulures sombres (canal coulures de la pierre réutilisé), sans mousse au départ. À tester avant validation.
+
+### Extérieur (vu de loin depuis la tour) 🟡
+- Rocher : un seul maillage, généré par script Blender (déplacement, décimation) + roche en projection triplanaire. Quai, môle, abri : blocs de pierre. Escalier : 4 volées droites de 16 marches avec paliers. Monte-charge : petits assets. Pas de masque de saleté (non nettoyable).
+- Sous-sol : rien à produire maintenant ; prévoir une dalle d'atelier avec trappe et un volume de 2,8 m sous le rez.
 
 ## Points ouverts
 - Valeurs de palette, résolution des textures, représentation sale / propre (TECHNICAL, phase 2), atmosphère globale ou par pièce (GDD).
