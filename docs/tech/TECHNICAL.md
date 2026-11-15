@@ -87,17 +87,50 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Décision (12/11/2026) : pas d'omission des écritures inutiles. À rouvrir si le profilage montre un problème.
 - Intégration (12/11/2026) : `Autosave` est instancié dans `sponge_test.tscn` seulement, sans autoload, tant que la scène de jeu n'existe pas.
 - Note (12/11/2026) : la salissure d'un outil relue du fichier peut différer sur les dernières décimales (JSON existant) ; les tests comparent avec tolérance.
-- Menu : « Continuer » remplace « Nouvelle partie » si une sauvegarde existe. « Recommencer » (Options) supprime le fichier principal et le `.bak`, ne touche pas aux réglages, puis ramène à l'écran-titre, après une alerte avec « Annuler » par défaut. À implémenter.
+- Menu : « Continuer » remplace « Nouvelle partie » si une sauvegarde existe. « Réinitialiser la partie » (Options) supprime le fichier principal et le `.bak`, ne touche pas aux réglages, puis ramène à l'écran-titre, après une alerte avec « Annuler » par défaut. Implémenté : voir la section « Réinitialiser la partie ».
 - Sauvegardes illisibles (principal et `.bak`) : jamais traitées comme une absence de sauvegarde. L'écran-titre affiche « sauvegarde endommagée ». Les fichiers sont renommés (par exemple `.corrompu`), jamais supprimés ni écrasés. « Nouvelle partie » reste disponible avec confirmation, qui précise que la sauvegarde endommagée sera mise de côté. L'entrée dans le journal est conservée.
 
 ## Menu (écran-titre et pause) ✅ (12/11/2026)
 - L'écran-titre est la scène principale du projet.
 - La pause s'ouvre par l'action d'Input Map `pause_menu` (touche Échap).
-- Le menu Options est vide pour l'instant (lot Options à venir).
+- Le menu Options est décrit dans les sections « Réglages (Options) » et « Commandes et caméra ».
 - « Retour au menu » et « Quitter » appellent `save_and_wait()` avant de sortir de la partie.
 - `Player.restore_mouse_mode()` rétablit le mode de la souris à la sortie de la pause.
 - Provisoire : la scène de jeu lancée depuis le titre est `sponge_test.tscn`, à remplacer par la vraie scène de jeu.
-- À faire (non fait, ne pas présenter comme acquis) : table de traduction (les boutons affichent encore des clés brutes, ex. `menu.new_game`) ; lot Options.
+- Fait : table de traduction (13/11/2026, section « Traduction ») ; lot Options (lots A, B et Réinitialiser, 13 au 15/11/2026).
+
+## Traduction ✅ (13/11/2026)
+- Langues : fr (référence) et en, décidées par Direction le 12/11/2026.
+- Un seul CSV `game/data/ui.csv`, colonnes `clés,fr,en`, importé comme ressource de traduction et déclaré dans les paramètres du projet. Langue de repli : en.
+- Au premier lancement, le jeu suit la langue du système (en si elle n'est pas supportée). Le choix du joueur n'est enregistré que s'il change la langue.
+- Clés au format `domaine.élément[.sous-élément]`, en minuscules. Aucune cellule vide.
+- Ajouter une langue = ajouter une colonne au CSV et une ligne dans `game/data/languages.json`.
+- `tools/check_project.sh` échoue si une clé trouvée dans `game/` manque dans `ui.csv`, mais seulement pour les domaines déjà présents et sans voir les clés construites dynamiquement.
+- Les tests comparent à `TranslationServer.translate(clé)`, jamais à un texte en dur.
+- Dette connue : le texte de debug du ToolController et le panneau d'inventaire provisoire restent en dur. 🟡 Les textes sont provisoires.
+
+## Réglages (Options) ✅ (13/11/2026)
+- Décisions de Direction du 13/11/2026, validées le 13/11/2026.
+- L'autoload `Settings` (`core/settings.gd`) lit et écrit `user://settings.cfg`. Défauts, bornes et pas dans `game/data/settings_defaults.json`.
+- Fichier absent, illisible ou valeur hors bornes = défaut. Valeur dans les bornes mais hors pas = arrondie au pas. Un fichier illisible est écrasé à la prochaine écriture.
+- Écriture atomique, à la fermeture de l'écran Options et à la sortie du jeu.
+- Affichage : plein écran non exclusif (défaut) ou fenêtré ; taille de fenêtre mémorisée ; minimum 960 × 540 (🟡 provisoire) ; synchro verticale activée par défaut.
+- Volumes : quatre canaux (Master = Général, Music, Ambience, Effects), 0 à 100, pas de 5, 0 = muet. Défauts 80, 70, 100, 100 (🟡 provisoires). Disposition des canaux dans `game/default_bus_layout.tres`.
+
+## Commandes et caméra ✅ (13/11/2026)
+- Toutes les actions de jeu sont modifiables ; liste dans `game/data/controls_actions.json` (`journal_open` retirée tant que le journal n'existe pas). Échap est fixe.
+- Clavier et souris, une touche par action, molette non assignable, pas de manette.
+- Touches enregistrées par position physique (`physical_keycode`), seuls les écarts dans la section `[controls]`. Touche déjà prise = échange. « Touches par défaut » ne remet à zéro que les touches.
+- Sensibilité de la souris : multiplicateur de 0,2 à 3,0 (1,0 = comportement d'origine), pas de 0,1 (🟡 provisoire). Inversion de l'axe vertical, désactivée par défaut.
+- Champ de vision de 70 à 95°, défaut 80°, entendu en horizontal pour un écran 16:9 de référence. Le code le convertit en champ vertical pour Godot (80° horizontal vaut environ 50,5° vertical). L'ancien défaut était 75° vertical.
+- 🟡 Valeurs de départ, à régler après essai.
+- À vérifier à l'écran : les objets portés sont sous `Head/HandAnchor`, à côté de la caméra, donc sensibles au champ de vision.
+
+## Réinitialiser la partie ✅ (12 et 13/11/2026)
+- Décisions de Direction des 12 et 13/11/2026.
+- Disponible seulement dans les Options ouvertes depuis l'écran-titre, jamais depuis la pause. Grisée sans sauvegarde (fichier principal ou `.bak` absent). Bouton rouge avec alerte de validation, « Annuler » par défaut.
+- Supprime le fichier principal et le `.bak` lisibles, sans toucher aux réglages. Un fichier illisible n'est jamais supprimé : il est renommé en `.corrompu`, sans écraser un `.corrompu` existant.
+- Limite connue (15/11/2026) : après une réinitialisation, un ancien `.corrompu` peut faire réapparaître l'avertissement « sauvegarde endommagée » jusqu'à la prochaine « Nouvelle partie ».
 
 ## Décisions de Direction ✅ (source : Direction 2026-11-10)
 - Verrou du 100 % : booléen « restaurée » par pièce, posé au premier passage à 100 %, sauvegardé, jamais retiré. Le pourcentage affiché reflète l'état réel ; un axe ajouté plus tard ne retire pas le statut.
@@ -203,7 +236,7 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - ✅ 2026-11-13 : poser le verrou déclenche une demande de sauvegarde (`Autosave`). Rien ne déclenche au chargement. Si le calcul au chargement donne « complet » sans verrou, celui-ci est posé sans demande de sauvegarde.
 - ✅ 2026-11-13 : la scène de jeu importe la section comme les autres (nettoyage, outils, disposition). Le premier calcul a lieu à l'évaluation du rangement.
 - ✅ 2026-11-13 (contrainte pour les scènes futures) : une scène qui charge ses états plus tard doit rappeler le recalcul.
-- 🟡 2026-11-13 : indicateur provisoire. Il affiche le pourcentage de la pièce, les surfaces finies sur le total, les objets rangés sur les objets suivis, et la marque « restaurée ». Interface provisoire, sans décision d'art. Les libellés sont des clés préfixées `progress` ; il n'existe pas encore de table de traduction.
+- 🟡 2026-11-13 : indicateur provisoire. Il affiche le pourcentage de la pièce, les surfaces finies sur le total, les objets rangés sur les objets suivis, et la marque « restaurée ». Interface provisoire, sans décision d'art. Les libellés sont des clés `progress.*` de `game/data/ui.csv`.
 - ✅ 2026-11-13 : remplace le texte de débogage des surfaces et les messages de débogage du journal, retirés.
 - ✅ 2026-11-13 : test `test_progression.gd`.
 - 🟡 2026-11-13, limite connue : dans la scène de jeu provisoire (`sponge_test`), aucun objet ne déclare le rangement. Le pourcentage ne porte donc que sur les surfaces. L'axe rangement est couvert par la scène de vérification de la progression. Les vrais objets déclareront le rangement avec le vestibule.
