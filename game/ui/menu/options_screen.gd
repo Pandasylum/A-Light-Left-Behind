@@ -8,6 +8,8 @@ extends Control
 
 signal closed
 
+const RESET_FAILED: int = preload("res://core/save_service.gd").ResetResult.FAILED
+
 ## Renseigné par l'appelant AVANT add_child : vrai seulement depuis l'écran-titre (la pause ne le change pas).
 var opened_from_title: bool = false
 ## Service et emplacement de « Réinitialiser la partie » (null : autoload SaveService ; remplaçables en test).
@@ -26,6 +28,7 @@ var _reset_controls_button: Button
 var _capturing: StringName = &"" ## action en attente d'une touche ("" : pas de capture)
 var _reset_game_button: Button ## null hors écran-titre
 var _reset_confirm: ConfirmationDialog
+var _reset_error: Label ## message d'échec de la réinitialisation (caché par défaut)
 
 
 func _ready() -> void:
@@ -101,6 +104,11 @@ func _build_reset_game(box: VBoxContainer) -> void:
 	_reset_game_button.disabled = not _has_save()
 	_reset_game_button.pressed.connect(_ask_reset)
 	box.add_child(_reset_game_button)
+	_reset_error = Label.new()
+	_reset_error.visible = false
+	_reset_error.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_reset_error.add_theme_color_override("font_color", Color(1, 0.45, 0.45))
+	box.add_child(_reset_error)
 	_reset_confirm = ConfirmationDialog.new()
 	_reset_confirm.confirmed.connect(_do_reset)
 	add_child(_reset_confirm)
@@ -122,8 +130,10 @@ func _ask_reset() -> void:
 
 func _do_reset() -> void:
 	var service: Node = _service()
-	if service != null:
-		service.call(&"reset_slot", slot_id)
+	if service != null and service.call(&"reset_slot", slot_id) == RESET_FAILED:
+		_reset_error.visible = true # l'écran reste ouvert, le bouton reste actif
+		_reset_game_button.grab_focus()
+		return
 	save_was_reset = true
 	_close() # retour à l'écran-titre, qui relit l'état de l'emplacement
 
@@ -318,6 +328,7 @@ func _retranslate() -> void:
 	_reset_controls_button.text = tr("controls.reset")
 	if _reset_game_button != null:
 		_reset_game_button.text = tr("options.reset_game")
+		_reset_error.text = tr("options.reset_game_failed")
 		_reset_confirm.title = tr("options.reset_game")
 		_reset_confirm.dialog_text = tr("options.reset_game_confirm")
 		_reset_confirm.ok_button_text = tr("menu.confirm")

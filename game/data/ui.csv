@@ -87,3 +87,4 @@ progress.stored,Objets rangés,Items stored
 progress.restored,Pièce restaurée,Room restored
 options.reset_game,Réinitialiser la partie,Reset game
 options.reset_game_confirm,La sauvegarde sera supprimée. Cette action est définitive. Continuer ?,The save will be deleted. This action is permanent. Continue?
+options.reset_game_failed,La sauvegarde n'a pas pu être supprimée.,The save could not be deleted.

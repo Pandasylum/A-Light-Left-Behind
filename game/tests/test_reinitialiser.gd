@@ -22,6 +22,7 @@ func _run() -> void:
 	_svc.save_dir = TEST_DIR
 	_case_service()
 	_case_options()
+	_case_failure()
 	_case_quit_from_title()
 	_clean()
 	_svc.free()
@@ -133,6 +134,29 @@ func _case_options() -> void:
 	title.call("_do_reset")
 	_check(closed[0] and title.get("save_was_reset") and not _svc.slot_exists("partie"), "validation : supprimé, écran fermé")
 	title.free()
+
+
+## Échec de reset_slot : l'écran reste ouvert, le bouton reste actif, le message s'affiche.
+func _case_failure() -> void:
+	var fake: GDScript = GDScript.new()
+	fake.source_code = "extends Node\nfunc slot_exists(_s): return true\nfunc reset_slot(_s): return %d\n" % R.FAILED
+	fake.reload()
+	var service: Node = fake.new()
+	var options: Control = OPTIONS_SCENE.instantiate()
+	options.set("opened_from_title", true)
+	options.set("save_service", service)
+	get_tree().root.add_child(options)
+	var closed: Array[bool] = [false]
+	options.connect("closed", func() -> void: closed[0] = true)
+	var button: Button = _find_reset_button(options)
+	var error: Label = options.get("_reset_error") as Label
+	_check(not error.visible, "échec : message caché au départ")
+	options.call("_do_reset")
+	_check(not closed[0] and not options.get("save_was_reset"), "échec : écran ouvert, pas de réinitialisation")
+	_check(button != null and not button.disabled, "échec : bouton toujours actif")
+	_check(error.visible and not error.text.is_empty(), "échec : message affiché")
+	options.free()
+	service.free()
 
 
 ## Point 3 : le titre n'a ni Autosave ni interception de fermeture ; quitter n'écrit rien.
