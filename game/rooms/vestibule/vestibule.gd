@@ -2,7 +2,7 @@ extends Node3D
 ## Vestibule en blocage gris (scène de jeu PROVISOIRE, décision du 2026-11-15) : mini-pièce du
 ## cleaning_spike en configuration réduite (3 surfaces à nettoyer : 2 marches et le mur droit), murs gris,
 ## table et palette (supports + zones comptées), étagère basse et 2 étagères murales (zones SMALL),
-## 9 objets suivis (les .tres de test, tracks_storing) et le seau (non suivi).
+## 10 objets suivis d'origine (tracks_storing) plus le tableau du phare, et le seau (non suivi).
 ## Branchement : Autosave, RoomLayout, StorageService, RoomProgress, ProgressIndicator, PauseMenu.
 ## « Continuer » : nettoyage, outils, disposition et portage, puis progression.
 

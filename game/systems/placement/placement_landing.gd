@@ -115,12 +115,18 @@ static func carrier_data(surface: PlacementSurface) -> ItemData:
 
 ## Verdict d'une pose : posture supportée, empilement autorisé, puis collisions, puis couverture. La posture est
 ## celle que la surface impose ; collisions et couverture utilisent la forme de pose qui en est dérivée (PoseShape).
+## Surface murale : `center` est le point d'ancrage sur le mur ; le lacet et la boîte viennent de HangPose (`yaw` ignoré).
 static func evaluate_pose(space: PhysicsDirectSpaceState3D, check: PlacementCheck, data: ItemData, yaw: float,
 		center: Vector3, surface: PlacementSurface, exclude: Array[RID] = []) -> Verdict:
 	var posture: ItemData.Posture = surface.posture_for(data.category)
-	if not PlacementCheck.supports_posture(data, posture):
+	if not PlacementCheck.posture_allowed(data, surface):
 		return Verdict.POSTURE_REFUSED
 	var shape: PoseShape = PoseShape.of(data, posture)
+	if surface.is_wall:
+		var normal: Vector3 = surface.wall_normal()
+		if is_blocked(space, data, HangPose.yaw_of(normal), HangPose.box_center(center, normal, data), exclude, shape):
+			return Verdict.BLOCKED
+		return Verdict.OK if check.evaluate(data, yaw, center, surface).status == PlacementCheck.Status.OK else Verdict.UNSTABLE
 	var below: ItemData = carrier_data(surface)
 	if below != null and (not below.can_support_items or not PlacementCheck.can_stack(data.category, below.category)):
 		return Verdict.CANNOT_STACK

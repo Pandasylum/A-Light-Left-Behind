@@ -9,6 +9,9 @@ extends Resource
 @export var edge_margin: float = 0.02
 ## Couverture minimale du support, dans ]0, 1]. Valeur de conception ouverte, ne pas figer.
 @export var min_support_coverage: float = 0.6
+## Épaisseur minimale du collider d'un objet, en mètres (un objet plus mince garde son visuel, son collider est épaissi
+## vers l'avant : face arrière et dessous inchangés). Valeur de départ, ne pas figer.
+@export var collider_min_thickness: float = 0.05
 
 
 ## Renvoie la liste des erreurs de validation (vide si valide).
@@ -20,4 +23,6 @@ func validate() -> PackedStringArray:
 		errors.append("marge au bord négative")
 	if min_support_coverage <= 0.0 or min_support_coverage > 1.0:
 		errors.append("couverture minimale hors de ]0, 1]")
+	if collider_min_thickness <= 0.0:
+		errors.append("épaisseur minimale du collider non strictement positive")
 	return errors

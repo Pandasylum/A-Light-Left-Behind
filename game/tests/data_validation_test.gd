@@ -100,7 +100,9 @@ func _invalid_rules() -> String:
 	p.rotation_step_degrees = 7.0
 	p.edge_margin = -1.0
 	p.min_support_coverage = 0.0
+	p.collider_min_thickness = 0.0
 	return _expect(p.validate(), [
 		"le pas de rotation doit être positif et diviser 360",
 		"marge au bord négative", "couverture minimale hors de ]0, 1]",
+		"épaisseur minimale du collider non strictement positive",
 	])

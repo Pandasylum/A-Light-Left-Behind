@@ -38,19 +38,31 @@ static func supports_posture(data: ItemData, posture: ItemData.Posture) -> bool:
 	return data.postures_supportees.has(posture)
 
 
+## Vrai si l'objet peut être posé sur cette surface selon la posture qu'elle lui impose : posture supportée, et une
+## surface murale n'accepte que ACCROCHE (fonction pure).
+static func posture_allowed(data: ItemData, surface: PlacementSurface) -> bool:
+	var posture: ItemData.Posture = surface.posture_for(data.category)
+	return supports_posture(data, posture) and (not surface.is_wall or posture == ItemData.Posture.ACCROCHE)
+
+
 func _init(placement_rules: PlacementRules = null) -> void:
 	rules = placement_rules if placement_rules != null else PlacementRules.new()
 
 
 ## Cas général : objet, lacet monde, centre de pose (monde), surface (dans l'arbre). La posture est celle que la
 ## surface impose (zone) ; la forme de pose en est dérivée (PoseShape). Posture non supportée : POSTURE_REFUSED.
+## Surface murale : `center` est le point d'ancrage (centre de la face arrière, sur le mur) ; la boîte accrochée
+## (largeur x hauteur, PoseShape) est échantillonnée dans le plan du mur ; `yaw` ignoré (orientation imposée).
 func evaluate(data: ItemData, yaw: float, center: Vector3, surface: PlacementSurface) -> Outcome:
 	var posture: ItemData.Posture = surface.posture_for(data.category)
-	if not supports_posture(data, posture):
+	if not posture_allowed(data, surface):
 		var refused: Outcome = Outcome.new()
 		refused.status = Status.POSTURE_REFUSED
 		return refused
 	var shape: PoseShape = PoseShape.of(data, posture)
+	if surface.is_wall:
+		var plane: Vector3 = surface.to_wall_plane(center)
+		return evaluate_local(Vector2(shape.footprint.x, shape.height), 0.0, Vector2(plane.x, plane.y), surface.size)
 	return evaluate_local(shape.footprint, surface.to_local_yaw(yaw), surface.to_local_xz(center), surface.size)
 
 

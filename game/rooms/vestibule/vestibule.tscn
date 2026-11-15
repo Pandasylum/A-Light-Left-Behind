@@ -63,6 +63,14 @@ script = ExtResource("7_zone_data")
 id = &"vestibule_etagere_murale"
 accepted_categories = Array[int]([0])
 
+[sub_resource type="Resource" id="zone_data_tableau"]
+script = ExtResource("7_zone_data")
+id = &"vestibule_zone_murale_tableau"
+accepted_categories = Array[int]([1])
+postures_imposees = Dictionary[int, int]({
+1: 1
+})
+
 [sub_resource type="BoxShape3D" id="shape_wall_ns"]
 size = Vector3(10.4, 3, 0.2)
 [sub_resource type="BoxMesh" id="mesh_wall_ns"]
@@ -87,6 +95,8 @@ size = Vector3(1.2, 0.8, 0.8)
 size = Vector3(1.2, 0.8, 1.0)
 [sub_resource type="BoxShape3D" id="shape_zone_murale"]
 size = Vector3(0.4, 0.6, 1.0)
+[sub_resource type="BoxShape3D" id="shape_zone_tableau"]
+size = Vector3(0.6, 0.5, 0.1)
 
 [node name="Vestibule" type="Node3D"]
 script = ExtResource("1_scene")
@@ -271,6 +281,21 @@ zone_data = SubResource("zone_data_murale")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneEtagereMuraleB"]
 shape = SubResource("shape_zone_murale")
+
+[node name="ZoneMuraleTableau" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -5.0)
+script = ExtResource("10_zone")
+zone_data = SubResource("zone_data_tableau")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneMuraleTableau"]
+shape = SubResource("shape_zone_tableau")
+
+[node name="PlacementSurface" type="Node3D" parent="Zones/ZoneMuraleTableau" node_paths=PackedStringArray("zone")]
+script = ExtResource("9_surface")
+size = Vector2(0.6, 0.5)
+is_floor = false
+is_wall = true
+zone = NodePath("..")
 
 [node name="Cle" parent="." instance=ExtResource("scn_cle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.025, 0.0)

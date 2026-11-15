@@ -1,13 +1,14 @@
 extends SceneTree
-## Vestibule (blocage gris) : chargement, GAME_SCENE, comptage surfaces + 10 objets suivis (7 SMALL, 2 MEDIUM, 1 LARGE ; ItemData .tres), table et palette
-## zones comptées (meubles non comptés), verrou « restaurée » à 100 % et conservé après sauvegarde/rechargement.
+## Vestibule (blocage gris) : chargement, GAME_SCENE, comptage surfaces + 11 objets suivis (7 SMALL, 3 MEDIUM dont le tableau, 1 LARGE ; ItemData .tres),
+## table et palette zones comptées (meubles non comptés), verrou « restaurée » à 100 % et conservé après sauvegarde/rechargement,
+## tableau (zone murale ACCROCHE, refus de posture, chute, raccrochage).
 ## Lancer : tools/godot.sh --headless --path game --script res://tests/test_vestibule.gd
 
 const SaveServiceScript: GDScript = preload("res://core/save_service.gd")
 const SCENE: String = "res://rooms/vestibule/vestibule.tscn"
 const SAVE_DIR: String = "user://test_saves_vestibule/"
 const SURFACES: int = 3
-const ITEMS: int = 10
+const ITEMS: int = 11 ## 10 objets d'origine + le tableau du phare (tracks_storing, 15/11/2026)
 const SWEEP_RADIUS: float = 0.15
 const SWEEP_STEP: float = 0.1
 const SWEEP_SEGMENTS: int = 8
@@ -42,12 +43,12 @@ func _run() -> void:
 	_check(started_stored == 0 and progress.storing_counts().x == 0 and progress.percent() == 0,
 			"scène neuve : 0 objet suivi rangé (%d), 0 objet compté, 0 %%" % started_stored)
 
-	# Comptage par taille : 7 SMALL, 2 MEDIUM, 1 LARGE, tous suivis, 10 ItemData utilisés ; PorteSortie présent.
+	# Comptage par taille : 7 SMALL, 3 MEDIUM (dont le tableau), 1 LARGE, tous suivis ; PorteSortie présent.
 	var by_size: Array[int] = [0, 0, 0]
 	for tracked: Node in (scene.get_node("StorageService") as StorageService).tracked_items():
 		if (tracked as TestItem).item_data.tracks_storing:
 			by_size[(tracked as TestItem).item_data.category] += 1
-	_check(by_size == [7, 2, 1], "objets suivis par taille : SMALL 7, MEDIUM 2, LARGE 1 (%s)" % str(by_size))
+	_check(by_size == [7, 3, 1], "objets suivis par taille : SMALL 7, MEDIUM 3 (tableau compris), LARGE 1 (%s)" % str(by_size))
 	_check(scene.get_node("PorteSortie") is Marker3D, "repère PorteSortie présent")
 
 	# Table (SMALL/MEDIUM) et palette (SMALL/MEDIUM/LARGE) : zones comptées ; les meubles eux-mêmes ne comptent pas.
@@ -59,17 +60,20 @@ func _run() -> void:
 			"les objets utilisent les .tres de game/data/items/")
 	# Art : chaque objet a un visuel .glb (pas de boîte de test), collision et surface conformes à l'ItemData.
 	for item: Node in scene.get_children():
-		if not (item is TestItem) or item.name == &"Bucket":
+		# Exclusions codées en dur (visuel .glb absent) : le seau ; le tableau du phare, dont le .glb d'Art n'est
+		# pas livré. À RETIRER (TableauPhare) à la livraison du .glb d'Art.
+		if not (item is TestItem) or item.name == &"Bucket" or item.name == &"TableauPhare":
 			continue
 		var it: TestItem = item
 		var data: ItemData = it.item_data
-		var box: Vector3 = Vector3(data.footprint.x, data.height, data.footprint.y)
+		var thick: float = TestItem.collider_thickness(data) ## épaisseur minimale du collider (PlacementRules)
+		var box: Vector3 = Vector3(data.footprint.x, thick, data.footprint.y)
 		var shape: BoxShape3D = (it.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
 		var top: PlacementSurface = it.get_node("PlacementSurface")
 		_check(it.has_node("Visuel") and not it.has_node("MeshInstance3D") and it.get_node("Visuel").get_child_count() > 0,
 				"visuel .glb, sans boîte de test : " + it.name)
 		_check(shape != null and shape.size.is_equal_approx(box) and top.size == data.footprint
-				and is_equal_approx(top.position.y, data.height * 0.5), "collision et surface conformes à l'ItemData : " + it.name)
+				and is_equal_approx(top.position.y, thick - data.height * 0.5), "collision et surface conformes à l'ItemData : " + it.name)
 	_put(cle, _support(scene, "Table"), -3.5, -1.5)
 	_put(bottes, _support(scene, "Table"), -3.2, -1.5)
 	_put(coffre, _support(scene, "Table"), -3.8, -1.5)
@@ -77,7 +81,7 @@ func _run() -> void:
 			"table : SMALL et MEDIUM rangés, LARGE refusé, total inchangé (%s)" % str(progress.storing_counts()))
 	_put(coffre, _support(scene, "Palette"), -3.5, 1.5)
 	_check(storage.is_stored(coffre) and progress.storing_counts() == Vector2i(3, ITEMS), "palette : LARGE rangé (%s)" % str(progress.storing_counts()))
-	_check(_zone_count(scene) == 5 and _count_nodes(scene, ^"Furniture") == 5, "5 zones comptées (basse, table, palette, 2 murales), 5 meubles non suivis")
+	_check(_zone_count(scene) == 6 and _count_nodes(scene, ^"Furniture") == 5, "6 zones comptées (basse, table, palette, 2 murales, zone du tableau), 5 meubles non suivis")
 	for furniture: Node in scene.get_node("Furniture").get_children():
 		_check(not (furniture is TestItem) and not furniture.has_node("StorageZone"), "meuble non compté : " + furniture.name)
 
@@ -136,8 +140,10 @@ func _run() -> void:
 	_put(scene.get_node("Gants"), _support(scene, "EtagereMuraleB"), 4.75, 2.8)
 	_put(scene.get_node("Tasse"), _support(scene, "EtagereMuraleB"), 4.75, 3.2)
 	_put(bottes, _support(scene, "Table"), -3.8, -1.5)
-	_check(progress.percent() < 100 and not progress.is_restored(), "9 objets sur 10 rangés : < 100 %%, verrou à faux (%d %%)" % progress.percent())
+	_check(progress.percent() < 100 and not progress.is_restored(), "9 objets sur 11 rangés : < 100 %%, verrou à faux (%d %%)" % progress.percent())
 	_put(scene.get_node("Cire"), _support(scene, "Table"), -3.2, -1.5)
+	_check(progress.percent() < 100 and not progress.is_restored(), "10 objets sur 11 rangés : < 100 %%, verrou à faux (%d %%)" % progress.percent())
+	_hang(scene.get_node("TableauPhare"), _wall(scene), Vector3(0.0, 1.5, -5.0))
 	_check(progress.percent() == 100 and progress.is_restored() and locks == [&"vestibule"], "100 %% : verrou posé une seule fois")
 	_check((scene.get_node("Autosave") as Autosave).save_and_wait() == 0, "sauvegarde écrite")
 	var saved: Dictionary = _saved()
@@ -153,9 +159,189 @@ func _run() -> void:
 	scene_b.queue_free()
 	await process_frame
 
+	await _tableau()
+	await _tableau_persistence(true)
+	await _tableau_persistence(false)
 	_close_service()
 	print("test_vestibule : ", "OK" if _failures == 0 else "%d échec(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
+
+
+## Surface murale de la zone du tableau.
+func _wall(scene: Node3D) -> PlacementSurface:
+	return scene.get_node("Zones/ZoneMuraleTableau/PlacementSurface")
+
+
+## Accroche l'objet par le même chemin que PlacementController : ancrage sur le mur, orientation de la normale.
+func _hang(item: TestItem, wall: PlacementSurface, anchor: Vector3) -> void:
+	item.on_picked_up()
+	item.global_transform = HangPose.transform_for(anchor, wall.wall_normal(), item.item_data)
+	item.on_placed(wall)
+
+
+func _aim_at(player: Player, pos: Vector3, target: Vector3) -> void:
+	player.global_position = pos
+	var dir: Vector3 = target - player.get_node("Head/Camera3D").global_position
+	player.rotation.y = atan2(-dir.x, -dir.z)
+	player.head.rotation.x = atan2(dir.y, Vector2(dir.x, dir.z).length())
+
+
+## Tableau du phare (Direction 15/11/2026, provisoire) : données, zone murale (mur nord), départ au sol, refus de
+## posture, accrochage, chute depuis la zone, raccrochage. Le contrôleur est forcé actif (souris non capturée en
+## headless : visée forcée puis _update_target() direct, comme test_phase1_flow.gd).
+func _tableau() -> void:
+	var scene: Node3D = _open(false)
+	await _settle()
+	var progress: RoomProgress = scene.get_node("RoomProgress")
+	var storage: StorageService = scene.get_node("StorageService")
+	var tableau: TestItem = scene.get_node("TableauPhare")
+	var bottes: TestItem = scene.get_node("Bottes")
+	var data: ItemData = tableau.item_data
+	var wall: PlacementSurface = _wall(scene)
+	var zone: StorageZone = scene.get_node("Zones/ZoneMuraleTableau")
+
+	# Données : seuls les champs demandés changent, collider épaissi en donnée, visuel inchangé.
+	_check(data == load("res://data/items/tableau_phare.tres") and data.validate().is_empty(), "tableau : ItemData valide, .tres de game/data/items/")
+	_check(data.category == ItemData.Category.MEDIUM and data.footprint.is_equal_approx(Vector2(0.45, 0.35)) and is_equal_approx(data.height, 0.03)
+			and data.postures_supportees == [ItemData.Posture.A_PLAT, ItemData.Posture.ACCROCHE] and data.tracks_storing,
+			"tableau : MEDIUM, 0,45 x 0,35 m, 0,03 m, [A_PLAT, ACCROCHE], suivi (rangement)")
+	var rules: PlacementRules = PlacementRules.new()
+	var cshape: BoxShape3D = (tableau.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
+	_check(is_equal_approx(rules.collider_min_thickness, 0.05) and is_equal_approx(cshape.size.y, 0.05) and is_equal_approx(cshape.size.x, 0.45)
+			and is_equal_approx(cshape.size.z, 0.35), "collider : épaisseur minimale 0,05 m (donnée de PlacementRules), emprise inchangée")
+	var collision: CollisionShape3D = tableau.get_node("CollisionShape3D")
+	_check(is_equal_approx(collision.position.y - cshape.size.y * 0.5, -data.height * 0.5), "collider : dessous et face arrière du visuel conservés (épaissi vers l'avant)")
+
+	# Zone murale : mur nord, plan 0,60 x 0,50 m, normale = orientation de la zone, MEDIUM -> ACCROCHE.
+	var zshape: BoxShape3D = (zone.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
+	_check(zone.zone_data.validate().is_empty() and zone.zone_data.accepted_categories == [ItemData.Category.MEDIUM]
+			and zone.zone_data.posture_for(ItemData.Category.MEDIUM) == ItemData.Posture.ACCROCHE
+			and zone.zone_data.posture_for(ItemData.Category.SMALL) == ItemData.Posture.A_PLAT, "zone murale : MEDIUM accepté et ACCROCHE imposé")
+	_check(wall.is_wall and wall.zone == zone and wall.size.is_equal_approx(Vector2(0.6, 0.5))
+			and is_equal_approx(zshape.size.x, 0.6) and is_equal_approx(zshape.size.y, 0.5), "zone murale : plan 0,60 m x 0,50 m (surface et volume)")
+	_check(wall.wall_normal().is_equal_approx(Vector3(0.0, 0.0, 1.0)) and is_equal_approx(zone.global_position.z, -5.0),
+			"zone murale : sur le mur nord, normale +Z (orientation de la zone)")
+
+	# Départ : au sol, à plat, hors zone, non rangé ; 10 objets d'origine suivis + le tableau.
+	var tracked: int = 0
+	for item: TestItem in storage.tracked_items():
+		if item.item_data.tracks_storing and item != tableau:
+			tracked += 1
+	_check(tracked == 10 and progress.storing_counts() == Vector2i(0, ITEMS), "départ : 10 objets suivis + le tableau (%s)" % str(progress.storing_counts()))
+	_check(tableau.support_surface != null and tableau.support_surface.is_floor and tableau.global_basis.y.is_equal_approx(Vector3.UP)
+			and not zone.contains_item(tableau) and not storage.is_stored(tableau) and progress.percent() == 0,
+			"départ : tableau au sol, à plat, hors zone, non rangé, 0 %%")
+
+	var player: Player = scene.get_node("Spike/Player")
+	var carry: CarryController = player.get_node("CarryController")
+	var placement: PlacementController = player.get_node("PlacementController")
+	var standing: Vector3 = Vector3(0.0, 0.05, -3.5)
+	var center: Vector3 = Vector3(0.0, 1.5, -5.0)
+
+	# Refus : un MEDIUM sans ACCROCHE (bottes) sur la zone murale.
+	var space: PhysicsDirectSpaceState3D = scene.get_world_3d().direct_space_state
+	var check: PlacementCheck = PlacementCheck.new()
+	_check(PlacementLanding.evaluate_pose(space, check, bottes.item_data, 0.0, center, wall) == PlacementLanding.Verdict.POSTURE_REFUSED
+			and check.evaluate(bottes.item_data, 0.0, center, wall).status == PlacementCheck.Status.POSTURE_REFUSED,
+			"zone murale : MEDIUM sans ACCROCHE refusé (POSTURE_REFUSED)")
+	carry.pick_up(bottes.get_node("Interactable"))
+	_aim_at(player, standing, center)
+	await physics_frame
+	placement._update_target()
+	_check(placement._surface == wall and placement._verdict == PlacementController.Verdict.BLOCKED, "visée : bottes refusées sur la zone murale (aperçu rouge)")
+	placement.place_held()
+	_check(carry.held_body() == bottes and bottes.support_surface == null, "bottes toujours en main : aucune pose")
+	_aim_at(player, Vector3(1.0, 0.05, -3.3), Vector3(1.0, 0.0, -4.2)) # loin du joueur et du mur
+	await physics_frame
+	placement._update_target()
+	placement.place_held() # repose les bottes au sol (mains libres)
+	_check(carry.held_body() == null and bottes.support_surface != null and bottes.support_surface.is_floor, "bottes reposées au sol")
+	await physics_frame
+
+	# Accrochage au centre de la zone : face arrière contre le mur, orientation de la normale, rangé.
+	carry.pick_up(tableau.get_node("Interactable"))
+	_aim_at(player, standing, center)
+	await physics_frame
+	placement._update_target()
+	_check(placement._surface == wall and placement._verdict == PlacementController.Verdict.OK, "visée : tableau accrochable au centre de la zone (vert)")
+	placement.place_held()
+	var back_face: Vector3 = tableau.global_position - tableau.global_basis.y * data.height * 0.5
+	_check(carry.held_body() == null and tableau.support_surface == wall and tableau.global_basis.y.is_equal_approx(Vector3(0.0, 0.0, 1.0))
+			and is_equal_approx(back_face.z, -5.0), "accroché : face arrière contre le mur nord, orientation imposée par la normale")
+	_check(storage.is_stored(tableau) and progress.storing_counts() == Vector2i(1, ITEMS), "accroché : rangé (%s)" % str(progress.storing_counts()))
+	var hung_percent: int = progress.percent()
+	_check(hung_percent > 0, "accroché : pourcentage > 0 (%d %%)" % hung_percent)
+	await physics_frame
+
+	# Chute depuis la zone : visée au bord (couverture insuffisante), le tableau tombe à plat au sol, non rangé.
+	carry.pick_up(tableau.get_node("Interactable"))
+	_aim_at(player, standing, Vector3(0.5, 1.5, -5.0))
+	await physics_frame
+	placement._update_target()
+	_check(placement._surface == wall and placement._verdict == PlacementController.Verdict.UNSTABLE, "visée au bord de la zone : instable (orange)")
+	placement.place_held()
+	_check(carry.held_body() == null and tableau.support_surface != null and tableau.support_surface.is_floor
+			and tableau.global_basis.y.is_equal_approx(Vector3.UP) and is_equal_approx(tableau.global_position.y, data.height * 0.5),
+			"chute : le tableau reste à plat au sol")
+	_check(not storage.is_stored(tableau) and progress.percent() < hung_percent and progress.storing_counts().x == 0,
+			"chute : non rangé, pourcentage en baisse (%d %% < %d %%)" % [progress.percent(), hung_percent])
+	await physics_frame
+
+	# Raccrochage : le pourcentage remonte.
+	carry.pick_up(tableau.get_node("Interactable"))
+	_aim_at(player, standing, center)
+	await physics_frame
+	placement._update_target()
+	placement.place_held()
+	_check(tableau.support_surface == wall and storage.is_stored(tableau) and progress.percent() == hung_percent,
+			"raccrochage : rangé, pourcentage remonté (%d %%)" % progress.percent())
+	scene.queue_free()
+	await process_frame
+
+
+## Sauvegarde → rechargement du tableau, sur la vraie zone murale : accroché (même transform, toujours rangé, même
+## nombre d'objets rangés) ou tombé à plat (rechargé à plat, non rangé). Champ « rotation » écrit dans l'entrée.
+func _tableau_persistence(hung: bool) -> void:
+	var tag: String = "accroché" if hung else "tombé à plat"
+	var scene: Node3D = _open(false)
+	await _settle()
+	var tableau: TestItem = scene.get_node("TableauPhare")
+	var wall: PlacementSurface = _wall(scene)
+	var anchor: Vector3 = Vector3(0.0, 1.5, -5.0)
+	var floor_surface: PlacementSurface = tableau.support_surface
+	_hang(tableau, wall, anchor)
+	if not hung: # chute : posé au sol, à plat, au même endroit qu'après une chute
+		tableau.on_picked_up()
+		tableau.global_transform = Transform3D(Basis.IDENTITY, Vector3(0.5, tableau.item_data.height * 0.5, -4.0))
+		tableau.on_placed(floor_surface)
+	await physics_frame
+	var storage: StorageService = scene.get_node("StorageService")
+	var stored_before: int = (scene.get_node("RoomProgress") as RoomProgress).storing_counts().x
+	var transform_before: Transform3D = tableau.global_transform
+	_check(storage.is_stored(tableau) == hung, "persistance (%s) : état de départ" % tag)
+	_check((scene.get_node("Autosave") as Autosave).save_and_wait() == 0, "persistance (%s) : sauvegarde écrite" % tag)
+	var entry: Dictionary = {}
+	for raw: Variant in (_saved().get("disposition", {}) as Dictionary).get("objets", []):
+		if (raw as Dictionary)["id"] == "TableauPhare":
+			entry = raw
+	_check(entry.has("rotation") and (entry["rotation"] as Array).size() == 4, "persistance (%s) : champ « rotation » écrit" % tag)
+	scene.queue_free()
+	await process_frame
+
+	var reloaded: Node3D = _open(true)
+	await _settle()
+	var again: TestItem = reloaded.get_node("TableauPhare")
+	_check(again.global_transform.is_equal_approx(transform_before), "persistance (%s) : même transform (%s)" % [tag, str(again.global_transform)])
+	var storage_again: StorageService = reloaded.get_node("StorageService")
+	for i: int in 5:
+		await physics_frame
+	var stored_after: int = (reloaded.get_node("RoomProgress") as RoomProgress).storing_counts().x
+	_check(storage_again.is_stored(again) == hung and stored_after == stored_before,
+			"persistance (%s) : rangé = %s, même nombre d'objets rangés (%d)" % [tag, str(hung), stored_before])
+	_check(again.global_basis.y.is_equal_approx(Vector3(0.0, 0.0, 1.0)) == hung and again.global_basis.y.is_equal_approx(Vector3.UP) == not hung,
+			"persistance (%s) : %s" % [tag, "face contre le mur (axe horizontal conservé)" if hung else "à plat"])
+	reloaded.queue_free()
+	await process_frame
 
 
 func _zone_count(scene: Node3D) -> int:
