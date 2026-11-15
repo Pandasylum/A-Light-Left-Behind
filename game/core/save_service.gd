@@ -19,6 +19,14 @@ const ENVELOPE_SECTIONS: Dictionary[String, int] = {
 	"format_version": TYPE_FLOAT, "written_at": TYPE_STRING, "checksum": TYPE_STRING, "payload": TYPE_STRING,
 }
 
+## Résultat de reset_slot.
+enum ResetResult {
+	NOTHING, ## aucun fichier principal ni .bak
+	DELETED, ## fichiers lisibles supprimés
+	KEPT_CORRUPT, ## au moins un fichier illisible conservé en .corrompu (les lisibles éventuels sont supprimés)
+	FAILED, ## suppression ou renommage impossible : des fichiers restent en place
+}
+
 enum SaveError {
 	OK,
 	INVALID_SLOT_ID,
@@ -257,6 +265,33 @@ func slot_exists(slot_id: String) -> bool:
 	flush()
 	var path: String = _slot_path(slot_id)
 	return FileAccess.file_exists(path) or FileAccess.file_exists(path + BACKUP_SUFFIX)
+
+
+## Réinitialise l'emplacement (« Réinitialiser la partie ») : supprime le principal et le .bak s'ils sont
+## lisibles ; un fichier illisible n'est jamais supprimé, il est renommé en .corrompu (sans écraser un
+## .corrompu existant). Les fichiers .corrompu déjà présents ne sont pas touchés. Ne modifie aucun autre
+## fichier (réglages inclus). Un emplacement invalide donne NOTHING.
+func reset_slot(slot_id: String) -> ResetResult:
+	if not _is_valid_slot_id(slot_id):
+		return ResetResult.NOTHING
+	flush()
+	var path: String = _slot_path(slot_id)
+	var result: ResetResult = ResetResult.NOTHING
+	for file_path: String in [path, path + BACKUP_SUFFIX]:
+		if not FileAccess.file_exists(file_path):
+			continue
+		if _read_and_validate(file_path)["error"] == SaveError.OK:
+			if DirAccess.remove_absolute(file_path) != OK:
+				result = ResetResult.FAILED
+			elif result == ResetResult.NOTHING:
+				result = ResetResult.DELETED
+		elif _set_aside(file_path).is_empty():
+			result = ResetResult.FAILED
+		elif result != ResetResult.FAILED:
+			result = ResetResult.KEPT_CORRUPT
+	_verified.erase(slot_id)
+	_damaged.erase(slot_id)
+	return result
 
 
 ## État « sauvegarde endommagée », lisible par l'écran-titre : vrai si le dernier chargement a échoué

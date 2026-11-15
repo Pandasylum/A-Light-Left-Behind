@@ -8,6 +8,14 @@ extends Control
 
 signal closed
 
+## Renseigné par l'appelant AVANT add_child : vrai seulement depuis l'écran-titre (la pause ne le change pas).
+var opened_from_title: bool = false
+## Service et emplacement de « Réinitialiser la partie » (null : autoload SaveService ; remplaçables en test).
+var save_service: Node
+var slot_id: String = GameFlow.SLOT_ID
+## Vrai si une réinitialisation a été faite dans cet écran (l'appelant relit l'état de l'emplacement).
+var save_was_reset: bool = false
+
 var _language: OptionButton
 var _display_mode: OptionButton
 var _vsync: CheckButton
@@ -16,6 +24,8 @@ var _value_labels: Dictionary = {}
 var _key_buttons: Dictionary = {} ## action -> Button
 var _reset_controls_button: Button
 var _capturing: StringName = &"" ## action en attente d'une touche ("" : pas de capture)
+var _reset_game_button: Button ## null hors écran-titre
+var _reset_confirm: ConfirmationDialog
 
 
 func _ready() -> void:
@@ -46,6 +56,8 @@ func _ready() -> void:
 	_build_audio(box)
 	_build_controls(box)
 	_build_camera(box)
+	if opened_from_title:
+		_build_reset_game(box)
 	var back: Button = Button.new()
 	back.text = tr("menu.back")
 	back.custom_minimum_size = Vector2(520, 48)
@@ -75,6 +87,45 @@ func _input(event: InputEvent) -> void:
 func _close() -> void:
 	Settings.save()
 	closed.emit()
+
+
+## Bouton rouge et alerte de validation (« Annuler » a le focus). Aucun fichier n'est touché ici :
+## tout passe par SaveService.reset_slot.
+func _build_reset_game(box: VBoxContainer) -> void:
+	_reset_game_button = Button.new()
+	_reset_game_button.custom_minimum_size = Vector2(0, 48)
+	_reset_game_button.add_theme_color_override("font_color", Color(1, 0.45, 0.45))
+	_reset_game_button.add_theme_color_override("font_hover_color", Color(1, 0.6, 0.6))
+	_reset_game_button.add_theme_color_override("font_focus_color", Color(1, 0.6, 0.6))
+	_reset_game_button.add_theme_color_override("font_pressed_color", Color(1, 0.3, 0.3))
+	_reset_game_button.disabled = not _has_save()
+	_reset_game_button.pressed.connect(_ask_reset)
+	box.add_child(_reset_game_button)
+	_reset_confirm = ConfirmationDialog.new()
+	_reset_confirm.confirmed.connect(_do_reset)
+	add_child(_reset_confirm)
+
+
+func _service() -> Node:
+	return save_service if save_service != null else get_node_or_null(^"/root/SaveService")
+
+
+func _has_save() -> bool:
+	var service: Node = _service()
+	return service != null and service.call(&"slot_exists", slot_id)
+
+
+func _ask_reset() -> void:
+	_reset_confirm.popup_centered()
+	_reset_confirm.get_cancel_button().grab_focus()
+
+
+func _do_reset() -> void:
+	var service: Node = _service()
+	if service != null:
+		service.call(&"reset_slot", slot_id)
+	save_was_reset = true
+	_close() # retour à l'écran-titre, qui relit l'état de l'emplacement
 
 
 func _build_language(box: VBoxContainer) -> void:
@@ -265,4 +316,10 @@ func _retranslate() -> void:
 	_display_mode.set_item_text(0, tr("options.display_mode.fullscreen"))
 	_display_mode.set_item_text(1, tr("options.display_mode.windowed"))
 	_reset_controls_button.text = tr("controls.reset")
+	if _reset_game_button != null:
+		_reset_game_button.text = tr("options.reset_game")
+		_reset_confirm.title = tr("options.reset_game")
+		_reset_confirm.dialog_text = tr("options.reset_game_confirm")
+		_reset_confirm.ok_button_text = tr("menu.confirm")
+		_reset_confirm.cancel_button_text = tr("menu.cancel")
 	_refresh_controls()
