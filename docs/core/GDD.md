@@ -1,6 +1,6 @@
 # A LIGHT LEFT BEHIND — Game Design Document
 
-Dernière mise à jour : 2026-11-12  
+Dernière mise à jour : 2026-11-15  
 Statut : document de référence des décisions de conception validées.
 
 **Légende** : ✅ décision validée · 💡 piste non engagée · 🟡 à préciser pendant le prototypage
@@ -53,7 +53,7 @@ La transformation de la pièce doit être lisible et gratifiante. La progression
 - Réparer ne demande aucune collecte de pièces ni de matériaux. Les pièces de remplacement sont fournies par la trousse à outils du joueur.
 - Les objets et meubles cassés ont deux états visuels, cassé puis réparé, sauf cas particuliers (par exemple la lampe du phare).
 - Une réparation a un effet fonctionnel dans le jeu.
-- Certaines réparations spécifiques (lampe du phare, chaufferie, électricité, etc.) peuvent avoir un impact sur le lore.
+- Certaines réparations spécifiques (lampe du phare, électricité, etc.) peuvent avoir un impact sur le lore.
 - Les réparations se font par étapes et tiennent compte du matériau de l'objet ou de l'élément concerné.
 - Métal très corrodé : le traitement est intégré au geste de réparation (outil multifonction), sans étape distincte. Aucun métal très corrodé avant l'atelier.
 - La réparation compte dans le 100 % de la pièce (§6).
@@ -150,21 +150,21 @@ Types de saleté et outils :
 - Les pièces sont initialement très sales et encombrées.
 - La restauration transforme visiblement et progressivement chaque espace.
 - Graphe des pièces (décisions validées le 2026-11-10) :
-  - Le jeu compte 7 pièces principales, hub et atelier compris, plus la pièce 1 (tutoriel), vestibule d'entrée et 8e zone jouable distincte des 7. Durée visée : 45 minutes à 1 heure par pièce principale, environ 7 heures de jeu au total. Le contenu est produit par étapes, pas tout d'un coup.
+  - Le jeu compte des pièces principales, hub et atelier compris, plus la pièce 1 (tutoriel), vestibule d'entrée et zone jouable distincte des pièces principales. Le nombre de pièces principales n'est plus 7 depuis la refonte du phare et n'est pas redéfini (décision du 2026-11-15 ; 🟡 point ouvert, §15). Durée visée : 45 minutes à 1 heure par pièce principale, environ 7 heures de jeu au total. Le contenu est produit par étapes, pas tout d'un coup.
   - Structure : noyau de départ (pièce 1 et atelier) → hub central (rez-de-chaussée) → branches de restauration → étages supérieurs → sommet du phare.
   - Entrée du phare et porte du fût (décision du 2026-11-12, reformulée le 2026-11-13 ; 🟡 provisoire) : le joueur accède à l'escalier par une ouverture percée dans le mur du fût, à chaque niveau où le passage existe (N0, N1, N2), au pied de la première marche au N0. L'escalier reste inchangé. L'ouverture utilise un module « mur avec ouverture » de 30° (ou 2 × 15°) ; la largeur de passage exacte reste à confirmer avec la corde réelle (environ 1,04 m à 2,0 m de rayon). Cette ouverture est fermée par une porte, la porte du fût, verrouillée tant que la cuisine, le salon et l'atelier ne sont pas à 100 %.
   - Le hub est le point central de circulation. Plusieurs portes donnent accès aux pièces ; certaines sont verrouillées et se débloquent progressivement. Le hub doit lui-même être restauré. L'escalier central, dans le fût, s'ouvre sur le hub par la porte du fût ; elle est déverrouillée quand cuisine, salon et atelier sont à 100 % (voir « Structure du bâtiment »).
   - L'atelier est collé au hub, ouvert et facilement accessible. Il sert de tutoriel.
   - Une pièce se débloque quand la précédente (dans sa branche) est à 100 %. Exception : le hub est accessible sans que l'atelier soit à 100 %. À partir du hub, plusieurs branches peuvent être explorées en parallèle et l'ordre de certaines pièces est libre. Seule la lanterne (la lampe) reste bloquée tant que le reste n'est pas terminé (voir « Accès à la lanterne »).
-  - Liste des pièces (décisions validées le 2026-11-10, révisées le 2026-11-13). Rez-de-chaussée (N0) : vestibule (pièce 1, hors des 7), atelier, cuisine, salon, hub. Le hub est la tour (voir « Structure du bâtiment »). Niveau 1 (N1) : une seule grande pièce, chambre + bureau (taille de la cuisine et du salon ensemble ; le bureau est une zone de cette pièce, ancien espace personnel du gardien). Niveau 2 (N2) : salle d'archives (documents, cartes, registres et souvenirs) et machinerie (petite pièce, voir ci-dessous). Niveau 3 (N3) : salle de la lanterne, dernière zone, cœur du phare et conclusion de la restauration. Les pièces principales restent au nombre de 7 : hub, atelier, cuisine, salon, chambre + bureau, archives, lanterne. La machinerie n'est pas une pièce principale (décision validée le 2026-11-13).
+  - Liste des pièces (décisions validées le 2026-11-10, révisées le 2026-11-13 puis le 2026-11-15). Rez-de-chaussée (N0) : vestibule (pièce 1, hors des pièces principales), atelier, hub (passage commun au nord, avec le sas de la tour en béton), cuisine, salle d'eau, WC. Le hub est la tour (voir « Structure du bâtiment »). Niveau 1 (N1) : salon (au-dessus de la cuisine) et chambre (au-dessus de la salle d'eau). Niveau 2 (N2) : archives et bureau en une seule grande pièce. La tour compte 7 niveaux (N0 à N6) plus la lanterne : N3 et N4 sont des niveaux sans plancher, traversés par l'escalier ; N5 est la salle de remontée (sol complet, trappe d'échelle) ; N6 contient la machinerie (voir ci-dessous). Salle de la lanterne : dernière zone, au sommet, cœur du phare et conclusion de la restauration. Cette liste remplace « chambre + bureau réunis » (N1) et « archives + machinerie » (N2) (décisions validées le 2026-11-15).
   - Structure du bâtiment (décisions validées le 2026-11-13) : la maison est accolée à la tour. La tour est le hub : elle longe tout le bâtiment et sert de passage commun. Le fût (cage d'escalier, rayon 2,0 m) se trouve dans ce passage. Le passage existe aux niveaux 0, 1 et 2, et une porte relie le fût au passage à chaque niveau. Ordre au rez-de-chaussée : vestibule → atelier → hub, l'atelier étant à côté du hub (cela remplace l'ordre de la maquette lore).
-  - Machinerie (décision validée le 2026-11-13) : petite pièce séparée, dans la moitié basse du fût au N2, avec un bloc de maçonnerie en dessous. Elle forme la « zone de la lampe » avec la lanterne. Elle est verrouillée : il faut une clé (la clé de la machinerie, prise dans la boîte à outils de la lanterne). Toutes ses réparations sont obligatoires pour rétablir le courant (décision validée le 2026-11-13) : elles font partie du lot final avec la lanterne et comptent dans la progression. Les découvertes facultatives (notes de l'ancien gardien, etc.) n'entrent pas dans le compteur de progression. Ses réparations ne sont pas comptées dans « le reste » : elles ne deviennent possibles qu'après la montée à la lanterne, donc les y compter bloquerait la trappe.
-  - Accès à la lanterne (décisions validées le 2026-11-13) : l'escalier s'arrête au palier du N2. La lanterne s'atteint par une échelle, via une trappe sur le palier à côté de la machinerie (pas à travers elle). La trappe est verrouillée tant que « le reste » n'est pas à 100 %. La tour est haute : environ 10 m entre le palier N2 et la lanterne ; cette hauteur est conservée. La montée est automatique (la caméra monte seule, pas d'escalade manuelle). La première fois, elle est animée : fentes de lumière, vent, fondu à mi-hauteur ; ensuite, c'est une transition courte. Un appui long sur le bouton permet de passer la montée, y compris la première fois ; la durée de l'appui long n'est pas décidée. La règle de l'échelle (objets en main) est décrite au §5.
+  - Machinerie (décision validée le 2026-11-13, emplacement révisé le 2026-11-15) : au N6, dans une cage grillagée fermée à clé. Elle forme la « zone de la lampe » avec la lanterne. Elle est verrouillée : il faut une clé (la clé de la machinerie, prise dans la boîte à outils de la lanterne). Toutes ses réparations sont obligatoires pour rétablir le courant (décision validée le 2026-11-13) : elles font partie du lot final avec la lanterne et comptent dans la progression. Les découvertes facultatives (notes de l'ancien gardien, etc.) n'entrent pas dans le compteur de progression. Ses réparations ne sont pas comptées dans « le reste » : elles ne deviennent possibles qu'après la montée à la lanterne, donc les y compter bloquerait la trappe.
+  - Accès à la lanterne (décisions validées le 2026-11-13, révisées le 2026-11-15) : l'escalier en colimaçon monte de N0 à N4 (72 marches), puis trois échelles de 3 m : N4 vers N5, N5 vers N6, N6 vers la lanterne. La trappe est verrouillée tant que « le reste » n'est pas à 100 %. La hauteur se découvre en montant, par les ouvertures (la « montée d'ambiance » est abandonnée). La mécanique des échelles est un point ouvert (§15). La règle de l'échelle (objets en main) est décrite au §5.
   - Clé de la machinerie (décision validée le 2026-11-13) : ce n'est pas une clé cachée à chercher, mais un jalon de la séquence de fin. Elle se trouve dans la boîte à outils de l'ancien gardien, dans la lanterne, à emplacement fixe et visible dès l'arrivée. La boîte à outils est accessible sans courant. Le verrou de la machinerie est explicite pour le joueur (« verrouillée, il faut une clé »).
   - 🟡 Points ouverts de la structure : position de la porte extérieure du bâtiment (proposition : côté vestibule) ; position du tableau électrique dans le passage ; quelles portes (cuisine, salon) sont verrouillées au départ ; place disponible dans le fût au N2 (machinerie + palier + échelle), à vérifier à l'échelle réelle par Art.
   - L'escalier central est accessible quand les 3 zones autour du hub (cuisine, salon, atelier) sont à 100 % : c'est la condition de déverrouillage de la porte du fût.
   - Réparations particulières par pièce : hall central (installation électrique générale, interrupteurs, éclairage, câblage) ; cuisine (robinetterie, évier, tuyauterie, équipements de cuisine) ; salon (cheminée, conduits, mobilier nécessitant une restauration particulière) ; atelier (établi, éclairage technique, prises, équipements d'amélioration des outils) ; chambre (mobilier abîmé, lit, armoire, éléments en bois) ; salle d'archives (étagères, tiroirs, boîtes de rangement, mobilier de conservation) ; salle de la lanterne (mécanisme optique, rotation de la lanterne, alimentation lumineuse, système de signalisation). Réparation signature par pièce : hall central, tableau électrique ; cuisine, évier et robinetterie ; salon, cheminée ; atelier, établi ; chambre, lit du gardien ; salle d'archives, meuble à tiroirs ; salle de la lanterne, mécanisme et lampe. Les autres réparations de chaque pièce restent classiques (bois, métal, surfaces, mobilier).
-  - Chaufferie : au sous-sol, dans l'extension prévue (trappe vers le tunnel, §14), hors des 7 pièces. Le jeu de base garde le chauffage via la cheminée du salon et la plomberie de la cuisine.
+  - Chaufferie supprimée (décision validée le 2026-11-15) : la cuisinière (bois ou charbon) et le ballon d'eau chaude de la salle d'eau reprennent son rôle.
   - Direction artistique (principe) : palette commune à tout le phare, avec des variations de matériaux, mobilier, décoration et éclairage propres à chaque pièce. La lumière est froide au début et devient progressivement plus chaude avec la restauration. Les détails relèvent du projet Art et de ART_BIBLE.md.
   - Courant de l'atelier : le joueur lance un générateur de secours pour alimenter l'atelier le temps de trouver l'installation électrique ; le personnage indique qu'il faut la chercher en priorité dans le hub. L'installation électrique générale (tableau principal) est dans le hub et se répare là.
   - Les étages supérieurs deviennent accessibles progressivement. Le phare monte vers la lanterne, au sommet, dernière grande étape : rallumer la lampe est l'aboutissement du jeu.
@@ -380,7 +380,7 @@ Valeurs de départ, à régler après essai.
 
 - Coopération à deux joueurs, uniquement si elle devient techniquement réaliste sans compromettre l'expérience solo. Aucune contrainte d'architecture ne doit être imposée à la première version pour cette possibilité.
 - Nouveaux espaces après la campagne (sous-sol, cabanon extérieur, autres extensions).
-- Extension : trappe vers un sous-sol menant à un tunnel ; le sous-sol accueillerait la chaufferie.
+- Extension : trappe vers un sous-sol menant à un tunnel.
 - Extension : cabanon extérieur.
 - Passage sous le phare pouvant éventuellement conduire jusqu'à la côte : idée d'extension future, pas une fonctionnalité requise pour la sortie initiale.
 - Support manette en bonus, si facile. Non engagé : le clavier/souris reste la référence.
@@ -388,7 +388,7 @@ Valeurs de départ, à régler après essai.
 - Coffre en bois de la pièce 1 utilisable ensuite comme rangement.
 - Catégorie « objets d'histoire » (clés, documents, souvenirs) hors des règles de rangement, avec un journal ou un inventaire.
 - Mobilité réduite en portant un gros objet.
-- Aucun élément de lore n'est rattaché pour l'instant au sous-sol, à la chaufferie ni au tunnel (décision du 2026-11-13).
+- Aucun élément de lore n'est rattaché pour l'instant au sous-sol ni au tunnel (décision du 2026-11-13, chaufferie supprimée le 2026-11-15).
 
 ## 15. Points à préciser pendant le prototypage 🟡
 
@@ -400,7 +400,10 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
    - fonctionnement du générateur de secours et 🟡 emplacement exact du tableau principal dans le hub ;
    - condition d'ouverture de la première branche ;
    - définition exacte de « le reste » pour débloquer la lanterne (partiellement réglée : la machinerie en est exclue, §6) ;
-   - durée de l'appui long pour passer la montée de l'échelle ;
+   - 🟡 nombre de pièces principales après la refonte du phare (n'est plus 7, non redéfini ; décision du 2026-11-15) ;
+   - 🟡 mécanique des échelles (montée automatique ou manuelle, transition éventuelle) ;
+   - 🟡 contenu et déblocage éventuel du sous-sol (hors lore, prévu pour le futur) ;
+   - 🟡 porte extérieure du vestibule et portes verrouillées de N0 ;
    - mécanisme de l'évolution de l'atmosphère (globale ou par pièce) ;
    - rôle, contenu et fonctionnement du journal (mentionné comme découverte du noyau de départ).
 3. Liste des postures par objet et par zone de pose (voir §5, Orientation).
@@ -418,7 +421,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
 8. Mécanique de réparation : déroulé exact des étapes et variantes selon le matériau.
 9. Origine des pièces de remplacement (fusibles, etc.) fournies par la trousse à outils.
 10. L'outil multifonction est-il consommable ?
-11. Liste et nombre des réparations spécifiques (lampe du phare, chaufferie, électricité, etc.) et de leur impact sur le lore.
+11. Liste et nombre des réparations spécifiques (lampe du phare, électricité, etc.) et de leur impact sur le lore.
 12. ~~Quand et où le joueur obtient la trousse à outils.~~ Réglé : à l'atelier (§6).
 13. Contenu exact de la trousse à outils.
 14. La trousse à outils est-elle améliorable ?
