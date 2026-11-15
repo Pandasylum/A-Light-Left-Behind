@@ -87,17 +87,17 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Décision (12/11/2026) : pas d'omission des écritures inutiles. À rouvrir si le profilage montre un problème.
 - Intégration (12/11/2026) : `Autosave` est instancié dans `sponge_test.tscn` seulement, sans autoload, tant que la scène de jeu n'existe pas.
 - Note (12/11/2026) : la salissure d'un outil relue du fichier peut différer sur les dernières décimales (JSON existant) ; les tests comparent avec tolérance.
-- Menu : « Continuer » remplace « Nouvelle partie » si une sauvegarde existe. « Recommencer » (Options) supprime le fichier principal et le `.bak`, ne touche pas aux réglages, puis ramène à l'écran-titre, après une alerte avec « Annuler » par défaut. À implémenter.
+- Menu : « Continuer » remplace « Nouvelle partie » si une sauvegarde existe. « Réinitialiser la partie » (Options) supprime le fichier principal et le `.bak`, ne touche pas aux réglages, puis ramène à l'écran-titre, après une alerte avec « Annuler » par défaut. Implémenté : voir la section « Réinitialiser la partie ».
 - Sauvegardes illisibles (principal et `.bak`) : jamais traitées comme une absence de sauvegarde. L'écran-titre affiche « sauvegarde endommagée ». Les fichiers sont renommés (par exemple `.corrompu`), jamais supprimés ni écrasés. « Nouvelle partie » reste disponible avec confirmation, qui précise que la sauvegarde endommagée sera mise de côté. L'entrée dans le journal est conservée.
 
 ## Menu (écran-titre et pause) ✅ (12/11/2026)
 - L'écran-titre est la scène principale du projet.
 - La pause s'ouvre par l'action d'Input Map `pause_menu` (touche Échap).
-- Le menu Options est vide pour l'instant (lot Options à venir).
+- Le menu Options est décrit dans les sections « Réglages (Options) » et « Commandes et caméra ».
 - « Retour au menu » et « Quitter » appellent `save_and_wait()` avant de sortir de la partie.
 - `Player.restore_mouse_mode()` rétablit le mode de la souris à la sortie de la pause.
 - Provisoire : la scène de jeu lancée depuis le titre est `sponge_test.tscn`, à remplacer par la vraie scène de jeu.
-- À faire (non fait, ne pas présenter comme acquis) : table de traduction (les boutons affichent encore des clés brutes, ex. `menu.new_game`) ; lot Options.
+- Fait : table de traduction (13/11/2026, section « Traduction ») ; lot Options (lots A, B et Réinitialiser, 13 au 15/11/2026).
 
 ## Traduction ✅ (13/11/2026)
 - Langues : fr (référence) et en, décidées par Direction le 12/11/2026.
@@ -236,7 +236,7 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - ✅ 2026-11-13 : poser le verrou déclenche une demande de sauvegarde (`Autosave`). Rien ne déclenche au chargement. Si le calcul au chargement donne « complet » sans verrou, celui-ci est posé sans demande de sauvegarde.
 - ✅ 2026-11-13 : la scène de jeu importe la section comme les autres (nettoyage, outils, disposition). Le premier calcul a lieu à l'évaluation du rangement.
 - ✅ 2026-11-13 (contrainte pour les scènes futures) : une scène qui charge ses états plus tard doit rappeler le recalcul.
-- 🟡 2026-11-13 : indicateur provisoire. Il affiche le pourcentage de la pièce, les surfaces finies sur le total, les objets rangés sur les objets suivis, et la marque « restaurée ». Interface provisoire, sans décision d'art. Les libellés sont des clés préfixées `progress` ; il n'existe pas encore de table de traduction.
+- 🟡 2026-11-13 : indicateur provisoire. Il affiche le pourcentage de la pièce, les surfaces finies sur le total, les objets rangés sur les objets suivis, et la marque « restaurée ». Interface provisoire, sans décision d'art. Les libellés sont des clés `progress.*` de `game/data/ui.csv`.
 - ✅ 2026-11-13 : remplace le texte de débogage des surfaces et les messages de débogage du journal, retirés.
 - ✅ 2026-11-13 : test `test_progression.gd`.
 - 🟡 2026-11-13, limite connue : dans la scène de jeu provisoire (`sponge_test`), aucun objet ne déclare le rangement. Le pourcentage ne porte donc que sur les surfaces. L'axe rangement est couvert par la scène de vérification de la progression. Les vrais objets déclareront le rangement avec le vestibule.
