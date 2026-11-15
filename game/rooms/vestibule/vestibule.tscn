@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" path="res://tests/test_cleaning/cleaning_spike.tscn" id="2_spike"]
 [ext_resource type="PackedScene" path="res://props/cle.tscn" id="scn_cle"]
 [ext_resource type="PackedScene" path="res://props/boite_vis.tscn" id="scn_boite_vis"]
+[ext_resource type="PackedScene" path="res://props/tableau_phare.tscn" id="scn_tableau"]
+[ext_resource type="Resource" path="res://data/items/tableau_phare.tres" id="6_tableau"]
 [ext_resource type="PackedScene" path="res://props/bobine_ficelle.tscn" id="scn_bobine_ficelle"]
 [ext_resource type="PackedScene" path="res://props/gants_travail.tscn" id="scn_gants_travail"]
 [ext_resource type="PackedScene" path="res://props/tasse_emaillee.tscn" id="scn_tasse_emaillee"]
@@ -273,6 +275,10 @@ shape = SubResource("shape_zone_murale")
 [node name="Cle" parent="." instance=ExtResource("scn_cle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.025, 0.0)
 item_data = ExtResource("6_cle")
+
+[node name="TableauPhare" parent="." instance=ExtResource("scn_tableau")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.015, 2.5)
+item_data = ExtResource("6_tableau")
 
 [node name="BoiteVis1" parent="." instance=ExtResource("scn_boite_vis")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45, 0.04, -1.5)
