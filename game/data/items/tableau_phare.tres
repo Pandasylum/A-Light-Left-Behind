@@ -9,4 +9,5 @@ name_key = "item.tableau_phare"
 category = 1
 footprint = Vector2(0.45, 0.35)
 height = 0.03
-tracks_storing = false
+postures_supportees = Array[int]([0, 1])
+tracks_storing = true

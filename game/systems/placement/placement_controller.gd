@@ -4,12 +4,17 @@ extends Node
 ## objet posé) : aperçu (vert = stable, orange = va tomber, rouge = refusé), rotation par paliers,
 ## empilement (PlacementCheck.can_stack), support (PlacementCheck) puis collision. Une pose instable
 ## déclenche une chute verticale (PlacementLanding). Règles d'empilement et de chute PROVISOIRES (GDD §15 pt 18).
+## Surface murale (PlacementSurface.is_wall) visée avec une posture ACCROCHE imposée : l'objet est accroché face arrière
+## contre le mur, orientation imposée par la normale (HangPose), le joueur ne règle aucun angle ; une pose instable le
+## fait tomber à plat au sol (même règle de chute). Hors zone murale et sur les autres zones : comportement inchangé.
 ## Actif seulement avec un objet en main et la souris capturée.
 
 const WORLD_MASK: int = 1 ## couche 1 : monde (raycast)
 const INTERACTIVE_LAYER_VALUE: int = 4 ## couche 3 : interactifs (valeur de masque)
 const AIM_MASK: int = WORLD_MASK | INTERACTIVE_LAYER_VALUE ## raycast d'aperçu : monde + objets posés
 const TOP_FACE_DOT: float = 0.95 ## produit scalaire minimal (normale . haut) d'une face visée
+const WALL_FACE_DOT: float = 0.95 ## produit scalaire minimal (normale touchée . normale de la surface murale)
+const WALL_PLANE_TOLERANCE: float = 0.05 ## m : écart maximal du point visé au plan de la surface murale
 const COLOR_VALID: Color = Color(0.2, 0.9, 0.3, 0.4)
 const COLOR_FALL: Color = Color(1.0, 0.6, 0.1, 0.4)
 const COLOR_INVALID: Color = Color(0.95, 0.2, 0.2, 0.4)
@@ -33,7 +38,8 @@ var _check: PlacementCheck
 var _yaw: float = 0.0 ## lacet monde de l'objet, rad
 var _verdict: Verdict = Verdict.NO_SURFACE
 var _surface: PlacementSurface = null
-var _center: Vector3 = Vector3.ZERO ## centre de pose sur la face supérieure (monde)
+var _center: Vector3 = Vector3.ZERO ## centre de pose sur la face supérieure (monde) ; surface murale : point d'ancrage sur le mur
+var _wall_body: RID = RID() ## surface murale visée : corps du mur touché par le rayon
 var _state_body: Node3D = null ## objet pour lequel l'état ci-dessus a été calculé
 
 
@@ -88,10 +94,20 @@ func place_held() -> void:
 	var surface: PlacementSurface = _surface
 	var center: Vector3 = _center
 	var fell: bool = false
+	var yaw: float = _yaw
+	var normal: Vector3 = Vector3.ZERO
+	if surface.is_wall:
+		normal = surface.wall_normal()
+		yaw = HangPose.yaw_of(normal)
 	if _verdict == Verdict.UNSTABLE:
 		var space: PhysicsDirectSpaceState3D = _camera.get_world_3d().direct_space_state
-		var origin: RID = (surface.get_parent() as CollisionObject3D).get_rid()
-		var landing: PlacementLanding.Landing = PlacementLanding.resolve(space, _check, data, _yaw, center, origin,
+		var start: Vector3 = center
+		var origin: RID = _wall_body
+		if surface.is_wall:
+			start = HangPose.fall_start(center, normal, data, rules.edge_margin) ## tombe à plat, dégagé du mur
+		else:
+			origin = (surface.get_parent() as CollisionObject3D).get_rid()
+		var landing: PlacementLanding.Landing = PlacementLanding.resolve(space, _check, data, yaw, start, origin,
 				(body as CollisionObject3D).get_rid())
 		if not landing.ok:
 			_prompt.show_message("place.blocked")
@@ -101,7 +117,10 @@ func place_held() -> void:
 		fell = true
 	var placed: Node3D = _carry.release_held()
 	placed.reparent(_placed_root(), false)
-	placed.global_transform = Transform3D(Basis(Vector3.UP, _yaw), center + Vector3.UP * data.height * 0.5)
+	if surface.is_wall:
+		placed.global_transform = HangPose.transform_for(center, normal, data)
+	else:
+		placed.global_transform = Transform3D(Basis(Vector3.UP, yaw), center + Vector3.UP * data.height * 0.5)
 	(placed as CollisionObject3D).collision_layer = INTERACTIVE_LAYER_VALUE
 	placed.visible = true
 	if placed.has_method(&"on_placed"):
@@ -136,15 +155,22 @@ func _update_target() -> void:
 	var to: Vector3 = from - _camera.global_transform.basis.z * _sensor.reach
 	var hit: Dictionary = space.intersect_ray(PhysicsRayQueryParameters3D.create(from, to, AIM_MASK))
 	var surface: PlacementSurface = null
-	if not hit.is_empty() and is_top_face(hit["normal"]):
-		surface = PlacementSurface.of_body(hit.get("collider")) ## support déclaré ou dessus d'un objet
+	if not hit.is_empty():
+		if is_top_face(hit["normal"]):
+			surface = PlacementSurface.of_body(hit.get("collider")) ## support déclaré ou dessus d'un objet
+		else:
+			surface = _aimed_wall(hit, data) ## mur d'une zone qui impose ACCROCHE
 	if surface == null:
 		_reset_state()
 		return
 	var hit_point: Vector3 = hit["position"]
 	_surface = surface
 	_state_body = body
-	_center = Vector3(hit_point.x, surface.top_y(), hit_point.z)
+	if surface.is_wall:
+		_center = hit_point
+		_wall_body = (hit["collider"] as CollisionObject3D).get_rid()
+	else:
+		_center = Vector3(hit_point.x, surface.top_y(), hit_point.z)
 	var exclude: Array[RID] = [(body as CollisionObject3D).get_rid()]
 	match PlacementLanding.evaluate_pose(space, _check, data, _yaw, _center, surface, exclude):
 		PlacementLanding.Verdict.OK:
@@ -158,17 +184,42 @@ func _update_target() -> void:
 	_show_preview(data)
 
 
+## Surface murale que le rayon vise : face du mur de normale conforme, point visé sur son plan et dans l'étendue où
+## l'objet la recouvrirait ; la zone doit imposer ACCROCHE à la catégorie de l'objet. Null sinon (aucune surface).
+func _aimed_wall(hit: Dictionary, data: ItemData) -> PlacementSurface:
+	var shape: PoseShape = PoseShape.of(data, ItemData.Posture.ACCROCHE)
+	for node: Node in get_tree().get_nodes_in_group(PlacementSurface.WALL_GROUP):
+		var wall: PlacementSurface = node as PlacementSurface
+		if wall == null or wall.posture_for(data.category) != ItemData.Posture.ACCROCHE:
+			continue
+		if wall.wall_normal().dot(hit["normal"]) < WALL_FACE_DOT:
+			continue
+		var plane: Vector3 = wall.to_wall_plane(hit["position"])
+		if absf(plane.z) <= WALL_PLANE_TOLERANCE and absf(plane.x) <= (wall.size.x + shape.footprint.x) * 0.5 \
+				and absf(plane.y) <= (wall.size.y + shape.height) * 0.5:
+			return wall
+	return null
+
+
 func _reset_state() -> void:
 	_verdict = Verdict.NO_SURFACE
 	_surface = null
+	_wall_body = RID()
 	_state_body = null
 	if _preview != null:
 		_preview.visible = false
 
 
 func _show_preview(data: ItemData) -> void:
-	(_preview.mesh as BoxMesh).size = Vector3(data.footprint.x, data.height, data.footprint.y)
-	_preview.global_transform = Transform3D(Basis(Vector3.UP, _yaw), _center + Vector3.UP * data.height * 0.5)
+	if _surface.is_wall:
+		var shape: PoseShape = PoseShape.of(data, ItemData.Posture.ACCROCHE)
+		var normal: Vector3 = _surface.wall_normal()
+		(_preview.mesh as BoxMesh).size = Vector3(shape.footprint.x, shape.height, shape.footprint.y)
+		_preview.global_transform = Transform3D(Basis(Vector3.UP, HangPose.yaw_of(normal)),
+				HangPose.box_center(_center, normal, data) + Vector3.UP * shape.height * 0.5)
+	else:
+		(_preview.mesh as BoxMesh).size = Vector3(data.footprint.x, data.height, data.footprint.y)
+		_preview.global_transform = Transform3D(Basis(Vector3.UP, _yaw), _center + Vector3.UP * data.height * 0.5)
 	match _verdict:
 		Verdict.OK:
 			_material.albedo_color = COLOR_VALID
