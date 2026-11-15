@@ -552,6 +552,11 @@ func _greybox() -> void:
 	var low: TestItem = items.get_node("furniture_low")
 	for item: TestItem in [preplaced, small, small_b, low]:
 		_tracked(item)
+	for node: Node in items.get_children(): # règle « objet libre suivi » (2026-11-15) : les autres objets de la scène grise sortent du scénario
+		if node is TestItem and not [small, small_b, low].has(node):
+			var other: ItemData = (node as TestItem).item_data.duplicate() as ItemData
+			other.tracks_storing = false
+			(node as TestItem).item_data = other
 	var room_data: RoomData = RoomData.new()
 	room_data.id = &"greybox_test"
 	var axes: Array[RoomData.Axis] = [CLEANING, STORING]

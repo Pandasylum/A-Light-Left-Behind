@@ -9,3 +9,4 @@ name_key = "item.test.large_1"
 category = 2
 footprint = Vector2(0.80, 0.80)
 height = 0.9
+tracks_storing = true
