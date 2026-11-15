@@ -5,7 +5,15 @@
 [ext_resource type="PackedScene" path="res://props/test_item.tscn" id="3_item"]
 [ext_resource type="PackedScene" path="res://props/bucket.tscn" id="4_bucket"]
 [ext_resource type="Resource" path="res://data/tools/sponge.tres" id="5_sponge"]
-[ext_resource type="Script" path="res://data/item_data.gd" id="6_item_data"]
+[ext_resource type="Resource" path="res://data/items/test_small_1.tres" id="6_s1"]
+[ext_resource type="Resource" path="res://data/items/test_small_2.tres" id="6_s2"]
+[ext_resource type="Resource" path="res://data/items/test_small_3.tres" id="6_s3"]
+[ext_resource type="Resource" path="res://data/items/test_small_4.tres" id="6_s4"]
+[ext_resource type="Resource" path="res://data/items/test_small_5.tres" id="6_s5"]
+[ext_resource type="Resource" path="res://data/items/test_small_6.tres" id="6_s6"]
+[ext_resource type="Resource" path="res://data/items/test_small_7.tres" id="6_s7"]
+[ext_resource type="Resource" path="res://data/items/test_medium_1.tres" id="6_m1"]
+[ext_resource type="Resource" path="res://data/items/test_large_1.tres" id="6_l1"]
 [ext_resource type="Script" path="res://data/zone_data.gd" id="7_zone_data"]
 [ext_resource type="Script" path="res://data/room_data.gd" id="8_room_data"]
 [ext_resource type="Script" path="res://systems/placement/placement_surface.gd" id="9_surface"]
@@ -23,55 +31,20 @@ id = &"vestibule"
 name_key = "room.vestibule"
 active_axes = Array[int]([0, 2])
 
-[sub_resource type="Resource" id="item_small_1"]
-script = ExtResource("6_item_data")
-id = &"test_small_1"
-name_key = "item.test.small_1"
-category = 0
-footprint = Vector2(0.12, 0.12)
-height = 0.1
-tracks_storing = true
-
-[sub_resource type="Resource" id="item_small_2"]
-script = ExtResource("6_item_data")
-id = &"test_small_2"
-name_key = "item.test.small_2"
-category = 0
-footprint = Vector2(0.15, 0.15)
-height = 0.2
-tracks_storing = true
-
-[sub_resource type="Resource" id="item_small_3"]
-script = ExtResource("6_item_data")
-id = &"test_small_3"
-name_key = "item.test.small_3"
-category = 0
-footprint = Vector2(0.18, 0.18)
-height = 0.12
-tracks_storing = true
-
-[sub_resource type="Resource" id="item_small_4"]
-script = ExtResource("6_item_data")
-id = &"test_small_4"
-name_key = "item.test.small_4"
-category = 0
-footprint = Vector2(0.21, 0.21)
-height = 0.25
-tracks_storing = true
-
-[sub_resource type="Resource" id="item_small_5"]
-script = ExtResource("6_item_data")
-id = &"test_small_5"
-name_key = "item.test.small_5"
-category = 0
-footprint = Vector2(0.24, 0.24)
-height = 0.15
-tracks_storing = true
-
 [sub_resource type="Resource" id="zone_data_basse"]
 script = ExtResource("7_zone_data")
 id = &"vestibule_etagere_basse"
 accepted_categories = Array[int]([0])
+
+[sub_resource type="Resource" id="zone_data_table"]
+script = ExtResource("7_zone_data")
+id = &"vestibule_table"
+accepted_categories = Array[int]([0, 1])
+
+[sub_resource type="Resource" id="zone_data_palette"]
+script = ExtResource("7_zone_data")
+id = &"vestibule_palette"
+accepted_categories = Array[int]([0, 1, 2])
 
 [sub_resource type="Resource" id="zone_data_murale"]
 script = ExtResource("7_zone_data")
@@ -104,6 +77,10 @@ size = Vector3(0.4, 0.05, 1.0)
 size = Vector3(0.4, 0.05, 1.0)
 [sub_resource type="BoxShape3D" id="shape_zone_basse"]
 size = Vector3(1.2, 0.8, 0.8)
+[sub_resource type="BoxShape3D" id="shape_zone_table"]
+size = Vector3(1.2, 0.8, 0.8)
+[sub_resource type="BoxShape3D" id="shape_zone_palette"]
+size = Vector3(1.2, 0.8, 1.0)
 [sub_resource type="BoxShape3D" id="shape_zone_murale"]
 size = Vector3(0.4, 0.6, 1.0)
 
@@ -262,6 +239,22 @@ zone_data = SubResource("zone_data_basse")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneEtagereBasse"]
 shape = SubResource("shape_zone_basse")
 
+[node name="ZoneTable" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.75, -1.5)
+script = ExtResource("10_zone")
+zone_data = SubResource("zone_data_table")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneTable"]
+shape = SubResource("shape_zone_table")
+
+[node name="ZonePalette" type="Area3D" parent="Zones"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.15, 1.5)
+script = ExtResource("10_zone")
+zone_data = SubResource("zone_data_palette")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZonePalette"]
+shape = SubResource("shape_zone_palette")
+
 [node name="ZoneEtagereMuraleA" type="Area3D" parent="Zones"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.75, 1.65, -3.0)
 script = ExtResource("10_zone")
@@ -280,23 +273,39 @@ shape = SubResource("shape_zone_murale")
 
 [node name="Item1" parent="." instance=ExtResource("3_item")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, -0.8)
-item_data = SubResource("item_small_1")
+item_data = ExtResource("6_s1")
 
 [node name="Item2" parent="." instance=ExtResource("3_item")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, -0.4)
-item_data = SubResource("item_small_2")
+item_data = ExtResource("6_s2")
 
 [node name="Item3" parent="." instance=ExtResource("3_item")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 0.0)
-item_data = SubResource("item_small_3")
+item_data = ExtResource("6_s3")
 
 [node name="Item4" parent="." instance=ExtResource("3_item")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 0.4)
-item_data = SubResource("item_small_4")
+item_data = ExtResource("6_s4")
 
 [node name="Item5" parent="." instance=ExtResource("3_item")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 0.8)
-item_data = SubResource("item_small_5")
+item_data = ExtResource("6_s5")
+
+[node name="Item6" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 1.2)
+item_data = ExtResource("6_s6")
+
+[node name="Item7" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.5, 1.6)
+item_data = ExtResource("6_s7")
+
+[node name="Item8" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.5, -1.0)
+item_data = ExtResource("6_m1")
+
+[node name="Item9" parent="." instance=ExtResource("3_item")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.5, 1.4)
+item_data = ExtResource("6_l1")
 
 [node name="Bucket" parent="." instance=ExtResource("4_bucket")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0.5, 0.0)

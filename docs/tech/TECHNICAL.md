@@ -251,8 +251,11 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - ✅ Test : `test_unlock_chain.gd`.
 
 ## Vestibule de test ✅ (décision de Direction, 2026-11-15)
-- ✅ 15/11/2026 : le vestibule en blocage gris (`game/rooms/vestibule/vestibule.tscn`) est la scène de jeu provisoire ; `GameFlow.GAME_SCENE` pointe dessus (au lieu de sponge_test.tscn). Contenu de test uniquement avec l'existant : 3 surfaces à nettoyer (cleaning_spike réduit), table et palette (supports, non comptés au rangement), étagère basse et 2 étagères murales (zones SMALL), 5 objets suivis, seau non suivi.
-- 🟡 Les 5 objets suivis sont des copies d'ItemData dans la scène (test_small_1 à 5, mêmes id, catégorie, emprise et hauteur, avec `tracks_storing = true`) : aucun .tres de test ne déclare l'axe rangement. Ces copies divergent des .tres et sont à resynchroniser s'ils évoluent.
+- ✅ 15/11/2026 : le vestibule en blocage gris (`game/rooms/vestibule/vestibule.tscn`) est la scène de jeu provisoire ; `GameFlow.GAME_SCENE` pointe dessus (au lieu de sponge_test.tscn). Contenu de test uniquement avec l'existant : 3 surfaces à nettoyer (cleaning_spike réduit), table et palette (supports ; zones comptées depuis le 15/11/2026, voir ci-dessous), étagère basse et 2 étagères murales (zones SMALL), 9 objets suivis (voir ci-dessous), seau non suivi.
+- ✅ 15/11/2026 (mise à jour) : les copies provisoires d'ItemData du vestibule sont supprimées ; la scène utilise les .tres de `game/data/items/` (mêmes id).
+- 🟡 15/11/2026 — règle « objet libre suivi » (Direction, provisoire, à régler après essai du vestibule) : tout objet libre est suivi (`tracks_storing = true`), sauf les outils et le seau. Appliquée aux 9 .tres d'objets libres (test_small_1 à 7, test_medium_1, test_large_1). Les 2 meubles libres (test_furniture_low, test_furniture_tall, `provides_support`) et bucket.tres restent inchangés (non suivis) ; un meuble n'est pas un objet suivi.
+- 🟡 15/11/2026 — table (SMALL, MEDIUM) et palette (SMALL, MEDIUM, LARGE) du vestibule deviennent des zones de rangement comptées, comme les étagères (5 zones au total). Les meubles eux-mêmes ne comptent pas. Disposition de départ : 9 objets au sol (7 SMALL, 1 MEDIUM, 1 LARGE), libre. Provisoire, à régler après essai.
+- 🟡 Capacité (15/11/2026) : aucune notion de capacité n'existe dans le code (zones souples, sans nombre d'emplacements) ; vérification faite par surface d'emprise cumulée contre surface de zone, SMALL 0,33 m² pour 3,92 m², MEDIUM 0,20 m² pour 2,16 m², LARGE 0,64 m² pour 1,20 m² : tout tient.
 
 ## Hypothèses 🟡
 - Valeurs par défaut de `PlacementRules` (pas de rotation, marge, couverture) : provisoires, conception ouverte.
