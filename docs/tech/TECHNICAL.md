@@ -1,6 +1,6 @@
 # TECHNICAL — A Light Left Behind
 
-Propriétaire : projet Godot Engineering. Dernière mise à jour : 2026-11-12.
+Propriétaire : projet Godot Engineering. Dernière mise à jour : 2026-11-15.
 Légende : ✅ décision validée · 🟡 à décider en Phase 0
 
 ## Contraintes validées ✅
@@ -220,3 +220,11 @@ Couches de collision (2026-11-10), mise à jour. Couche 3 : objets interactifs (
 - Anneau de progression pendant l'appui. Si l'appui est relâché avant la fin, l'anneau se vide et la montée continue normalement.
 - Ordre d'exécution : verrou de la trappe, puis règle de la main, puis montée. Si la règle de la main refuse, l'appui long ne démarre pas.
 - Verrous prévus : porte du fût, machinerie, trappe.
+- 🟡 à réexaminer par Direction (GDD §15, mécanique des échelles ouverte)
+
+### 2026-11-15 — Refonte du phare : impacts techniques
+- ✅ Décisions de Direction : chaîne de déverrouillage en 6 étapes. Escalier N0-N4 (72 marches), puis trois échelles de 3 m ; règles d'échelle inchangées. Mécanique de montée = point ouvert : rien à implémenter avant décision. Plus de montée d'ambiance ni de cinématique. Le nombre de pièces principales n'est plus 7 et n'est pas redéfini. Cotes : étage 3,0 m, tour 5,9 m de diamètre, pilier 0,7 m de rayon, portes 0,9 x 2,1 m. Électricité et eau = repères, aucun système.
+- 🟡 Proposition d'Engineering : la chaîne de déverrouillage sera une ressource de données (étapes, identifiants de RoomData requis, verrous ouverts). L'état d'une étape se déduit des verrous « restaurée » déjà sauvegardés, sans nouvelle section de sauvegarde. Non implémenté.
+- ✅ Zones de la chaîne de déverrouillage (Direction, 2026-11-15, à inscrire dans GDD §6) : 1 vestibule ; 2 atelier ; 3 hub N0, cuisine, salle d'eau, WC ; 4 salon, chambre, hub N1 ; 5 archives + bureau (une zone), hub N2, tour N0-N4 ; 6 N5, N6, lanterne (trois zones). Le sas appartient au hub de son niveau. La tour N0-N4 est une zone unique (fût rond, escalier, paliers, N3 et N4, sans les sas), un seul RoomData, un seul verrou « restaurée ».
+- 🟡 Proposition d'Engineering : la tour est une scène unique, sas exclus, pour que son pourcentage se recalcule d'un bloc. Les verrous d'accès (porte du fût, trappe) et les verrous de comptage (« restaurée ») restent distincts dans la ressource d'étapes.
+- ✅ Comptage de la tour (Direction, 2026-11-15) : la tour compte dès qu'elle est à 100 %, même avant l'étape 5. Son verrou « restaurée » se pose à ce moment et reste définitif. Ses surfaces ne sont jamais désactivées avant l'étape 4. La trappe N4 vers N5 se déverrouille quand toutes les zones de l'étape 5 (tour, archives + bureau, hub N2) ont leur verrou « restaurée », dans n'importe quel ordre.
