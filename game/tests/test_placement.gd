@@ -13,6 +13,7 @@ func _run() -> void:
 	_test_can_stack()
 	_test_top_face()
 	_test_surface_transform()
+	_test_posture()
 	_test_push_out()
 	await _test_shape_query()
 	await _test_item_surface()
@@ -79,6 +80,61 @@ func _test_surface_transform() -> void:
 	_check(c.evaluate(data, 0.0, center, s).status == PlacementCheck.Status.UNSUPPORTED, "surface tournée : lacet 0 déborde")
 	_check(is_equal_approx(s.top_y(), 0.5), "top_y = hauteur monde de la surface")
 	s.queue_free()
+
+
+## Posture « accroché » (Lot 2, partie A) : forme dérivée, zone qui impose la posture, refus d'un objet incompatible.
+func _test_posture() -> void:
+	var data: ItemData = ItemData.new()
+	data.id = &"tableau_test"
+	data.category = ItemData.Category.SMALL
+	data.footprint = Vector2(0.4, 0.5)
+	data.height = 0.1
+	_check(data.postures_supportees.size() == 1 and data.postures_supportees.has(ItemData.Posture.A_PLAT) and data.validate().is_empty(), "défaut : postures [A_PLAT]")
+	var flat: PoseShape = PoseShape.of(data, ItemData.Posture.A_PLAT)
+	_check(flat.footprint == data.footprint and is_equal_approx(flat.height, data.height), "A_PLAT : forme = forme à plat")
+	var hung: PoseShape = PoseShape.of(data, ItemData.Posture.ACCROCHE)
+	_check(is_equal_approx(hung.footprint.x, 0.4) and is_equal_approx(hung.footprint.y, 0.1) and is_equal_approx(hung.height, 0.5),
+			"ACCROCHE : largeur = footprint.x, profondeur = height, hauteur = footprint.y")
+	var c: PlacementCheck = PlacementCheck.new()
+	# La forme dérivée change le verdict : emprise 0,4 x 0,1 tient sur une bande 0,5 x 0,12 ; 0,4 x 0,5 non.
+	var strip: Vector2 = Vector2(0.5, 0.12)
+	_check(c.evaluate_local(hung.footprint, 0.0, Vector2.ZERO, strip).status == PlacementCheck.Status.OK, "ACCROCHE : forme dérivée tient")
+	_check(c.evaluate_local(flat.footprint, 0.0, Vector2.ZERO, strip).status == PlacementCheck.Status.UNSUPPORTED, "à plat : même bande, instable")
+	# Surface rattachée à une zone qui impose ACCROCHE aux objets SMALL seulement.
+	var zone_data: ZoneData = ZoneData.new()
+	zone_data.id = &"mur_test"
+	zone_data.accepted_categories = [ItemData.Category.SMALL, ItemData.Category.MEDIUM]
+	zone_data.postures_imposees = {ItemData.Category.SMALL: ItemData.Posture.ACCROCHE}
+	_check(zone_data.posture_for(ItemData.Category.SMALL) == ItemData.Posture.ACCROCHE, "zone : SMALL imposé ACCROCHE")
+	_check(zone_data.posture_for(ItemData.Category.MEDIUM) == ItemData.Posture.A_PLAT, "zone : catégorie absente = A_PLAT")
+	var zone: StorageZone = StorageZone.new()
+	zone.zone_data = zone_data
+	var s: PlacementSurface = PlacementSurface.new()
+	s.size = strip
+	s.zone = zone
+	root.add_child(s)
+	_check(PlacementSurface.new().posture_for(ItemData.Category.SMALL) == ItemData.Posture.A_PLAT, "surface sans zone : A_PLAT")
+	_check(s.posture_for(ItemData.Category.SMALL) == ItemData.Posture.ACCROCHE, "surface liée : posture lue dans la zone")
+	# Objet qui ne supporte pas ACCROCHE : refusé, rien n'est évalué ; compatible : forme dérivée utilisée.
+	var o: PlacementCheck.Outcome = c.evaluate(data, 0.0, Vector3.ZERO, s)
+	_check(o.status == PlacementCheck.Status.POSTURE_REFUSED and o.coverage == 0.0, "ACCROCHE imposé, objet non compatible : refusé")
+	data.postures_supportees = [ItemData.Posture.A_PLAT, ItemData.Posture.ACCROCHE]
+	_check(c.evaluate(data, 0.0, Vector3.ZERO, s).status == PlacementCheck.Status.OK, "ACCROCHE imposé, objet compatible : OK (forme dérivée)")
+	data.category = ItemData.Category.MEDIUM
+	data.postures_supportees = [ItemData.Posture.A_PLAT]
+	_check(c.evaluate(data, 0.0, Vector3.ZERO, s).status == PlacementCheck.Status.UNSUPPORTED, "catégorie non imposée : à plat, forme à plat")
+	data.category = ItemData.Category.SMALL
+	data.postures_supportees = [ItemData.Posture.ACCROCHE]
+	_check(not PlacementCheck.supports_posture(data, ItemData.Posture.A_PLAT), "objet ACCROCHE seul : ne supporte pas A_PLAT")
+	data.postures_supportees = []
+	_check(not data.validate().is_empty(), "aucune posture supportée : invalide")
+	# Landing : même refus.
+	var space: PhysicsDirectSpaceState3D = root.get_world_3d().direct_space_state
+	data.postures_supportees = [ItemData.Posture.A_PLAT]
+	_check(PlacementLanding.evaluate_pose(space, c, data, 0.0, Vector3.ZERO, s) == PlacementLanding.Verdict.POSTURE_REFUSED,
+			"PlacementLanding : posture refusée")
+	s.queue_free()
+	zone.free()
 
 
 func _body(layer: int, pos: Vector3, size: Vector3) -> StaticBody3D:

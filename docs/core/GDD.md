@@ -103,7 +103,7 @@ Types de saleté et outils :
 - Orientation (décision validée le 2026-11-10) : le joueur ne règle que l'angle autour de la verticale, par paliers, avec une touche ou la molette. Il ne choisit jamais de posture. Quelques objets ont plusieurs postures (par exemple un livre : à plat ou debout) ; la posture est imposée par la zone de pose (bibliothèque = debout, surface de table = à plat). Hors zone de pose, la posture par défaut est « à plat ». La valeur du pas de rotation est un réglage de départ, à ajuster après essai (grossier par défaut, mode fin optionnel si l'essai le réclame) : voir TECHNICAL.md.
 - Rangement : zones souples par catégorie d'objets, sans position imposée. Un objet est rangé s'il repose directement sur un support déclaré, dans une zone qui accepte sa catégorie. Le sol de la pièce n'est jamais une zone. Un support déclaré (palette, étagère basse…) n'est pas du sol, même posé au niveau du sol. Un objet posé sur un autre objet qui n'est pas un support déclaré n'est pas rangé. Déplacer un support qui porte des objets est interdit.
 - Empilement par catégorie (décision validée le 2026-11-10) : un petit objet peut être posé sur tout (exemple : une lampe de table sur un gros carton) ; un objet moyen peut être posé sur un gros objet ; rien ne se pose sur un objet fixe, sauf les supports déclarés fixes (une étagère fixe reste une zone de pose). Exception : le seau n'est pas empilable, aucun objet ne peut être posé dessus quelle que soit sa catégorie ; un placement sur le seau est refusé comme tout placement impossible, et le seau reste ramassable et déplaçable (décision validée le 2026-11-11). Petit sur petit (livres) est permis physiquement mais l'objet du dessus est « non rangé » (règle ci-dessus : objet posé sur un non-support). Marge au bord et couverture minimale du support sont des réglages de départ, à ajuster après essai : voir TECHNICAL.md.
-- Murs : objets décoratifs et cadres. Pas de plafond (exception possible : la réparation d'un lustre).
+- Murs : objets décoratifs et cadres. Un tableau accroché reste un objet libre et reprenable (décision du 2026-11-15, 🟡 provisoire). Pas de plafond (exception possible : la réparation d'un lustre).
 - Prise en main : le joueur dispose d'une main (un objet) et d'une ceinture qui n'accepte que les petits objets (capacité de départ et améliorations : voir la ceinture ci-dessous).
   - Petit objet : pris en main si elle est libre ; sinon rangé dans la ceinture si un emplacement est libre ; sinon refusé.
   - Objet moyen ou gros : pris en main. Si la main tient un petit objet, celui-ci est rangé automatiquement dans un emplacement libre de la ceinture ; si la ceinture est pleine, la prise est refusée.
@@ -425,7 +425,7 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
    - mécanisme de l'évolution de l'atmosphère (globale ou par pièce) ;
    - rôle, contenu et fonctionnement du journal (mentionné comme découverte du noyau de départ).
 3. Liste des postures par objet et par zone de pose (voir §5, Orientation).
-   - Note (décision validée le 2026-11-13) : le vestibule ne contient aucun objet à posture multiple. La liste des postures attend la bibliothèque du salon et les pièces suivantes.
+   - Note (décision du 2026-11-15, 🟡 provisoire) : le vestibule contient un tableau, qui a la posture « accroché » en zone murale et « à plat » au sol, mais pas de posture « debout ». La liste générale des postures attend toujours le salon et les pièces suivantes.
 4. ~~Liste, ordre et coûts des améliorations d'outils.~~ Fusionné au point 5.
 5. Catalogue des améliorations d'outils (arbres, contenu de chacun) et ordre de déblocage. Les améliorations n'ont pas de coût en matériaux : elles se débloquent par la récupération d'items d'amélioration. L'éponge abrasive en est le premier exemple.
    Contenu précis restant de l'atelier (voir « Pièce 2 — atelier », §6) et du reste de la première pièce tutorielle (voir « Pièce 1 — tutoriel », §6). Points ouverts de l'atelier :
@@ -452,7 +452,8 @@ Ces points ne remettent pas en cause les décisions de conception ci-dessus ; il
      - table (libre, peut rester au sol) : SMALL, MEDIUM ;
      - palette (libre) : SMALL, MEDIUM, LARGE ;
      - étagère basse (fixe) : SMALL ;
-     - étagères murales (fixes) : SMALL.
+     - étagères murales (fixes) : SMALL ;
+     - zone murale du tableau (🟡 provisoire, décision du 2026-11-15) : le tableau ; tailles en valeurs de départ, voir TECHNICAL.md.
    - Le coffre (LARGE) se range sur la palette. Le coffre n'est pas une zone de rangement.
 20. Valeur du pas de rotation (grossier par défaut, mode fin optionnel après essai) : réglage de départ, voir TECHNICAL.md.
 21. ~~Articulation entre orientations autorisées et paliers de rotation.~~ Réglé : le joueur ne règle que l'angle vertical, la posture est imposée par la zone (§5).

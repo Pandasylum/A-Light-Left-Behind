@@ -16,7 +16,7 @@ const TIE_EPSILON: float = 1e-4 ## m : deux décalages à moins de cet écart so
 const OVERLAP_EPSILON: float = 0.001 ## m : recouvrement vertical minimal avec le support quitté
 
 ## Verdict d'une pose sur une surface donnée.
-enum Verdict { OK, UNSTABLE, BLOCKED, CANNOT_STACK }
+enum Verdict { OK, UNSTABLE, BLOCKED, CANNOT_STACK, POSTURE_REFUSED }
 
 ## Rectangle orienté dans le plan XZ (lacet autour de Y, convention Basis(Vector3.UP, yaw)). Vector2 = (x, z).
 class OrientedRect extends RefCounted:
@@ -113,24 +113,36 @@ static func carrier_data(surface: PlacementSurface) -> ItemData:
 	return body.get("item_data") as ItemData if body != null else null
 
 
-## Verdict d'une pose : empilement autorisé, puis collisions, puis couverture.
+## Verdict d'une pose : posture supportée, empilement autorisé, puis collisions, puis couverture. La posture est
+## celle que la surface impose ; collisions et couverture utilisent la forme de pose qui en est dérivée (PoseShape).
+## Surface murale : `center` est le point d'ancrage sur le mur ; le lacet et la boîte viennent de HangPose (`yaw` ignoré).
 static func evaluate_pose(space: PhysicsDirectSpaceState3D, check: PlacementCheck, data: ItemData, yaw: float,
 		center: Vector3, surface: PlacementSurface, exclude: Array[RID] = []) -> Verdict:
+	var posture: ItemData.Posture = surface.posture_for(data.category)
+	if not PlacementCheck.posture_allowed(data, surface):
+		return Verdict.POSTURE_REFUSED
+	var shape: PoseShape = PoseShape.of(data, posture)
+	if surface.is_wall:
+		var normal: Vector3 = surface.wall_normal()
+		if is_blocked(space, data, HangPose.yaw_of(normal), HangPose.box_center(center, normal, data), exclude, shape):
+			return Verdict.BLOCKED
+		return Verdict.OK if check.evaluate(data, yaw, center, surface).status == PlacementCheck.Status.OK else Verdict.UNSTABLE
 	var below: ItemData = carrier_data(surface)
 	if below != null and (not below.can_support_items or not PlacementCheck.can_stack(data.category, below.category)):
 		return Verdict.CANNOT_STACK
-	if is_blocked(space, data, yaw, center, exclude):
+	if is_blocked(space, data, yaw, center, exclude, shape):
 		return Verdict.BLOCKED
 	if check.evaluate(data, yaw, center, surface).status != PlacementCheck.Status.OK:
 		return Verdict.UNSTABLE
 	return Verdict.OK
 
 
-## Vrai si une boîte de l'emprise de l'objet, à ce lacet et centre de pose, touche un corps des couches 1, 2 ou 3
-## (hors `exclude`). Boîte réduite et soulevée de quelques mm pour ne pas détecter la surface porteuse.
+## Vrai si une boîte de la forme de pose de l'objet (`shape`, à plat si null), à ce lacet et centre de pose, touche
+## un corps des couches 1, 2 ou 3 (hors `exclude`). Boîte réduite et soulevée de quelques mm pour ne pas détecter
+## la surface porteuse.
 static func is_blocked(space: PhysicsDirectSpaceState3D, data: ItemData, yaw: float, center: Vector3,
-		exclude: Array[RID] = []) -> bool:
-	var query: PhysicsShapeQueryParameters3D = _box_query(data, yaw, center, QUERY_MASK, exclude)
+		exclude: Array[RID] = [], shape: PoseShape = null) -> bool:
+	var query: PhysicsShapeQueryParameters3D = _box_query(data, yaw, center, QUERY_MASK, exclude, shape)
 	return not space.intersect_shape(query, 1).is_empty()
 
 
@@ -185,7 +197,7 @@ static func resolve(space: PhysicsDirectSpaceState3D, check: PlacementCheck, dat
 				landing.center = pose
 				landing.surface = surface
 				return landing
-			if verdict == Verdict.CANNOT_STACK:
+			if verdict == Verdict.CANNOT_STACK or verdict == Verdict.POSTURE_REFUSED:
 				return landing
 			if verdict == Verdict.UNSTABLE and fall_from == Vector3.INF:
 				fall_from = pose
@@ -196,12 +208,16 @@ static func resolve(space: PhysicsDirectSpaceState3D, check: PlacementCheck, dat
 	return landing
 
 
-static func _box_query(data: ItemData, yaw: float, center: Vector3, mask: int, exclude: Array[RID]) -> PhysicsShapeQueryParameters3D:
+## Boîte de requête de la forme de pose `pose` (forme à plat de `data` si null). La chute reste celle de l'objet à plat.
+static func _box_query(data: ItemData, yaw: float, center: Vector3, mask: int, exclude: Array[RID],
+		pose: PoseShape = null) -> PhysicsShapeQueryParameters3D:
+	if pose == null:
+		pose = PoseShape.of(data, ItemData.Posture.A_PLAT)
 	var shape: BoxShape3D = BoxShape3D.new()
-	shape.size = Vector3(data.footprint.x - SHRINK, data.height - SHRINK, data.footprint.y - SHRINK)
+	shape.size = Vector3(pose.footprint.x - SHRINK, pose.height - SHRINK, pose.footprint.y - SHRINK)
 	var query: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
 	query.shape = shape
-	query.transform = Transform3D(Basis(Vector3.UP, yaw), center + Vector3.UP * (data.height * 0.5 + LIFT))
+	query.transform = Transform3D(Basis(Vector3.UP, yaw), center + Vector3.UP * (pose.height * 0.5 + LIFT))
 	query.collision_mask = mask
 	query.exclude = exclude
 	return query

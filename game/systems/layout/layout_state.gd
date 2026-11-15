@@ -29,7 +29,8 @@ class Plan extends RefCounted:
 	## Une ligne par entrée ignorée seule.
 	var warnings: Array[String] = []
 	## Objets à replacer, dans l'ordre sauvegardé (ordre des charges de chaque porteur) :
-	## id, position (Vector3), angle, posture, support, furniture.
+	## id, position (Vector3), angle, posture, support, furniture, rotation (Quaternion, ou null si
+	## le champ est absent : l'angle vertical seul fait alors foi).
 	var placements: Array[Dictionary] = []
 	## Portage : identifiant de l'objet en main ("" = main vide) et de chaque emplacement de
 	## ceinture, dans l'ordre exact ("" = emplacement vide).
@@ -56,11 +57,17 @@ static func describe_item(furniture: bool, category: int) -> Dictionary:
 	return {"furniture": furniture, "category": category}
 
 
-## Entrée d'un objet posé : position absolue dans la pièce, angle autour de la verticale (rad).
+## Entrée d'un objet posé : position absolue dans la pièce, angle autour de la verticale (rad) et,
+## si rotation est donnée (Quaternion), la rotation complète (champ optionnel « rotation » =
+## [x, y, z, w], ajout tolérant : nécessaire à un objet accroché, tourné autour d'un axe horizontal).
 static func make_entry(id: String, position: Vector3, angle: float, support: String,
-		posture: String = POSTURE_FLAT) -> Dictionary:
-	return {"id": id, "position": [position.x, position.y, position.z], "angle": angle,
+		posture: String = POSTURE_FLAT, rotation: Variant = null) -> Dictionary:
+	var entry: Dictionary = {"id": id, "position": [position.x, position.y, position.z], "angle": angle,
 			"posture": posture, "support": support}
+	if rotation is Quaternion:
+		var quat: Quaternion = rotation
+		entry["rotation"] = [quat.x, quat.y, quat.z, quat.w]
+	return entry
 
 
 ## Section complète : entrées des objets posés + portage (identifiant de l'objet en main, et de
@@ -118,7 +125,7 @@ static func _read(content: Dictionary, items: Dictionary, supports: Dictionary, 
 			continue
 		var position: Array = raw["position"]
 		candidates.append({"id": id, "position": Vector3(position[0], position[1], position[2]),
-				"angle": float(raw["angle"]), "posture": raw["posture"], "support": raw["support"],
+				"angle": float(raw["angle"]), "rotation": _rotation_of(raw), "posture": raw["posture"], "support": raw["support"],
 				"furniture": bool((items[id] as Dictionary).get("furniture", false))})
 	var error: String = _read_carry(content.get(CARRY_KEY), items, seen, belt_capacity, plan)
 	if not error.is_empty():
@@ -173,11 +180,26 @@ static func _entry_problem(raw: Dictionary, items: Dictionary, supports: Diction
 			return "position non finie"
 	if not _is_number(raw.get("angle")) or not is_finite(raw["angle"]):
 		return "angle non fini"
+	if raw.has("rotation") and _rotation_of(raw) == null:
+		return "rotation illisible"
 	if not (raw.get("posture") is String):
 		return "posture illisible"
 	if not (raw.get("support") is String) or not supports.has(raw["support"]):
 		return "support introuvable"
 	return ""
+
+
+## Rotation optionnelle d'une entrée : Quaternion, ou null si le champ est absent ou illisible
+## (quatre nombres finis, non nuls ; normalisés à la lecture).
+static func _rotation_of(raw: Dictionary) -> Variant:
+	var value: Variant = raw.get("rotation")
+	if not (value is Array) or (value as Array).size() != 4:
+		return null
+	for component: Variant in value:
+		if not _is_number(component) or not is_finite(component):
+			return null
+	var quat: Quaternion = Quaternion(value[0], value[1], value[2], value[3])
+	return quat.normalized() if quat.length() > 0.0001 else null
 
 
 ## Garde les objets dont le support est réellement en place : support fixe ou sol, ou dessus d'un

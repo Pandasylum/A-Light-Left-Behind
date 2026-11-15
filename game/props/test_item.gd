@@ -6,6 +6,8 @@ extends StaticBody3D
 signal support_changed(item: TestItem)
 
 @export var item_data: ItemData
+## Réglages de placement (épaisseur minimale du collider). Vide : valeurs par défaut de PlacementRules.
+@export var placement_rules: PlacementRules = null
 
 ## Surface de pose porteuse (null tant que l'objet n'est pas posé ; vidée à la reprise).
 var support_surface: PlacementSurface = null
@@ -29,18 +31,30 @@ func _ready() -> void:
 		var mesh: BoxMesh = BoxMesh.new()
 		mesh.size = size
 		box_node.mesh = mesh
+	# Collider : épaisseur minimale en donnée (PlacementRules). Un objet plus mince garde son visuel ; son collider
+	# est épaissi vers l'avant (+Y local), face arrière et dessous inchangés.
+	var thickness: float = collider_thickness(item_data, placement_rules)
 	var shape: BoxShape3D = BoxShape3D.new()
-	shape.size = size
-	($CollisionShape3D as CollisionShape3D).shape = shape
-	# Dessus de l'objet : surface de pose (suit la rotation du corps), emprise = taille de l'ItemData.
+	shape.size = Vector3(size.x, thickness, size.z)
+	var collision: CollisionShape3D = $CollisionShape3D
+	collision.shape = shape
+	collision.position = Vector3(0.0, (thickness - item_data.height) * 0.5, 0.0)
+	# Dessus de l'objet : surface de pose (suit la rotation du corps), emprise = taille de l'ItemData, à la face
+	# supérieure du collider.
 	var top: PlacementSurface = $PlacementSurface
-	top.position = Vector3(0.0, item_data.height * 0.5, 0.0)
+	top.position = Vector3(0.0, thickness - item_data.height * 0.5, 0.0)
 	top.size = item_data.footprint
 	top.is_declared_support = item_data.provides_support
 
 
 static func cube_size(data: ItemData) -> Vector3:
 	return Vector3(data.footprint.x, data.height, data.footprint.y)
+
+
+## Épaisseur du collider : hauteur de l'objet, au moins `collider_min_thickness` (rules vide : valeurs par défaut).
+static func collider_thickness(data: ItemData, rules: PlacementRules = null) -> float:
+	var active: PlacementRules = rules if rules != null else PlacementRules.new()
+	return maxf(data.height, active.collider_min_thickness)
 
 
 ## Vrai si au moins un objet est posé dessus (l'objet ne peut alors pas être pris).

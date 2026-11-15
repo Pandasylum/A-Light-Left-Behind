@@ -125,6 +125,24 @@ func _pure() -> void:
 	var nan_angle: LayoutState.Plan = LayoutState.parse(_raw(1, [LayoutState.make_entry("a", Vector3.ZERO, NAN, "sol")]), items, supports)
 	_check(nan_angle.accepted and nan_angle.placements.is_empty() and nan_angle.warnings.size() == 1, "pur : angle non fini = entrée ignorée")
 
+	# Rotation complète optionnelle : présente = fait foi ; absente = angle vertical seul, sans avertissement ;
+	# illisible = entrée seule ignorée.
+	var tilt: Quaternion = Quaternion(Vector3.RIGHT, PI * 0.5)
+	var with_rot: LayoutState.Plan = LayoutState.parse(_section([
+		LayoutState.make_entry("a", Vector3.ZERO, 0.3, "sol", LayoutState.POSTURE_FLAT, tilt)]), items, supports)
+	_check(with_rot.accepted and with_rot.warnings.is_empty() and (with_rot.placements[0]["rotation"] as Quaternion).is_equal_approx(tilt),
+			"pur : rotation présente relue (quaternion)")
+	var legacy: Dictionary = LayoutState.make_entry("a", Vector3.ZERO, 0.3, "sol")
+	var without_rot: LayoutState.Plan = LayoutState.parse(_section([legacy]), items, supports)
+	_check(not legacy.has("rotation") and without_rot.warnings.is_empty() and without_rot.placements[0]["rotation"] == null
+			and is_equal_approx(without_rot.placements[0]["angle"], 0.3), "pur : ancienne entrée sans rotation relue sur l'angle, sans avertissement")
+	for bad: Variant in [[0.0, 0.0, 1.0], "x", [0.0, 0.0, 0.0, 0.0], [INF, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, "w"]]:
+		var broken: Dictionary = LayoutState.make_entry("a", Vector3.ZERO, 0.3, "sol")
+		broken["rotation"] = bad
+		var kept: Dictionary = LayoutState.make_entry("meuble", Vector3.ZERO, 0.1, "sol")
+		var ignored: LayoutState.Plan = LayoutState.parse(_section([broken, kept]), items, supports)
+		_check(ignored.accepted and _ids(ignored) == ["meuble"] and ignored.warnings.size() == 1, "pur : rotation illisible (%s) = entrée seule ignorée" % str(bad))
+
 	# Support porté par un objet qui n'est pas en place : objet ignoré, boucles comprises.
 	var cascade: LayoutState.Plan = LayoutState.parse(_section([
 		LayoutState.make_entry("b", Vector3.ZERO, 0.0, "a/dessus"),
