@@ -34,6 +34,14 @@ func _run() -> void:
 	_check(progress.cleaning_counts() == Vector2i(0, SURFACES) and progress.storing_counts() == Vector2i(0, ITEMS),
 			"comptage : %d surfaces + %d objets suivis (%s, %s)" % [SURFACES, ITEMS, str(progress.cleaning_counts()), str(progress.storing_counts())])
 
+	# Règle de contenu (Direction 15/11/2026, provisoire) : tout objet suivi démarre non rangé, sans geste du joueur.
+	var started_stored: int = 0
+	for tracked: Node in (scene.get_node("StorageService") as StorageService).tracked_items():
+		if (scene.get_node("StorageService") as StorageService).is_stored(tracked):
+			started_stored += 1
+	_check(started_stored == 0 and progress.storing_counts().x == 0 and progress.percent() == 0,
+			"scène neuve : 0 objet suivi rangé (%d), 0 objet compté, 0 %%" % started_stored)
+
 	# Table (SMALL/MEDIUM) et palette (SMALL/MEDIUM/LARGE) : zones comptées ; les meubles eux-mêmes ne comptent pas.
 	var storage: StorageService = scene.get_node("StorageService")
 	var item1: TestItem = scene.get_node("Item1")
