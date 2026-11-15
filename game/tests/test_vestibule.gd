@@ -81,6 +81,47 @@ func _run() -> void:
 	for furniture: Node in scene.get_node("Furniture").get_children():
 		_check(not (furniture is TestItem) and not furniture.has_node("StorageZone"), "meuble non compté : " + furniture.name)
 
+	# Meubles .glb (15/11/2026, hauteurs de l'art provisoires) : surfaces et zones alignées sur le dessus,
+	# dimensions horizontales (capacités) inchangées, Visuel des étagères murales pivoté de 90°.
+	# nom : [hauteur monde du dessus, zone, centre Y de zone, emprise zone XZ, catégories]
+	var expect: Dictionary = {
+		"Table": [0.75, "ZoneTable", Vector2(1.2, 0.8), [0, 1]],
+		"Palette": [0.144, "ZonePalette", Vector2(1.2, 1.0), [0, 1, 2]],
+		"EtagereBasse": [0.70, "ZoneEtagereBasse", Vector2(1.2, 0.8), [0]],
+		"EtagereMuraleA": [1.425, "ZoneEtagereMuraleA", Vector2(0.4, 1.0), [0]],
+		"EtagereMuraleB": [1.425, "ZoneEtagereMuraleB", Vector2(0.4, 1.0), [0]],
+	}
+	for fname: String in expect:
+		var furn: StaticBody3D = scene.get_node("Furniture/" + fname)
+		var row: Array = expect[fname]
+		var surf: PlacementSurface = PlacementSurface.of_body(furn)
+		var zone: StorageZone = scene.get_node("Zones/" + str(row[1]))
+		var zshape: BoxShape3D = (zone.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
+		var visuel: Node3D = furn.get_node_or_null("Visuel")
+		_check(visuel != null and visuel.get_child_count() > 0 and not furn.has_node("MeshInstance3D"), "visuel .glb sans boîte de test : " + fname)
+		_check(is_equal_approx(surf.global_position.y, row[0]), "surface de pose au dessus du modèle (%.3f m) : %s" % [row[0], fname])
+		var is_wall: bool = fname.begins_with("EtagereMurale")
+		if is_wall:
+			_check(is_equal_approx(zone.global_position.y, 1.65), "zone murale inchangée (1,65 m) : " + fname)
+		else:
+			_check(is_equal_approx(zone.global_position.y, row[0]), "zone centrée sur le dessus : " + fname)
+		_check(is_equal_approx(zshape.size.x, row[2].x) and is_equal_approx(zshape.size.z, row[2].y) and is_equal_approx(zshape.size.y, 0.6 if is_wall else 0.8),
+				"zone : dimensions inchangées (capacité) : " + fname)
+		_check(zone.zone_data.accepted_categories == Array(row[3], TYPE_INT, &"", null), "zone : catégories inchangées : " + fname)
+		_check(is_equal_approx(zone.global_position.x, furn.global_position.x) and is_equal_approx(zone.global_position.z, furn.global_position.z),
+				"zone alignée sur le meuble (XZ) : " + fname)
+		var cshape: BoxShape3D = (furn.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
+		_check(is_equal_approx(furn.global_position.y + cshape.size.y * 0.5, row[0]), "collision boîte : dessus = dessus du modèle : " + fname)
+		_check(is_equal_approx(surf.size.x, row[2].x) and is_equal_approx(surf.size.y, row[2].y), "surface de pose : emprise inchangée : " + fname)
+		if is_wall:
+			var bois: MeshInstance3D = visuel.find_child("bois", true, false)
+			var box: AABB = bois.global_transform * bois.get_aabb()
+			_check(is_equal_approx(box.size.x, 0.4) and is_equal_approx(box.size.z, 1.0) and is_equal_approx(visuel.rotation.x, 0.0) and is_equal_approx(visuel.rotation.z, 0.0),
+					"Visuel pivoté de 90° autour de la verticale (0,4 en X, 1,0 en Z), surface et zone non pivotées : " + fname)
+			_check(surf.global_transform.basis.is_equal_approx(Basis()) and zone.global_transform.basis.is_equal_approx(Basis()), "surface et zone sans rotation : " + fname)
+			# Plaque verticale des équerres côté -Z du modèle : doit viser le mur est (+X).
+			_check((visuel.global_transform.basis * Vector3(0.0, 0.0, -1.0)).is_equal_approx(Vector3.RIGHT), "côté mur des équerres vers +X : " + fname)
+
 	# Rangement : 100 % pose le verrou une fois.
 	var locks: Array[StringName] = []
 	progress.lock_posed.connect(func(id: StringName) -> void: locks.append(id))
