@@ -67,12 +67,19 @@ func _launch(continue_save: bool) -> void:
 func _open_options() -> void:
 	_menu.visible = false
 	_options = OPTIONS_SCENE.instantiate()
+	_options.opened_from_title = true
 	_options.closed.connect(_close_options)
 	add_child(_options)
 
 
 func _close_options() -> void:
+	var was_reset: bool = _options.save_was_reset
 	_options.queue_free()
+	if was_reset: # la partie a été réinitialisée : on reconstruit les boutons et l'avertissement
+		_state = GameFlow.slot_state(get_node_or_null(^"/root/SaveService"))
+		_menu.queue_free()
+		_confirm.queue_free()
+		_build()
 	_menu.visible = true
 
 
