@@ -15,6 +15,11 @@ Aucun texte n'est rédigé ici (les textes iront dans TEXTS.md). Tout ce qui est
 - Le système n'est pas autonome : le groupe électrogène doit être ravitaillé, donc un gardien était présent.
 - L'ancien gardien connaissait bien ce système.
 - **Son sort n'est pas tranché.** Aucune pièce ne le confirme.
+- ✅ (validé le 2026-11-15) L'ancien gardien était présent lors de la transition vers l'électricité (vers 1950). Aucune date n'est posée dans le jeu.
+- ✅ (validé le 2026-11-15) Objet personnel du père : un galet peint, sans photo. Il tient dans une poche et se pose près de la fenêtre à la fin.
+- ✅ (validé le 2026-11-15) Pensées sur la fille : 5 sur le parcours obligatoire (ceinture au vestibule, porte du fût, ouverture de la machinerie, arrivée à la lanterne, fin), plus quelques-unes facultatives et rares.
+- ✅ (validé le 2026-11-15) Notes de l'ancien gardien : ton sec et technique, rares phrases personnelles, glissant vers le doute en montant. Aucune attache extérieure dans le jeu de base (ni destinataire ni nom).
+- ✅ (validé le 2026-11-15) Moteur d'optique branché ; seul le disjoncteur du coffret de N5 est coupé. Les réparations de N6 viennent de l'usure, pas d'un geste du gardien. Le poids de l'ancien système est remonté mais inutilisé (le moteur a pris le relais) : il reste visible en haut de son tube à N5.
 - Sous-sol (cave, galerie, citerne, fosse, puisard, salle murée) : prévu pour le futur, **hors lore, aucun contenu**. Aucun objet ni texte ne le désigne, y compris la trappe de l'atelier et le regard de la cuisine.
 - Chaufferie supprimée (cuisinière et ballon d'eau chaude).
 - Référence : Tévennec, maison collée à la tour. Référence d'architecture seulement ; sa légende réelle n'est pas reprise.
@@ -27,7 +32,7 @@ Aucun texte n'est rédigé ici (les textes iront dans TEXTS.md). Tout ce qui est
 💡 **Garde-fous d'ambiguïté** (à appliquer à tout texte et objet)
 - Pas de vêtement ou bagage manquant, pas de papier brûlé, pas de lettre personnelle, pas d'adieu, pas de médicament.
 - Pas de « dernière entrée » qui date ou explique le départ.
-- Les « attaches extérieures » de l'ancien gardien restent ❓ : aucun destinataire, aucun nom.
+- Aucune attache extérieure de l'ancien gardien (✅ validé le 2026-11-15) : aucun destinataire, aucun nom.
 - Aucun écho de la légende dans les objets (seule exception : sa note de doute, facultative, voir chambre).
 
 ---
@@ -43,7 +48,7 @@ Aucun texte n'est rédigé ici (les textes iront dans TEXTS.md). Tout ce qui est
 
 **Pensées [P]**
 - 💡 À l'entrée : commentaire d'apprentissage, sans forcer.
-- 💡 À la prise de la ceinture (étape obligatoire) : première pensée sur la fille, liée à l'objet personnel (type ❓), sans la décrire.
+- 💡 À la prise de la ceinture (étape obligatoire) : première pensée sur la fille, liée au galet peint (✅), sans décrire la fille.
 
 ---
 
@@ -144,15 +149,13 @@ Aucun texte n'est rédigé ici (les textes iront dans TEXTS.md). Tout ce qui est
 **Établi ✅** : documents, cartes, registres, souvenirs ; meuble à tiroirs (réparation signature) ; coin bureau sous les fenêtres, ancien espace personnel du gardien ; ampoule nue, lampe de bureau ; évent de la chute.
 
 **Propositions 💡**
-- [O] Registre de feu : entrées ordinaires, puis formules plus prudentes sur l'intensité et la couleur du feu, puis une note d'intervention **sans date de reprise**. Lecture officielle, administrative.
+- [O] Registre de feu : entrées ordinaires, puis formules plus prudentes sur l'intensité et la couleur du feu, puis une note d'intervention **sans date de reprise** (✅ validé le 2026-11-15). Lecture officielle, administrative.
 - [F] Meuble à tiroirs : tiroirs classés par sujet (météo, oiseaux, bateaux, lumière). Le tiroir « lumière » contient relevés chiffrés et croquis incomplets. Chaque tiroir se lit seul.
 - [F] Carte marine annotée de pointages de bateaux. Observation, sans événement.
 - [F] Carnet d'observations sur le bureau, période calme : oiseaux, petits dessins. Montre la solitude choisie.
 - [R] Lampe de bureau : abat-jour réparé par lui.
 
 **Pensée [P]** : 💡 en lisant le registre : le phare est officiellement en activité, la lampe ne l'est pas.
-
-**Ouvert ❓** : ton de base des notes et attaches extérieures (LORE §11) : à trancher avant d'écrire TEXTS.md.
 
 ---
 
@@ -174,14 +177,14 @@ Aucun texte n'est rédigé ici (les textes iront dans TEXTS.md). Tout ce qui est
 **Établi ✅** : sol complet, trappe d'échelle ; coffret (disjoncteur) avec chargeur, batteries à plat ; ancien système hors service : poids dans son tube, manivelle, coffre en bois qui cache le tambour et les engrenages. 🟡 Le chargeur est à activer avant la lampe.
 
 **Propositions 💡**
-- [O] **Disjoncteur du coffret en position coupée** : c'est la coupure d'alimentation de la lampe (LORE §4). Lisible, sans lien avec un sort.
+- ✅ [O] **Disjoncteur du coffret en position coupée** : c'est la coupure d'alimentation de la lampe (LORE §4). Lisible, sans lien avec un sort.
+- ✅ [O] **Poids remonté en haut de son tube**, visible, inutilisé. Aucune explication de qui l'a remonté ni quand.
 - [O] Manivelle à poignée polie par des mains successives. Dit : plusieurs gardiens, avant lui.
-- [F] Cahier de remontée du poids : plusieurs écritures, dernier relevé daté de la rénovation (année incomplète). Je ne dis pas laquelle est la sienne.
+- [F] Cahier de remontée du poids : plusieurs écritures, écritures plus anciennes d'autres gardiens, puis les dernières remontées à la main de la main de l'ancien gardien, jusqu'à la transition vers le moteur (année incomplète).
+- ✅ [F] (validé le 2026-11-15) Annotation en marge du cahier, dans la veine de « À faire : retirer poids du système ». Écrite de la main de l'ancien gardien (validé le 2026-11-15), reconnaissable à son écriture, déjà vue dans les dernières remontées. Une tâche laissée en plan, comme le reste ; elle ne dit pas pourquoi ni si elle devait être faite. Formulation finale dans TEXTS.md.
 - [R] Consigne manuscrite près du chargeur (vérifier le niveau chaque semaine) et schéma unifilaire sur le couvercle du coffret.
 
 **Pensée [P]** : 💡 à l'arrivée, observation des deux systèmes côte à côte.
-
-**Ouvert ❓** : état du moteur et du poids, voir §14.
 
 **À distinguer** : le coffre de N5 (cache le treuil) n'est pas le coffre du vestibule (ceinture). Art doit les rendre différents.
 
@@ -189,12 +192,12 @@ Aucun texte n'est rédigé ici (les textes iront dans TEXTS.md). Tout ce qui est
 
 ## 12. Machinerie (N6)
 
-**Établi ✅** : demi-disque sous la lanterne ; engrenages, régulateur, moteur d'optique ; cage grillagée fermée à clé, clé dans la boîte à outils de la lanterne ; gargouilles ; câble du coffret N5 au moteur puis à la lampe. Réparations obligatoires.
+**Établi ✅** : demi-disque sous la lanterne ; engrenages, régulateur, moteur d'optique (branché) ; cage grillagée fermée à clé, clé dans la boîte à outils de la lanterne ; gargouilles ; câble du coffret N5 au moteur puis à la lampe. Réparations obligatoires.
 
 **Propositions 💡**
 - [O] Plaque de sécurité sur la cage (organes en mouvement). La serrure se lit comme une règle de sécurité, pas comme un secret.
-- [R] Deux séries de traits de repère peints sur le régulateur, légèrement décalées. Dit : il corrigeait une dérive. Hypothèse subjective, jamais confirmée.
-- [R] Graisse récente sur certains engrenages, ancienne ailleurs.
+- [R] Usure seule : graisse sèche et durcie, rouille d'embruns sur les engrenages et le régulateur, dépôt de sel sur la cage. Aucune trace de geste du gardien sur ces pièces (décision du 2026-11-15).
+- [R] Un seul jeu de traits de repère d'origine, peints à l'installation, sans retouche.
 
 **Pensée [P]** : 💡 à l'ouverture de la cage (déclencheur obligatoire) : écho avec la clé du vestibule (une clé qui ouvre quelque chose) et pensée sur la fille.
 
@@ -219,17 +222,15 @@ Aucun texte n'est rédigé ici (les textes iront dans TEXTS.md). Tout ce qui est
 ## 14. Points ouverts et contradictions
 
 **À trancher ❓**
-1. **État du moteur et du poids** (PHARE_RESEAUX). Options :
-   - A : moteur débranché à N6. Montre une intervention volontaire ; penche vers la lecture prosaïque.
-   - B : moteur branché, seul le disjoncteur N5 coupé. Plus simple ; les réparations de N6 viennent alors de l'usure.
-   - Poids : recommandation, aucun sens narratif (état de repos). Un poids en bas n'est pas montrable sans le sous-sol.
+1. ~~État du moteur et du poids~~ Réglé le 2026-11-15 : option B et poids remonté (voir §0 et §11).
 2. Ravitaillement du groupe à l'extérieur (Direction).
 3. Nombre de pièces principales après la refonte (GDD §15, non redéfini).
+4. Alignement sur la liste du GDD §6 (15 zones : hubs N1 et N2 à part, N5, N6 et lanterne séparés) : à faire une fois la PR fusionnée. Ce fichier compte 13 zones.
 
-**Contradictions à corriger (rien n'est modifié sans ta validation)**
+**Contradictions à corriger** (LORE.md : mise à jour préparée par Direction, ne pas toucher avant sa fusion)
 - LORE §9 est obsolète : N1 « chambre + bureau », N2 « archives + machinerie », « 7 pièces principales », sommet « N3 », chaufferie.
 - LORE §4 dit que le tableau n'a aucun lien avec la coupure de la lampe. PHARE_RESEAUX fait pourtant partir de lui le câble vers N5, N6 et la lampe.
 - LORE §4 et §9 situent la coupure à la « machinerie » ; la refonte propose le coffret de N5.
-- LORE §2 (phare construit début XXᵉ, séjour de 3 à 8 ans, époque 1950-60) et PHARE_RESEAUX (« a pu participer à la rénovation ») : aucune date n'est posée, à garder ainsi.
+- LORE §2 (séjour de 3 à 8 ans, époque 1950-60) et sa présence à la transition vers 1950 (validée le 2026-11-15) : compatibles seulement si son départ se situe dans les années 1950. Aucune date n'est posée, à garder ainsi.
 - PLAN_DE_PRODUCTION : « 8 zones, 7 pièces principales » et cabanon « hors périmètre » ne suivent plus la refonte.
 - LORE §9 « hors lore : cabanon » : PHARE_RESEAUX le décide (extérieur, non jouable).
