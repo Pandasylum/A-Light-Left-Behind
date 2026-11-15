@@ -2,7 +2,14 @@
 
 [ext_resource type="Script" path="res://rooms/vestibule/vestibule.gd" id="1_scene"]
 [ext_resource type="PackedScene" path="res://tests/test_cleaning/cleaning_spike.tscn" id="2_spike"]
-[ext_resource type="PackedScene" path="res://props/test_item.tscn" id="3_item"]
+[ext_resource type="PackedScene" path="res://props/cle.tscn" id="scn_cle"]
+[ext_resource type="PackedScene" path="res://props/boite_vis.tscn" id="scn_boite_vis"]
+[ext_resource type="PackedScene" path="res://props/bobine_ficelle.tscn" id="scn_bobine_ficelle"]
+[ext_resource type="PackedScene" path="res://props/gants_travail.tscn" id="scn_gants_travail"]
+[ext_resource type="PackedScene" path="res://props/tasse_emaillee.tscn" id="scn_tasse_emaillee"]
+[ext_resource type="PackedScene" path="res://props/bottes_reparees.tscn" id="scn_bottes_reparees"]
+[ext_resource type="PackedScene" path="res://props/cire_plie.tscn" id="scn_cire_plie"]
+[ext_resource type="PackedScene" path="res://props/coffre.tscn" id="scn_coffre"]
 [ext_resource type="PackedScene" path="res://props/bucket.tscn" id="4_bucket"]
 [ext_resource type="Resource" path="res://data/tools/sponge.tres" id="5_sponge"]
 [ext_resource type="Resource" path="res://data/items/cle.tres" id="6_cle"]
@@ -270,43 +277,43 @@ zone_data = SubResource("zone_data_murale")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Zones/ZoneEtagereMuraleB"]
 shape = SubResource("shape_zone_murale")
 
-[node name="Cle" parent="." instance=ExtResource("3_item")]
+[node name="Cle" parent="." instance=ExtResource("scn_cle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0.025, 0.0)
 item_data = ExtResource("6_cle")
 
-[node name="BoiteVis1" parent="." instance=ExtResource("3_item")]
+[node name="BoiteVis1" parent="." instance=ExtResource("scn_boite_vis")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45, 0.04, -1.5)
 item_data = ExtResource("6_boite_vis")
 
-[node name="BoiteVis2" parent="." instance=ExtResource("3_item")]
+[node name="BoiteVis2" parent="." instance=ExtResource("scn_boite_vis")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45, 0.04, -1.2)
 item_data = ExtResource("6_boite_vis")
 
-[node name="BoiteVis3" parent="." instance=ExtResource("3_item")]
+[node name="BoiteVis3" parent="." instance=ExtResource("scn_boite_vis")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.45, 0.04, -0.9)
 item_data = ExtResource("6_boite_vis")
 
-[node name="Bobine" parent="." instance=ExtResource("3_item")]
+[node name="Bobine" parent="." instance=ExtResource("scn_bobine_ficelle")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, 0.06, -3.5)
 item_data = ExtResource("6_bobine_ficelle")
 
-[node name="Gants" parent="." instance=ExtResource("3_item")]
+[node name="Gants" parent="." instance=ExtResource("scn_gants_travail")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0.03, 4.5)
 item_data = ExtResource("6_gants_travail")
 
-[node name="Tasse" parent="." instance=ExtResource("3_item")]
+[node name="Tasse" parent="." instance=ExtResource("scn_tasse_emaillee")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.05, -0.85)
 item_data = ExtResource("6_tasse_emaillee")
 
-[node name="Bottes" parent="." instance=ExtResource("3_item")]
+[node name="Bottes" parent="." instance=ExtResource("scn_bottes_reparees")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.15, 4.5)
 item_data = ExtResource("6_bottes_reparees")
 
-[node name="Cire" parent="." instance=ExtResource("3_item")]
+[node name="Cire" parent="." instance=ExtResource("scn_cire_plie")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, 0.1, -4.2)
 item_data = ExtResource("6_cire_plie")
 
-[node name="Coffre" parent="." instance=ExtResource("3_item")]
+[node name="Coffre" parent="." instance=ExtResource("scn_coffre")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.25, 4.2)
 item_data = ExtResource("6_coffre")
 

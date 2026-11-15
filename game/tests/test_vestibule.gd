@@ -57,6 +57,19 @@ func _run() -> void:
 	var coffre: TestItem = scene.get_node("Coffre")
 	_check(cle.item_data == load("res://data/items/cle.tres") and coffre.item_data == load("res://data/items/coffre.tres"),
 			"les objets utilisent les .tres de game/data/items/")
+	# Art : chaque objet a un visuel .glb (pas de boîte de test), collision et surface conformes à l'ItemData.
+	for item: Node in scene.get_children():
+		if not (item is TestItem) or item.name == &"Bucket":
+			continue
+		var it: TestItem = item
+		var data: ItemData = it.item_data
+		var box: Vector3 = Vector3(data.footprint.x, data.height, data.footprint.y)
+		var shape: BoxShape3D = (it.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
+		var top: PlacementSurface = it.get_node("PlacementSurface")
+		_check(it.has_node("Visuel") and not it.has_node("MeshInstance3D") and it.get_node("Visuel").get_child_count() > 0,
+				"visuel .glb, sans boîte de test : " + it.name)
+		_check(shape != null and shape.size.is_equal_approx(box) and top.size == data.footprint
+				and is_equal_approx(top.position.y, data.height * 0.5), "collision et surface conformes à l'ItemData : " + it.name)
 	_put(cle, _support(scene, "Table"), -3.5, -1.5)
 	_put(bottes, _support(scene, "Table"), -3.2, -1.5)
 	_put(coffre, _support(scene, "Table"), -3.8, -1.5)

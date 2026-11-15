@@ -23,9 +23,12 @@ func _ready() -> void:
 	if item_data == null:
 		return
 	var size: Vector3 = cube_size(item_data)
-	var mesh: BoxMesh = BoxMesh.new()
-	mesh.size = size
-	($MeshInstance3D as MeshInstance3D).mesh = mesh
+	# Boîte visuelle de test, sauf si la scène fournit déjà son visuel (nœud « Visuel », ex. un .glb).
+	var box_node: MeshInstance3D = get_node_or_null("MeshInstance3D") as MeshInstance3D
+	if box_node != null and not has_node("Visuel"):
+		var mesh: BoxMesh = BoxMesh.new()
+		mesh.size = size
+		box_node.mesh = mesh
 	var shape: BoxShape3D = BoxShape3D.new()
 	shape.size = size
 	($CollisionShape3D as CollisionShape3D).shape = shape
