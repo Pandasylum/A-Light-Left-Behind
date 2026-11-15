@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Light Left Behind — Phare 3D v12</title>
+<style>
+:root{--bg:#f3efe4;--fg:#2a2d31;--mut:#6b6e73;--pan:rgba(255,255,255,.88);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d2024;--fg:#ecebe6;--mut:#a3a6ab;--pan:rgba(40,43,48,.9)}}
+:root[data-theme="dark"]{--bg:#1d2024;--fg:#ecebe6;--mut:#a3a6ab;--pan:rgba(40,43,48,.9)}
+html,body{height:100%;margin:0}body{background:var(--bg);color:var(--fg);font:13px system-ui,sans-serif;overflow:hidden}
+canvas{display:block}
+#ui{position:absolute;left:10px;top:calc(10px + env(safe-area-inset-top,0px));background:var(--pan);padding:10px 12px;border-radius:8px;max-width:290px;max-height:calc(100% - 30px);overflow:auto}
+#ui b{font-size:14px}#ui p{margin:6px 0;color:var(--mut);line-height:1.35}
+#ui button{margin:2px 2px 0 0;padding:4px 8px;border:1px solid var(--mut);border-radius:6px;background:transparent;color:var(--fg);cursor:pointer;font-size:12px}
+#ui button:focus-visible{outline:2px solid #2e7d5b}
+#ui button.on{background:#2e7d5b;color:#fff;border-color:#2e7d5b}
+.l{position:absolute;font-size:11px;font-weight:600;pointer-events:none;transform:translate(-50%,-50%);color:var(--fg);text-shadow:0 0 3px var(--bg),0 0 3px var(--bg);white-space:nowrap}
+.l.e{color:#7a4fb5}.l.w{color:#2f78b5}.l.d{color:#8a5a3a}
+</style></head><body>
+<div id="ui"><b>Phare — plan 3D v12 (1 u = 1 m)</b>
+<p>Étage 3,0 m · tour de 21 m (N0 à N6 + lanterne) · îlot de roche de 14 m · escalier colimaçon N0 à N4 (72 marches), puis 3 échelles · portes 0,9×2,1 m.<br>Vert = ouvert · rouge = verrouillé au départ (chaîne de déblocage) · orange = porte extérieure ou trappe · gris foncé = béton (sas et terrasse, ajoutés vers 1950).</p>
+<div id="b"></div>
+<p>Sous-sol et réseaux :</p><div id="t"></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const S=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.1,300);cam.position.set(4,32,52);
+const R=new THREE.WebGLRenderer({antialias:true,alpha:true});R.setSize(innerWidth,innerHeight);R.setPixelRatio(Math.min(devicePixelRatio,2));document.body.appendChild(R.domElement);
+const C=new THREE.OrbitControls(cam,R.domElement);C.target.set(16,9,3);C.update();
+S.add(new THREE.AmbientLight(0xffffff,.75));const dl=new THREE.DirectionalLight(0xffffff,.6);dl.position.set(-20,40,30);S.add(dl);
+// groupes : 0-2 niveaux, 3 tour haute, 4 sous-sol, 5 toits
+const H=3,G=[0,1,2,3,4,5].map(()=>{const g=new THREE.Group();S.add(g);return g});
+const g=l=>G[Math.min(l,3)];
+function bx(x0,x1,y0,y1,z0,z1,c,op,l,edge=true){const q=new THREE.BoxGeometry(x1-x0,y1-y0,z1-z0);const m=new THREE.Mesh(q,new THREE.MeshLambertMaterial({color:c,transparent:op<1,opacity:op,depthWrite:op>=.9}));m.position.set((x0+x1)/2,(y0+y1)/2,(z0+z1)/2);if(edge)m.add(new THREE.LineSegments(new THREE.EdgesGeometry(q),new THREE.LineBasicMaterial({color:0x444444})));G[l].add(m);return m}
+function bm(w,h,d,x,y,z,c,gr){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:c}));m.position.set(x,y,z);gr.add(m);return m}
+const BE=0xe9d9b8,CO=0xb9bcc2,MA=0x8d909a,WT=0xd5e4e8,BT=0x7d7b76;
+// N0 : vestibule, atelier, cuisine, salle d'eau, WC ; hub ; sas béton (côté tour)
+bx(0,6.3,0,H,2.3,7.9,0xc9d3dc,.35,0);bx(6.3,12.6,0,H,2.3,7.9,BE,.35,0);bx(18.5,25.5,0,H,2.3,7.9,BE,.35,0);bx(25.5,30,0,H,2.3,7.9,WT,.4,0);bx(30,32.6,0,H,2.3,7.9,WT,.4,0);
+bx(0,12.6,0,H,0,2.3,CO,.55,0);bx(18.5,32.6,0,H,0,2.3,CO,.55,0);bx(12.6,18.5,0,H,0,2.3,BT,.8,0);bx(12.6,18.5,0,H,2.3,7.9,MA,.22,0);
+// N1 : salon + chambre ; terrasse en béton au-dessus du socle de la tour
+bx(18.5,25.5,H,2*H,2.3,7.9,BE,.35,1);bx(25.5,32.6,H,2*H,2.3,7.9,0xe3d2c4,.35,1);bx(18.5,32.6,H,2*H,0,2.3,CO,.55,1);bx(12.6,18.5,H,2*H,0,2.3,BT,.8,1);
+bx(12.6,18.5,H,H+.12,2.3,7.9,BT,.9,1);bx(12.6,14.1,H+.12,H+.5,7.7,7.9,BT,1,1,false);bx(17,18.5,H+.12,H+.5,7.7,7.9,BT,1,1,false);
+// N2 : archives + bureau
+bx(18.5,32.6,2*H,3*H,2.3,7.9,BE,.35,2);bx(18.5,32.6,2*H,3*H,0,2.3,CO,.55,2);bx(12.6,18.5,2*H,3*H,0,2.3,BT,.8,2);bx(29.4,32.4,2*H,2*H+.8,6.5,7.7,0x7a5c3a,1,2);
+// toits
+bx(0,12.6,H,H+.25,0,7.9,0x5b6070,1,5,false);bx(18.5,32.6,3*H,3*H+.3,0,7.9,0x5b6070,1,5,false);bx(12.6,18.5,3*H,3*H+.3,0,2.3,0x5b6070,1,5,false);
+// sous-sol (taillé dans le rocher)
+bx(6.3,32.6,-2.8,-.1,.3,1.9,CO,.4,4);bx(6.3,12.6,-2.8,-.1,2.3,7.9,CO,.3,4);bx(19,25,-2.8,-.1,2.9,7.6,0x9cc3e4,.4,4);
+bx(26.5,29.5,-2.8,-.1,2.9,7.6,0xcdb59a,.4,4);bx(29.5,32.4,-2.8,-.1,2.9,7.6,0xcdb59a,.4,4);bx(0,6.3,-2.8,-.1,2.3,7.9,0x888888,.12,4);
+// tour : rayon 2,95 (touche le hub et le mur du salon), 7 niveaux
+const cx=15.55,cz=5.1,rT=2.95,rI=2.2,NT=7;
+for(let l=0;l<NT;l++){const q=new THREE.CylinderGeometry(rT,rT,H,40,1,true);const m=new THREE.Mesh(q,new THREE.MeshLambertMaterial({color:0xcfc6b0,transparent:true,opacity:.3,side:THREE.DoubleSide,depthWrite:false}));m.position.set(cx,l*H+H/2,cz);m.add(new THREE.LineSegments(new THREE.EdgesGeometry(q),new THREE.LineBasicMaterial({color:0x444444})));g(l).add(m);
+ const n=new THREE.Mesh(new THREE.CylinderGeometry(rI,rI,H,40,1,true),new THREE.MeshLambertMaterial({color:0xa89f8a,transparent:true,opacity:.25,side:THREE.DoubleSide,depthWrite:false}));n.position.set(cx,l*H+H/2,cz);g(l).add(n)}
+for(let l=0;l<5;l++){const m=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,H,20),new THREE.MeshLambertMaterial({color:0xa89f8a}));m.position.set(cx,l*H+H/2,cz);g(l).add(m)}
+{const a=new THREE.Mesh(new THREE.CylinderGeometry(rT,rT,2.9,40,1,true),new THREE.MeshLambertMaterial({color:0xcfc6b0,transparent:true,opacity:.3,side:THREE.DoubleSide,depthWrite:false}));a.position.set(cx,-1.45,cz);G[4].add(a);
+ const p=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,2.9,20),new THREE.MeshLambertMaterial({color:0xa89f8a}));p.position.set(cx,-1.45,cz);G[4].add(p);
+ // tube transparent du pilier (poids visible) à N5-N6, poids et câble
+ const t=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,6,20,1,true),new THREE.MeshLambertMaterial({color:0x6fbf98,transparent:true,opacity:.25,side:THREE.DoubleSide,depthWrite:false}));t.position.set(cx,18,cz);G[3].add(t);
+ const w=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,1.4,16),new THREE.MeshLambertMaterial({color:0x3a3d44}));w.position.set(cx,16.6,cz);G[3].add(w);
+ const c=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,3.4,6),new THREE.MeshBasicMaterial({color:0x222222}));c.position.set(cx,18.9,cz);G[3].add(c)}
+// escalier colimaçon : 72 marches (4 tours), de N0 à N4
+const sm=new THREE.MeshLambertMaterial({color:0x7a5c3a});
+for(let i=0;i<72;i++){const a=Math.PI+i/18*2*Math.PI;const m=new THREE.Mesh(new THREE.BoxGeometry(1.6,.14,.45),sm);m.position.set(cx+1.5*Math.sin(a),(i+1)*H/18-.07,cz+1.5*Math.cos(a));m.rotation.y=a-Math.PI/2;g(Math.floor(i/18)).add(m)}
+for(const l of [1,2,4]){const m=new THREE.Mesh(new THREE.CylinderGeometry(rI,rI,.12,24,1,false,Math.PI-.7,l==4?1.76:.7),new THREE.MeshLambertMaterial({color:0x9a8f7a}));m.position.set(cx,l*H-.06,cz);g(l).add(m)}
+function slab(y,ox,oz){const sh=new THREE.Shape();sh.absarc(0,0,2.7,0,Math.PI*2);const hp=new THREE.Path(),x0=ox-.35,x1=ox+.35,y0=-(oz+.2)-.35,y1=-(oz+.2)+.35;hp.moveTo(x0,y0);hp.lineTo(x1,y0);hp.lineTo(x1,y1);hp.lineTo(x0,y1);hp.closePath();sh.holes.push(hp);const sg=new THREE.ExtrudeGeometry(sh,{depth:.15,bevelEnabled:false,curveSegments:32});sg.rotateX(-Math.PI/2);const m=new THREE.Mesh(sg,new THREE.MeshLambertMaterial({color:0x6b6560}));m.position.set(cx,y,cz);G[3].add(m)}
+slab(5*H-.15,-1.4,-1.4);slab(6*H,-1.6,.65);slab(7*H,-1.6,-.9);bm(.8,.05,.8,cx-1.4,5*H+.03,cz-1.2,0xd0342c,G[3]);
+// N6 : demi-disque d'engrenages, cage grillagée, échelles
+{const gm=new THREE.MeshLambertMaterial({color:0x6fbf98,transparent:true,opacity:.4,side:THREE.DoubleSide});const mc=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,H-.15,24,1,false,0,Math.PI),gm);mc.position.set(cx,19.5+.075,cz);G[3].add(mc)}
+const lm=new THREE.MeshBasicMaterial({color:0x2e7d5b});[[-1.4,-1.4,12],[-1.6,.65,15],[-1.6,-.9,18]].forEach(([ox,oz,y0])=>{for(let k=0;k<2;k++){const r=new THREE.Mesh(new THREE.BoxGeometry(.05,H,.05),lm);r.position.set(cx+ox,y0+H/2,cz+oz+(k?.4:0));G[3].add(r)}for(let k=0;k<10;k++){const r=new THREE.Mesh(new THREE.BoxGeometry(.05,.05,.4),lm);r.position.set(cx+ox,y0+.3*(k+1),cz+oz+.2);G[3].add(r)}});
+// lanterne
+const lan=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.7,2.4,24,1,true),new THREE.MeshLambertMaterial({color:0xfff0a8,transparent:true,opacity:.55,side:THREE.DoubleSide}));lan.position.set(cx,22.2,cz);G[3].add(lan);
+const lamp=new THREE.Mesh(new THREE.SphereGeometry(.5,16,12),new THREE.MeshBasicMaterial({color:0x2e7d5b}));lamp.position.set(cx,22.2,cz);G[3].add(lamp);
+const rf=new THREE.Mesh(new THREE.ConeGeometry(2.2,1.4,24),new THREE.MeshLambertMaterial({color:0x5b6070}));rf.position.set(cx,24.1,cz);G[5].add(rf);
+// ancien système (N5), cage et boîte à outils
+bm(1.2,1.2,.9,cx+1.1,15.6,cz+1.1,0x7a5c3a,G[3]);bm(.3,.06,.06,cx+1.85,15.9,cz+1.1,0x8a5a3a,G[3]);bm(.06,.3,.06,cx+2,15.75,cz+1.1,0x8a5a3a,G[3]);
+{const cg=new THREE.BoxGeometry(2.2,2.6,2.4);const cm=new THREE.Mesh(cg,new THREE.MeshBasicMaterial({color:0xe08a1e,transparent:true,opacity:.12,depthWrite:false}));cm.position.set(cx+.8,19.5,cz);cm.add(new THREE.LineSegments(new THREE.EdgesGeometry(cg),new THREE.LineBasicMaterial({color:0xe08a1e})));G[3].add(cm)}
+bm(.06,2.1,.9,cx-.3,19.3,cz,0xd0342c,G[3]);bm(.5,.3,.3,cx+1,21.3,cz+.9,0xe08a1e,G[3]);bm(.12,.12,.04,cx+.15,16.5,cz-2.05,0xd0342c,G[3]);
+// portes
+function door(x,z,l,col,w=.9,dz=.35,dx=null){const m=new THREE.Mesh(new THREE.BoxGeometry(dx||w,2.1,dx?w:dz),new THREE.MeshBasicMaterial({color:col}));m.position.set(x,l*H+1.05,z);G[l].add(m)}
+const OK=0x2e9d6b,LK=0xd0342c,OR=0xe08a1e;
+door(cx+.8,2.3,0,LK);door(cx+.8,2.3,1,OK);door(cx+.8,2.3,2,LK);
+door(9.4,2.3,0,LK);door(22,2.3,0,OK);door(27.7,2.3,0,OK);door(31.3,2.3,0,OK);door(22,2.3,1,OK);door(29,2.3,1,OK);door(25,2.3,2,OK);
+door(6.3,5,0,LK,.9,0,.35);door(3,7.9,0,OR);
+bm(.9,.06,.9,7.5,.04,6.5,OR,G[0]);bm(.8,.06,.8,22,.04,6.2,0x555555,G[0]);bm(.7,.06,.7,31,.04,8.9,0x555555,G[0]);
+bm(3,2,1.8,13.2,1,9.5,0x8a6a45,G[0]);bm(3.4,.2,2.2,13.2,2.1,9.5,0x5b6070,G[0]);
+// accès sous-sol
+{const rm=new THREE.MeshBasicMaterial({color:0x2e7d5b});
+for(const dx of [-.28,.28]){const r=new THREE.Mesh(new THREE.BoxGeometry(.05,3.1,.05),rm);r.position.set(7.5+dx,-1.25,6.5);G[4].add(r)}
+for(let k=0;k<9;k++){const r=new THREE.Mesh(new THREE.BoxGeometry(.56,.04,.04),rm);r.position.set(7.5,-.3-k*.3,6.5);G[4].add(r)}
+function sd(x,z,col,v){const m=new THREE.Mesh(new THREE.BoxGeometry(v?.2:.9,2.1,v?.9:.2),new THREE.MeshBasicMaterial({color:col}));m.position.set(x,-1.75,z);G[4].add(m)}
+sd(9.4,2.1,0x2e9d6b);sd(15.55,2.1,0xd0342c);sd(32.7,1.1,0xd0342c,1);bm(.7,.7,.2,22,-1.5,2.4,0x555555,G[4])}
+// fenêtres (façade sud)
+for(const [x,l] of [[9.4,0],[22,0],[27.7,0],[22,1],[29,1],[22,2],[29,2]])bx(x-.7,x+.7,l*H+1,l*H+2,7.9,8,0x7fb2d6,1,l,false);
+// réseaux : électricité (e), eau (w), évacuation (d) ; index 3 = tour haute, 4 = sous-sol
+const UC={e:0x7a4fb5,w:0x2f78b5,d:0x8a5a3a},U={};
+for(const t in UC)U[t]=[0,1,2,3,4].map(()=>{const q=new THREE.Group();S.add(q);return q});
+function ub(t,l,x0,x1,y0,y1,z0,z1,c){const m=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,y1-y0,z1-z0),new THREE.MeshBasicMaterial({color:c||UC[t]}));m.position.set((x0+x1)/2,(y0+y1)/2,(z0+z1)/2);U[t][l].add(m)}
+const rod=(t,l,x,z,y0,y1,w=.12,c)=>ub(t,l,x-w/2,x+w/2,y0,y1,z-w/2,z+w/2,c);
+function ucyl(t,l,x,y,z,r,h,c){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,16),new THREE.MeshBasicMaterial({color:c||UC[t]}));m.position.set(x,y,z);U[t][l].add(m)}
+// électricité
+ub('e',0,7.4,8.6,0,.8,3,4.2,0x4b3a66);ub('e',0,13.3,13.8,1.3,2.1,.1,.3);ub('e',0,9.3,9.5,.25,.35,3.9,8.6,0x4b3a66);ucyl('e',0,9.4,.5,8.9,.5,1,0x4b3a66);
+ub('e',0,8,32,2.55,2.65,.15,.25);ub('e',0,4.4,8,2.55,2.65,3.45,3.55);rod('e',0,8,3.5,.8,2.55,.1);ub('e',0,4.3,4.5,2.2,2.6,3.4,3.6,0x555555);rod('e',0,8,2.9,.8,2.65,.1);ub('e',0,7.95,8.05,2.55,2.65,.15,2.95);ub('e',0,cx-.05,cx+.05,2.55,2.65,.2,cz-2.1);
+for(let l=0;l<3;l++){rod('e',l,17.6,.3,l*H,(l+1)*H);rod('e',l,cx,cz-2.15,l*H,(l+1)*H);if(l)ub('e',l,17.6,32,l*H+2.55,l*H+2.65,.15,.25)}
+rod('e',3,cx,cz-2.15,9,21.2);ub('e',3,cx-.25,cx+.25,16,16.7,cz-2.2,cz-2.05);
+ub('e',3,cx,cx+1.25,18.4,18.5,cz-2.2,cz-2.1);ub('e',3,cx+1.15,cx+1.25,18.4,18.5,cz-2.2,cz-.25);ub('e',3,cx-.05,cx+.05,21.1,21.2,cz-2.15,cz);rod('e',3,cx,cz,21.2,21.9,.1);
+rod('e',0,25.5,5.1,0,H,.5,0xc0661a);rod('e',1,25.5,5.1,H,2*H,.5,0xc0661a);rod('e',2,25.5,5.1,2*H,3*H+1.4,.5,0xc0661a);ub('e',0,24.1,24.9,0,.9,6.9,7.5,0x2a2a2e);
+for(let i=0;i<3;i++)ub('e',3,cx+1.35,cx+1.7,15,15.4,cz-.6+i*.45,cz-.3+i*.45,0x333b4a);
+ub('e',3,cx+.3,cx+.8,16,16.6,cz-2.2,cz-2.05,0xc0661a);ub('e',3,cx+.5,cx+.6,15.15,16,cz-2.15,cz-2.05);ub('e',3,cx+.5,cx+1.55,15.15,15.25,cz-2.15,cz-2.05);ub('e',3,cx+1.45,cx+1.55,15.15,15.25,cz-2.15,cz-.6);
+ub('e',3,cx+.95,cx+1.45,18.2,18.6,cz-.25,cz+.25);ucyl('e',3,cx,20.5,cz,.5,.08,0xb08d3a);
+// eau
+ub('w',4,19.2,24.8,-2.6,-1.2,3.1,7.4,0x4f98d6);rod('w',4,24.2,2.9,-2,0);rod('w',0,24.2,2.9,0,1.3);ub('w',0,20,20.4,.8,1.3,2.8,3.2);ub('w',0,26.8,27.2,.8,1.3,2.8,3.2);ucyl('w',0,26.3,.7,6.6,.4,1.2);
+for(let l=0;l<3;l++)rod('w',l,32.8,1.1,l*H,(l+1)*H);rod('w',0,12.4,1.1,0,H);ub('w',1,12.3,12.5,3.05,3.15,1.1,7.7);rod('w',4,32.8,1.1,-1,0);rod('w',4,12.4,1.1,-1,0);
+ub('w',4,12.4,32.8,-1.05,-.95,1.05,1.15);ub('w',4,19.45,19.55,-1.05,-.95,1.1,2.95);ub('w',4,19.1,19.9,-1.7,-.5,1.5,2.3,0x8fbfe6);
+// évacuation
+for(let l=0;l<3;l++)rod('d',l,25.5,2.9,l*H,(l+1)*H);rod('d',2,25.5,2.9,9,10.6);rod('d',4,25.5,2.9,-1.6,0);
+ub('d',4,25.5,31.3,-1.6,-1.5,2.85,2.95);ub('d',4,28.8,30.2,-1.6,-1.5,5.5,5.6);rod('d',0,31.3,3.8,0,.9);rod('d',4,31.3,3.8,-1.6,0);
+ub('d',4,22,34,-1.6,-1.5,8.85,8.95);ub('d',4,21.95,22.05,-1.6,-1.5,7.6,8.9);ub('d',4,27.95,28.05,-1.6,-1.5,7.6,8.9);
+// sol (plateau du rocher)
+const gr=new THREE.Mesh(new THREE.PlaneGeometry(80,60),new THREE.MeshBasicMaterial({color:0x8f9aa8,transparent:true,opacity:.25}));gr.rotation.x=-Math.PI/2;gr.position.set(16,-.02,0);S.add(gr);
+// étiquettes (l numérique = niveau ; s = sous-sol ; lettre = couche)
+const LB=[['VESTIBULE',3.1,1.5,5,0],['ATELIER',9.4,1.5,5,0],['CUISINE',22,1.5,5,0],['SALLE D’EAU',27.7,1.5,5,0],['WC',31.3,1.5,5,0],['HUB 0',6,1.5,1.1,0],['SAS DE LA TOUR (béton, ~1950)',15.55,2.6,1.1,0],['Socle de la tour (maçonnerie)',cx,.6,cz,0],
+['SALON',22,4.5,5,1],['CHAMBRE',29,4.5,5,1],['HUB 1',25.5,4.5,1.1,1],['Terrasse (béton)',15,3.5,7,1],['ARCHIVES + BUREAU',25.5,7.5,5,2],['HUB 2',25.5,7.5,1.1,2],
+['N3 · palier sans plancher (escalier seul)',cx,10.5,cz+2.4,3],['N4 · fin de l’escalier',cx,13.5,cz+2.4,3],['N5 · salle de remontée (sol complet)',cx,16.9,cz+2.4,3],['Trappe N4→N5 (verrouillée)',cx-1.4,15.5,cz-1.2,3],['Échelle N4→N5',cx-1.4,13,cz-1.2,3],['Échelle N5→N6',cx-1.6,16.5,cz+.85,3],['Échelle N6→lanterne',cx-1.6,19.5,cz-.7,3],['N6 · engrenages (cage)',cx+.8,20,cz,3],['Lanterne',cx,22.4,cz,3],
+['Escalier',cx,1.5,cz,0],['Porte ext.',3,.6,9.2,0],['Trappe du sous-sol',7.5,.6,6.5,0],['Regard citerne',22,.6,6.2,0],['Tampon rejet',31,.6,8.9,0],['Cabanon bois + charbon',13.2,2.6,9.5,0],
+['CAVE (réserve)',9.4,-1.4,5,'s'],['CITERNE',22,-1.4,5,'s'],['PUISARD',28,-1.4,5,'s'],['FOSSE',31,-1.4,5,'s'],['GALERIE',19,-1.4,1.1,'s'],['Puits des poids',cx,-1.4,cz,'s'],['Salle murée (à définir)',3.1,-1.4,5,'s'],['Échelle (3 m)',7.5,-.9,6.5,'s'],['Porte cave',9.4,-.6,2.1,'s'],['Porte du puits (clé)',15.55,-.6,2.1,'s'],['Trou d’homme citerne',22,-.9,2.4,'s'],['Grille de sortie',32.7,-.6,1.1,'s'],
+['Groupe',8,1.2,3.6,'e'],['Ampoule vestibule (hors service)',4.4,1.9,3.5,'e'],['Tableau (dans le sas)',13.5,2.3,.2,'e'],['Cuve fioul',9.4,1.5,8.9,'e'],['Colonne montante',17.6,2.5,.3,'e'],['Cuisinière + souche',25.5,1.6,5.1,'e'],['Coffret N5 (coupé)',cx,16.95,cz-2.1,'e'],['Batteries (à plat)',cx+1.6,15.7,cz-.2,'e'],['Chargeur (à activer)',cx+.6,17.35,cz-2.1,'e'],['Moteur d’optique',cx+1.2,19,cz,'e'],['Câble → lampe',cx,21.6,cz-1,'e'],
+['Pompe cuisine',20.2,1.6,3,'w'],['Ballon',26.3,1.6,6.6,'w'],['Pompe SdB',27,1.6,3,'w'],['Descente',32.8,7,1.1,'w'],['Collecteur',26,-.8,1.1,'w'],['Gouttière terrasse',12.4,3.5,4.5,'w'],['Décanteur',19.5,-.2,1.9,'w'],
+['Chute',25.5,4.6,2.9,'d'],['Évent',25.5,10.8,2.9,'d'],['Rejet mer →',32,-1.1,8.9,'d'],['Poids + coffre du treuil (hors service)',cx+1.3,17.1,cz+1.3,3]];
+const lbEl=LB.map(([t,x,yy,z,l])=>{const d=document.createElement('div');d.className='l'+(typeof l=='string'&&l!='s'?' '+l:'');d.textContent=t;document.body.appendChild(d);return{d,v:new THREE.Vector3(x,yy,z),l}});
+let K=4,sous=0;const on={e:0,w:0,d:0};
+const names=['Niv. 0','Niv. 0–1','Niv. 0–2','+ Tour haute','Tout'];
+const bb=document.getElementById('b'),tt=document.getElementById('t');
+function upd(){G.forEach((q,i)=>q.visible=i<4?i<=K:i==4?!!sous:K==4);
+ for(const t in U)U[t].forEach((q,i)=>q.visible=!!on[t]&&(i<4?i<=K:!!sous));
+ [...bb.children].forEach((e,i)=>e.className=i==K?'on':'');
+ [...tt.children].forEach(e=>e.className=(e.dataset.t=='s'?sous:on[e.dataset.t])?'on':'')}
+names.forEach((n,i)=>{const e=document.createElement('button');e.textContent=n;e.onclick=()=>{K=i;upd()};bb.appendChild(e)});
+[['s','Sous-sol'],['e','Électricité et feu'],['w','Eau'],['d','Évacuation']].forEach(([k,n])=>{const e=document.createElement('button');e.dataset.t=k;e.textContent=n;e.onclick=()=>{if(k=='s')sous=sous?0:1;else on[k]=on[k]?0:1;upd()};tt.appendChild(e)});
+upd();
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();R.setSize(innerWidth,innerHeight)});
+(function loop(){requestAnimationFrame(loop);C.update();R.render(S,cam);
+lbEl.forEach(o=>{const p=o.v.clone().project(cam);let vis=p.z<1;
+ if(typeof o.l=='number')vis=vis&&o.l<=Math.min(K,3);
+ else{const sub=o.v.y<0;vis=vis&&(o.l=='s'?!!sous:(sub?!!sous:Math.min(3,Math.floor(o.v.y/H))<=Math.min(K,3))&&!!on[o.l])}
+ o.d.style.display=vis?'block':'none';o.d.style.left=(p.x+1)/2*innerWidth+'px';o.d.style.top=(1-p.y)/2*innerHeight+'px'})})();
+</script></body></html>
