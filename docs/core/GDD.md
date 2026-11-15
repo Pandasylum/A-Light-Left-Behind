@@ -189,6 +189,7 @@ Types de saleté et outils :
   - L'atmosphère (éclairage, ambiance) évolue avec la progression, du froid vers le chaleureux.
   - Aucune nouveauté de mécanique n'est imposée pièce par pièce : tous les outils et mécaniques sont utilisables ; à revoir avec une extension.
   - Principes d'architecture : éviter une progression entièrement linéaire, donner une sensation de liberté sans monde ouvert, réutiliser les mêmes systèmes et des espaces indépendants, limiter les coûts grâce à une architecture simple.
+  - La tour compte dès qu'elle est à 100 %, même avant l'étape 5 (le joueur peut l'anticiper : elle est accessible dès l'étape 3). Seule la trappe N4 vers N5 reste gouvernée par l'étape 5 : elle exige aussi les archives + bureau et le hub N2, qui ne s'ouvrent qu'à l'étape 4. Décision validée le 2026-11-15.
 
 ### Pièce 1 — tutoriel
 
