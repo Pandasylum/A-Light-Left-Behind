@@ -4,7 +4,7 @@ extends RefCounted
 ## (testable). Valeurs provisoires : il n'existe pas encore de scène de jeu officielle.
 
 const TITLE_SCENE: String = "res://ui/menu/title_screen.tscn"
-const GAME_SCENE: String = "res://tests/test_tools/sponge_test.tscn" ## PROVISOIRE, configurable (title_screen.game_scene)
+const GAME_SCENE: String = "res://rooms/vestibule/vestibule.tscn" ## PROVISOIRE, configurable (title_screen.game_scene)
 const SLOT_ID: String = "partie"
 
 ## État de l'emplacement vu par l'écran-titre.
