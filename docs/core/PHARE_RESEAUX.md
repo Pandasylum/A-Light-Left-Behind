@@ -1,6 +1,6 @@
 # Phare — gestion de l’électricité et de l’eau
 
-Document de référence pour *A Light Left Behind*. Il rassemble les choix faits pour l’électricité, le fioul, le feu, l’eau et l’évacuation. Il suit les plans 2D et 3D v12 (en cours de mise à jour).
+Document de référence pour *A Light Left Behind*. Il rassemble les choix faits pour l’électricité, le fioul, le feu, l’eau et l’évacuation. Il suit les plans 2D et 3D v12, dans docs/core/plans/.
 
 ## Principe général
 
@@ -159,6 +159,4 @@ Des ampoules nues éclairent la galerie. Elles sont alimentées par le circuit d
 
 - **Chargeur et lampe** (décision provisoire) : recharger les batteries (chargeur activé) est une action à faire avant l’allumage de la lampe.
 - **Confort de montée** : si le confort de montée l’exige, retirer un étage reste possible (non décidé).
-- **Sentier et muret** : à corriger dans les plans v12 (le sentier doit rejoindre la porte du vestibule, le muret doit être au bord du rocher).
-- **Fosse et puisard** : les plans les inversent dans la v12 pour que les WC soient au-dessus de la fosse (le texte du présent document reste inchangé).
-- **Portes verrouillées de N0** (fût, cuisine, salle d’eau, WC) : à documenter.
+- **Portes de N0** (décision validée le 2026-11-15) : après l’atelier à 100 %, le hub, la cuisine, la salle d’eau et les WC s’ouvrent ensemble, sans verrou individuel. La porte du fût de N0 reste verrouillée jusqu’à l’étape 3 de la chaîne de déverrouillage (GDD §6).
