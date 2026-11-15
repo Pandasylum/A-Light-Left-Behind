@@ -1,6 +1,6 @@
 # TECHNICAL — A Light Left Behind
 
-Propriétaire : projet Godot Engineering. Dernière mise à jour : 2026-11-12.
+Propriétaire : projet Godot Engineering. Dernière mise à jour : 2026-11-15.
 Légende : ✅ décision validée · 🟡 à décider en Phase 0
 
 ## Contraintes validées ✅
