@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="UnlockChain" format=3]
+
+[ext_resource type="Script" path="res://data/unlock_chain.gd" id="1_chain"]
+[ext_resource type="Script" path="res://data/unlock_step.gd" id="2_step"]
+
+[sub_resource type="Resource" id="Resource_s1"]
+script = ExtResource("2_step")
+id = &"etape_1"
+required_zones = Array[StringName]([&"vestibule"])
+opens = Array[StringName]([&"atelier"])
+
+[sub_resource type="Resource" id="Resource_s2"]
+script = ExtResource("2_step")
+id = &"etape_2"
+required_zones = Array[StringName]([&"atelier"])
+opens = Array[StringName]([&"hub_n0", &"cuisine", &"salle_d_eau", &"wc"])
+
+[sub_resource type="Resource" id="Resource_s3"]
+script = ExtResource("2_step")
+id = &"etape_3"
+required_zones = Array[StringName]([&"hub_n0", &"cuisine", &"salle_d_eau", &"wc"])
+opens = Array[StringName]([&"porte_fut_n0"])
+
+[sub_resource type="Resource" id="Resource_s4"]
+script = ExtResource("2_step")
+id = &"etape_4"
+required_zones = Array[StringName]([&"salon", &"chambre", &"hub_n1"])
+opens = Array[StringName]([&"acces_n2"])
+
+[sub_resource type="Resource" id="Resource_s5"]
+script = ExtResource("2_step")
+id = &"etape_5"
+required_zones = Array[StringName]([&"archives_bureau", &"hub_n2", &"tour_n0_n4"])
+opens = Array[StringName]([&"trappe_n4_n5"])
+
+[sub_resource type="Resource" id="Resource_s6"]
+script = ExtResource("2_step")
+id = &"etape_6"
+required_zones = Array[StringName]([&"n5", &"n6", &"lanterne"])
+opens = Array[StringName]([&"fin_du_jeu"])
+
+[resource]
+script = ExtResource("1_chain")
+steps = Array[ExtResource("2_step")]([SubResource("Resource_s1"), SubResource("Resource_s2"), SubResource("Resource_s3"), SubResource("Resource_s4"), SubResource("Resource_s5"), SubResource("Resource_s6")])

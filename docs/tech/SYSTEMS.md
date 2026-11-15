@@ -67,10 +67,13 @@ Couches de collision : 1 monde, 2 joueur, 3 interactifs (valeur de masque 4).
 `game/systems/progress/progress_indicator.tscn` + `.gd` — ProgressIndicator (CanvasLayer, provisoire) : pourcentage, surfaces, objets rangés, marque « restaurée » ; libellés tr(progress.*) — RoomProgress
 `game/tests/test_progression.gd` + `test_progression/progression_test.tscn` — formule, section, chaîne en scène (mini-pièce NON OFFICIELLE, touche F8), verrou, sauvegarde — room_progress.gd, autosave.gd ; test : `tools/godot.sh --headless --path game --script res://tests/test_progression.gd`
 `game/tests/test_tools.gd` — ToolData, ToolSlots, equip_tool, seau, rinçage, verrou caméra, sauvegarde des outils, Autosave, sponge_test.tscn — tool_*.gd, autosave.gd, save_service.gd, bucket.tscn, cleaning_spike.tscn, sponge_test.tscn ; Test : `tools/godot.sh --headless --path game --script res://tests/test_tools.gd`
+`game/systems/progress/unlock_evaluator.gd` — UnlockEvaluator (RefCounted, statique) : SEUL endroit de la règle de la chaîne de déverrouillage (GDD §6) ; evaluate(chain, zones restaurées) -> Result (étapes complètes, accès ouverts) ; non branché à une scène — UnlockChain, UnlockStep
+`game/tests/test_unlock_chain.gd` — chaîne de 6 étapes, tour avant l'étape 3, étape 5, ordre de pose, inconnus, étape sans zone — unlock_evaluator.gd, unlock_chain.tres ; test : `tools/godot.sh --headless --path game --script res://tests/test_unlock_chain.gd`
 
 ## Données et ressources
 `game/data/item_data.gd` — ItemData (Resource) : id, nom, catégorie, emprise, height, orientations, axes suivis, provides_support, can_support_items ; validate() — aucune
 `game/data/zone_data.gd` — ZoneData (Resource) : id, catégories acceptées ; validate() — ItemData ; `game/data/room_data.gd` — RoomData (Resource) : id, nom, pièce précédente, axes actifs ; validate() — aucune
 `game/data/tool_data.gd` + `game/data/tools/sponge.tres` — ToolData (Resource) : id, nom, couches nettoyées, rayon, efficacité, perte max, salissure, portée ; validate() — aucune
 `game/data/placement_rules.gd` — PlacementRules (Resource) : pas de rotation, marge, couverture (provisoire) ; validate() — aucune
+`game/data/unlock_step.gd` + `game/data/unlock_chain.gd` + `game/data/unlock/unlock_chain.tres` — UnlockStep (Resource) : id, zones requises, accès ouverts ; UnlockChain (Resource) : les 6 étapes ; validate() — aucune
 `game/tests/data_validation_test.gd` — validate() des 4 classes de données — game/data/* ; Test : `tools/godot.sh --headless --path game --script res://tests/data_validation_test.gd`
