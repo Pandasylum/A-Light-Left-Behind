@@ -8,6 +8,14 @@ extends Resource
 ## Catégories d'objets acceptées (FIXED jamais accepté).
 @export var accepted_categories: Array[ItemData.Category] = []
 
+## Posture imposée par catégorie de taille. Catégorie absente = à plat (ItemData.Posture.A_PLAT).
+@export var postures_imposees: Dictionary[ItemData.Category, ItemData.Posture] = {}
+
+
+## Posture imposée par la zone à cette catégorie (à plat si aucune).
+func posture_for(category: ItemData.Category) -> ItemData.Posture:
+	return postures_imposees.get(category, ItemData.Posture.A_PLAT)
+
 
 ## Renvoie la liste des erreurs de validation (vide si valide).
 func validate() -> PackedStringArray:
