@@ -1,7 +1,8 @@
 extends SceneTree
 ## Vestibule (blocage gris) : chargement, GAME_SCENE, comptage surfaces + 11 objets suivis (7 SMALL, 3 MEDIUM dont le tableau, 1 LARGE ; ItemData .tres),
 ## table et palette zones comptées (meubles non comptés), verrou « restaurée » à 100 % et conservé après sauvegarde/rechargement,
-## tableau (zone murale ACCROCHE, refus de posture, chute, raccrochage).
+## tableau (zone murale ACCROCHE, refus de posture, chute, raccrochage), zones murales des 4 murs (découpe, accrochage
+## à plusieurs hauteurs, refus hors plage / devant étagère, porte, face à nettoyer / chevauchement, persistance).
 ## Lancer : tools/godot.sh --headless --path game --script res://tests/test_vestibule.gd
 
 const SaveServiceScript: GDScript = preload("res://core/save_service.gd")
@@ -81,7 +82,7 @@ func _run() -> void:
 			"table : SMALL et MEDIUM rangés, LARGE refusé, total inchangé (%s)" % str(progress.storing_counts()))
 	_put(coffre, _support(scene, "Palette"), -3.5, 1.5)
 	_check(storage.is_stored(coffre) and progress.storing_counts() == Vector2i(3, ITEMS), "palette : LARGE rangé (%s)" % str(progress.storing_counts()))
-	_check(_zone_count(scene) == 7 and _count_nodes(scene, ^"Furniture") == 7, "7 zones comptées (basse, table, palette, 2 murales, meuble à bottes, zone du tableau), 7 meubles non suivis")
+	_check(_zone_count(scene) == 13 and _count_nodes(scene, ^"Furniture") == 7, "13 zones (6 fixes : basse, table, palette, 2 murales, meuble à bottes ; 7 zones murales « accroché »), 7 meubles non suivis")
 	for furniture: Node in scene.get_node("Furniture").get_children():
 		_check(not (furniture is TestItem) and not furniture.has_node("StorageZone"), "meuble non compté : " + furniture.name)
 
@@ -189,16 +190,24 @@ func _run() -> void:
 	await process_frame
 
 	await _tableau()
-	await _tableau_persistence(true)
-	await _tableau_persistence(false)
+	await _zones_murales()
+	await _tableau_persistence(true, "ZoneMuraleEast1", Vector3(5.0, 1.5, 0.0))
+	await _tableau_persistence(true, "ZoneMuraleSouth1", Vector3(-2.0, 1.5, 5.0))
+	await _tableau_persistence(true, "ZoneMuraleWest0", Vector3(-5.0, 1.5, 2.0))
+	await _tableau_persistence(true, "ZoneMuraleNorth0", Vector3(0.0, 1.5, -5.0))
+	await _tableau_persistence(false, "ZoneMuraleNorth0", Vector3(0.0, 1.5, -5.0))
 	_close_service()
 	print("test_vestibule : ", "OK" if _failures == 0 else "%d échec(s)" % _failures)
 	quit(1 if _failures > 0 else 0)
 
 
-## Surface murale de la zone du tableau.
+## Surface murale de la zone du tableau (mur nord).
 func _wall(scene: Node3D) -> PlacementSurface:
-	return scene.get_node("Zones/ZoneMuraleTableau/PlacementSurface")
+	return _wall_of(scene, "ZoneMuraleNorth0")
+
+
+func _wall_of(scene: Node3D, zone_name: String) -> PlacementSurface:
+	return scene.get_node("Zones/%s/PlacementSurface" % zone_name)
 
 
 ## Accroche l'objet par le même chemin que PlacementController : ancrage sur le mur, orientation de la normale.
@@ -227,7 +236,7 @@ func _tableau() -> void:
 	var bottes: TestItem = scene.get_node("Bottes")
 	var data: ItemData = tableau.item_data
 	var wall: PlacementSurface = _wall(scene)
-	var zone: StorageZone = scene.get_node("Zones/ZoneMuraleTableau")
+	var zone: StorageZone = scene.get_node("Zones/ZoneMuraleNorth0")
 
 	# Données : seuls les champs demandés changent, collider épaissi en donnée, visuel inchangé.
 	_check(data == load("res://data/items/tableau_phare.tres") and data.validate().is_empty(), "tableau : ItemData valide, .tres de game/data/items/")
@@ -241,13 +250,15 @@ func _tableau() -> void:
 	var collision: CollisionShape3D = tableau.get_node("CollisionShape3D")
 	_check(is_equal_approx(collision.position.y - cshape.size.y * 0.5, -data.height * 0.5), "collider : dessous et face arrière du visuel conservés (épaissi vers l'avant)")
 
-	# Zone murale : mur nord, plan 0,60 x 0,50 m, normale = orientation de la zone, MEDIUM -> ACCROCHE.
+	# Zone murale : mur nord, plan 10 x 1,10 m (pan libre entier, plage 0,90 à 2,00 m), normale = orientation de la zone,
+	# MEDIUM -> ACCROCHE.
 	var zshape: BoxShape3D = (zone.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D
 	_check(zone.zone_data.validate().is_empty() and zone.zone_data.accepted_categories == [ItemData.Category.MEDIUM]
 			and zone.zone_data.posture_for(ItemData.Category.MEDIUM) == ItemData.Posture.ACCROCHE
 			and zone.zone_data.posture_for(ItemData.Category.SMALL) == ItemData.Posture.A_PLAT, "zone murale : MEDIUM accepté et ACCROCHE imposé")
-	_check(wall.is_wall and wall.zone == zone and wall.size.is_equal_approx(Vector2(0.6, 0.5))
-			and is_equal_approx(zshape.size.x, 0.6) and is_equal_approx(zshape.size.y, 0.5), "zone murale : plan 0,60 m x 0,50 m (surface et volume)")
+	_check(wall.is_wall and wall.zone == zone and wall.size.is_equal_approx(Vector2(10.0, 1.1))
+			and is_equal_approx(zshape.size.x, 10.0) and is_equal_approx(zshape.size.y, 1.1) and is_equal_approx(zshape.size.z, 0.1),
+			"zone murale du mur nord : plan 10 m x 1,10 m, épaisseur 0,10 m (surface et volume)")
 	_check(wall.wall_normal().is_equal_approx(Vector3(0.0, 0.0, 1.0)) and is_equal_approx(zone.global_position.z, -5.0),
 			"zone murale : sur le mur nord, normale +Z (orientation de la zone)")
 
@@ -302,12 +313,12 @@ func _tableau() -> void:
 	_check(hung_percent > 0, "accroché : pourcentage > 0 (%d %%)" % hung_percent)
 	await physics_frame
 
-	# Chute depuis la zone : visée au bord (couverture insuffisante), le tableau tombe à plat au sol, non rangé.
+	# Chute depuis la zone : visée sous la plage de hauteur (couverture insuffisante), le tableau tombe à plat au sol, non rangé.
 	carry.pick_up(tableau.get_node("Interactable"))
-	_aim_at(player, standing, Vector3(0.5, 1.5, -5.0))
+	_aim_at(player, standing, Vector3(0.0, 0.85, -5.0))
 	await physics_frame
 	placement._update_target()
-	_check(placement._surface == wall and placement._verdict == PlacementController.Verdict.UNSTABLE, "visée au bord de la zone : instable (orange)")
+	_check(placement._surface == wall and placement._verdict == PlacementController.Verdict.UNSTABLE, "visée sous la plage de la zone : instable (orange)")
 	placement.place_held()
 	_check(carry.held_body() == null and tableau.support_surface != null and tableau.support_surface.is_floor
 			and tableau.global_basis.y.is_equal_approx(Vector3.UP) and is_equal_approx(tableau.global_position.y, data.height * 0.5),
@@ -328,15 +339,277 @@ func _tableau() -> void:
 	await process_frame
 
 
+## Zones murales « accroché » (Direction 15/11/2026, option A, provisoire) : réglages, découpe en pans, zones créées sur les 4
+## murs, accrochage et « rangé » sur chaque mur à plusieurs hauteurs, refus hors plage (chute à plat), devant une étagère
+## murale, la porte de sortie ou une face à nettoyer, refus d'un tableau qui en chevauche un autre, refus d'un MEDIUM sans ACCROCHE.
+func _zones_murales() -> void:
+	# Réglages : valeurs de départ en données, jamais en dur ailleurs.
+	var rules: WallZoneRules = WallZoneRules.new()
+	_check(rules.validate().is_empty() and is_equal_approx(rules.height_min, 0.90) and is_equal_approx(rules.height_max, 2.00)
+			and is_equal_approx(rules.cut_margin, 0.05) and is_equal_approx(rules.door_half_width, 0.60)
+			and is_equal_approx(rules.thickness, 0.10), "réglages murs : plage 0,90 à 2,00 m, marge 0,05 m, porte ±0,60 m, épaisseur 0,10 m")
+	var bad: WallZoneRules = WallZoneRules.new()
+	bad.height_max = 0.5
+	bad.thickness = 0.0
+	_check(bad.validate().size() == 2, "réglages murs : plage inversée et épaisseur nulle refusées par validate()")
+
+	# Découpe en pans (fonction pure).
+	var span: Vector2 = Vector2(-5.0, 5.0)
+	_check(_same_pans(WallZoneBuilder.pans_of(span, _list([]), 0.05), [Vector2(-5.0, 5.0)]), "pans : mur sans retrait = un pan, coin à coin")
+	_check(_same_pans(WallZoneBuilder.pans_of(span, _list([Vector2(1.0, 2.0)]), 0.05), [Vector2(-5.0, 0.95), Vector2(2.05, 5.0)]),
+			"pans : un retrait au milieu = deux pans, marge de 0,05 m de chaque côté")
+	_check(_same_pans(WallZoneBuilder.pans_of(span, _list([Vector2(1.0, 2.0), Vector2(1.98, 3.0)]), 0.05), [Vector2(-5.0, 0.95), Vector2(3.05, 5.0)]),
+			"pans : deux retraits qui se recouvrent = un seul trou")
+	_check(_same_pans(WallZoneBuilder.pans_of(span, _list([Vector2(3.0, 4.0), Vector2(-3.0, -2.0)]), 0.05),
+			[Vector2(-5.0, -3.05), Vector2(-1.95, 2.95), Vector2(4.05, 5.0)]), "pans : retraits donnés dans le désordre, pans rendus dans l'ordre")
+	_check(_same_pans(WallZoneBuilder.pans_of(span, _list([Vector2(-6.0, -4.9)]), 0.05), [Vector2(-4.85, 5.0)]), "pans : retrait au coin = pan raccourci")
+	_check(_same_pans(WallZoneBuilder.pans_of(span, _list([Vector2(6.0, 7.0)]), 0.05), [Vector2(-5.0, 5.0)]), "pans : retrait hors du mur ignoré")
+	_check(WallZoneBuilder.pans_of(span, _list([Vector2(-6.0, 6.0)]), 0.05).is_empty(), "pans : retrait qui couvre tout le mur = aucun pan")
+	var north: WallZoneBuilder.Wall = WallZoneBuilder.Wall.new()
+	north.point = Vector3(0.0, 0.0, -5.0)
+	north.normal = Vector3.BACK
+	north.tangent = Vector3.RIGHT
+	_check(WallZoneBuilder.cut_of_box(north, AABB(Vector3(2.0, 1.0, -4.95), Vector3(1.0, 0.5, 0.4)), 0.30) == _list([Vector2(2.0, 3.0)])
+			and WallZoneBuilder.cut_of_box(north, AABB(Vector3(2.0, 1.0, -0.2), Vector3(1.0, 0.5, 0.4)), 0.30).is_empty()
+			and WallZoneBuilder.cut_of_box(north, AABB(Vector3(-1.0, 0.0, -5.0), Vector3(2.0, 2.0, 0.0)), 0.30) == _list([Vector2(-1.0, 1.0)]),
+			"retrait d'une boîte : rattaché au mur s'il est à 0,30 m ou moins (face plate sur le mur comprise), sinon ignoré")
+	_check(WallZoneBuilder.cut_of_door(north, Vector3(1.0, 1.0, -4.95), 0.6, 0.3) == _list([Vector2(0.4, 1.6)])
+			and WallZoneBuilder.cut_of_door(north, Vector3(1.0, 1.0, 0.0), 0.6, 0.3).is_empty(), "retrait d'une porte : ± demi-largeur autour du repère")
+
+	var scene: Node3D = _open(false)
+	await _settle()
+	var storage: StorageService = scene.get_node("StorageService")
+	var tableau: TestItem = scene.get_node("TableauPhare")
+	var data: ItemData = tableau.item_data
+	var scene_rules: WallZoneRules = scene.wall_rules
+	_check(scene_rules != null and scene_rules.validate().is_empty() and scene.wall_zone_data.validate().is_empty(), "scène : réglages et ZoneData des murs valides")
+
+	# Zones créées : mur, centre (x, z), largeur, normale.
+	var expected: Dictionary = {
+		"ZoneMuraleNorth0": [Vector2(0.0, -5.0), 10.0, Vector3(0.0, 0.0, 1.0)],
+		"ZoneMuraleSouth0": [Vector2(3.575, 5.0), 2.85, Vector3(0.0, 0.0, -1.0)],
+		"ZoneMuraleSouth1": [Vector2(-2.075, 5.0), 5.85, Vector3(0.0, 0.0, -1.0)],
+		"ZoneMuraleEast0": [Vector2(5.0, -4.275), 1.45, Vector3(-1.0, 0.0, 0.0)],
+		"ZoneMuraleEast1": [Vector2(5.0, 0.0), 4.9, Vector3(-1.0, 0.0, 0.0)],
+		"ZoneMuraleEast2": [Vector2(5.0, 4.275), 1.45, Vector3(-1.0, 0.0, 0.0)],
+		"ZoneMuraleWest0": [Vector2(-5.0, 0.0), 10.0, Vector3(1.0, 0.0, 0.0)],
+	}
+	var built: int = 0
+	var zone_boxes: Array[AABB] = []
+	for node: Node in scene.get_node("Zones").get_children():
+		if node.name.begins_with(WallZoneBuilder.NAME_PREFIX):
+			built += 1
+	_check(built == expected.size(), "zones murales : %d zones (nord 1, sud 2, est 3, ouest 1)" % built)
+	for zone_name: String in expected:
+		var zone: StorageZone = scene.get_node_or_null("Zones/" + zone_name)
+		if zone == null:
+			_check(false, "zone murale absente : " + zone_name)
+			continue
+		var spec: Array = expected[zone_name]
+		var center: Vector2 = spec[0]
+		var width: float = spec[1]
+		var box: BoxShape3D = (zone.get_child(0) as CollisionShape3D).shape as BoxShape3D
+		var surface: PlacementSurface = _wall_of(scene, zone_name)
+		_check(zone.global_position.is_equal_approx(Vector3(center.x, 1.45, center.y)) and box.size.is_equal_approx(Vector3(width, 1.1, 0.1))
+				and zone.global_basis.z.is_equal_approx(spec[2]) and surface.is_wall and surface.zone == zone
+				and surface.size.is_equal_approx(Vector2(width, 1.1)) and surface.global_basis.z.is_equal_approx(spec[2])
+				and zone.zone_data == scene.wall_zone_data and surface.is_in_group(PlacementSurface.WALL_GROUP),
+				"%s : centre (%.3f ; %.3f), %.2f m x 1,10 m (0,90 à 2,00 m), épaisseur 0,10 m, normale %s" % [zone_name, center.x, center.y, width, str(spec[2])])
+		_check(zone.zone_data.accepted_categories == [ItemData.Category.MEDIUM] and zone.zone_data.posture_for(ItemData.Category.MEDIUM) == ItemData.Posture.ACCROCHE
+				and zone.zone_data.posture_for(ItemData.Category.SMALL) == ItemData.Posture.A_PLAT, "%s : MEDIUM accepté, ACCROCHE imposé" % zone_name)
+		var wall_plane: float = zone.global_position.dot(spec[2])
+		_check(absf(wall_plane + 5.0) < 0.001 and _corner_ok(zone, width), "%s : sur le plan intérieur du mur, jamais à cheval sur un coin" % zone_name)
+		zone_boxes.append(AABB(zone.global_position - _abs_basis(zone.global_basis) * box.size * 0.5, _abs_basis(zone.global_basis) * box.size))
+	# Retraits : marge de 0,05 m autour des étagères murales et de la porte ; aucune zone sur un meuble ni une face à nettoyer.
+	var shelves: Array[Array] = []
+	for shelf: String in ["EtagereMuraleA", "EtagereMuraleB"]:
+		var body: Node3D = scene.get_node("Furniture/" + shelf)
+		var size: Vector3 = ((body.get_node("CollisionShape3D") as CollisionShape3D).shape as BoxShape3D).size
+		shelves.append([body.global_position.z - size.z * 0.5, body.global_position.z + size.z * 0.5])
+	var door_x: float = scene.get_node("PorteSortie").global_position.x
+	var margins_ok: bool = true
+	for zone_name: String in expected:
+		var zone: Node3D = scene.get_node("Zones/" + zone_name)
+		var half: float = (expected[zone_name][1] as float) * 0.5
+		if zone_name.begins_with("ZoneMuraleEast"):
+			for shelf_span: Array in shelves:
+				margins_ok = margins_ok and _gap(zone.global_position.z - half, zone.global_position.z + half, shelf_span[0], shelf_span[1]) >= 0.05 - 0.0001
+		elif zone_name.begins_with("ZoneMuraleSouth"):
+			margins_ok = margins_ok and _gap(zone.global_position.x - half, zone.global_position.x + half, door_x - 0.6, door_x + 0.6) >= 0.05 - 0.0001
+	_check(margins_ok, "retraits : étagères murales A et B (mur est) et porte de sortie ±0,60 m (mur sud) laissées libres, marge 0,05 m")
+	var overlaps: int = 0
+	for body_node: Node in scene.get_node("Furniture").get_children():
+		var shape_node: CollisionShape3D = body_node.get_node("CollisionShape3D")
+		var size: Vector3 = (shape_node.shape as BoxShape3D).size
+		for zbox: AABB in zone_boxes:
+			if zbox.intersects(AABB(shape_node.global_position - size * 0.5, size)):
+				overlaps += 1
+	for face_node: Node in get_nodes_cleanable(scene):
+		for zbox: AABB in zone_boxes:
+			if zbox.intersects((face_node as CleanableFace).world_bounds()):
+				overlaps += 1
+	_check(overlaps == 0, "aucune zone murale ne recouvre un meuble ni une face à nettoyer (%d recouvrements)" % overlaps)
+
+	var player: Player = scene.get_node("Spike/Player")
+	var carry: CarryController = player.get_node("CarryController")
+	var placement: PlacementController = player.get_node("PlacementController")
+	var bottes: TestItem = scene.get_node("Bottes")
+	var space: PhysicsDirectSpaceState3D = scene.get_world_3d().direct_space_state
+	var check: PlacementCheck = PlacementCheck.new()
+	var cases: Array[Dictionary] = [
+		{"zone": "ZoneMuraleNorth0", "normal": Vector3(0.0, 0.0, 1.0), "base": Vector3(0.0, 0.0, -5.0)},
+		{"zone": "ZoneMuraleEast1", "normal": Vector3(-1.0, 0.0, 0.0), "base": Vector3(5.0, 0.0, 0.0)},
+		{"zone": "ZoneMuraleSouth1", "normal": Vector3(0.0, 0.0, -1.0), "base": Vector3(-2.0, 0.0, 5.0)},
+		{"zone": "ZoneMuraleWest0", "normal": Vector3(1.0, 0.0, 0.0), "base": Vector3(-5.0, 0.0, 0.0)},
+	]
+	for wall_case: Dictionary in cases:
+		var zone_name: String = wall_case["zone"]
+		var normal: Vector3 = wall_case["normal"]
+		var base: Vector3 = wall_case["base"]
+		var wall: PlacementSurface = _wall_of(scene, zone_name)
+		var label: String = zone_name.trim_prefix(WallZoneBuilder.NAME_PREFIX)
+
+		# Un MEDIUM sans ACCROCHE (bottes) est refusé sur chaque mur.
+		var any_anchor: Vector3 = Vector3(base.x, 1.45, base.z)
+		_check(PlacementLanding.evaluate_pose(space, check, bottes.item_data, 0.0, any_anchor, wall) == PlacementLanding.Verdict.POSTURE_REFUSED
+				and check.evaluate(bottes.item_data, 0.0, any_anchor, wall).status == PlacementCheck.Status.POSTURE_REFUSED,
+				"%s : MEDIUM sans posture accrochée refusé (POSTURE_REFUSED)" % label)
+
+		# Accrochage et « rangé » à plusieurs hauteurs de la plage.
+		for height: float in [1.0, 1.45, 1.9]:
+			var anchor: Vector3 = Vector3(base.x, height, base.z)
+			await _take_and_aim(player, carry, placement, tableau, anchor, normal)
+			var verdict_ok: bool = placement._surface == wall and placement._verdict == PlacementController.Verdict.OK
+			placement.place_held()
+			var back: Vector3 = tableau.global_position - tableau.global_basis.y * data.height * 0.5
+			_check(verdict_ok and carry.held_body() == null and tableau.support_surface == wall and tableau.global_basis.y.is_equal_approx(normal)
+					and absf((back - wall.global_position).dot(normal)) < 0.001 and wall.zone.holds(tableau) and storage.is_stored(tableau),
+					"%s, hauteur %.2f m : accroché (vert), face arrière sur le mur, rangé" % [label, height])
+			await physics_frame
+
+		# Hors plage : le tableau tombe à plat au sol, non rangé.
+		for height: float in [0.85, 2.10]:
+			var anchor: Vector3 = Vector3(base.x, height, base.z)
+			await _take_and_aim(player, carry, placement, tableau, anchor, normal)
+			var verdict_unstable: bool = placement._surface == wall and placement._verdict == PlacementController.Verdict.UNSTABLE
+			placement.place_held()
+			_check(verdict_unstable and carry.held_body() == null and tableau.support_surface != null and tableau.support_surface.is_floor
+					and tableau.global_basis.y.is_equal_approx(Vector3.UP) and not storage.is_stored(tableau),
+					"%s, hauteur %.2f m (hors 0,90 à 2,00 m) : instable (orange), chute à plat au sol, non rangé" % [label, height])
+			await physics_frame
+
+		# Bornes du volume (point de référence du tableau) : 0,90 et 2,00 m rangés, en dessous et au-dessus non.
+		var stored_by_height: Array[bool] = []
+		for height: float in [0.895, 0.905, 1.995, 2.005]:
+			_hang(tableau, wall, Vector3(base.x, height, base.z))
+			stored_by_height.append(storage.is_stored(tableau))
+		_check(stored_by_height == [false, true, true, false], "%s : rangé entre 0,90 et 2,00 m seulement (%s)" % [label, str(stored_by_height)])
+		tableau.on_picked_up()
+		await physics_frame
+
+	# Refus par absence de zone : devant une étagère murale, devant la porte de sortie, sur une face à nettoyer.
+	var no_surface: Array[Dictionary] = [
+		{"label": "au-dessus de l'étagère murale A (mur est)", "anchor": Vector3(5.0, 1.8, -3.0), "normal": Vector3(-1.0, 0.0, 0.0)},
+		{"label": "sous l'étagère murale B (mur est)", "anchor": Vector3(5.0, 1.2, 3.0), "normal": Vector3(-1.0, 0.0, 0.0)},
+		{"label": "devant la porte de sortie (mur sud)", "anchor": Vector3(1.5, 1.5, 5.0), "normal": Vector3(0.0, 0.0, -1.0)},
+		{"label": "sur le mur droit à nettoyer", "anchor": Vector3(-1.5, 1.5, 0.0), "normal": Vector3(0.0, 0.0, 1.0)},
+	]
+	for refused: Dictionary in no_surface:
+		await _take_and_aim(player, carry, placement, tableau, refused["anchor"], refused["normal"])
+		var none: bool = placement._surface == null and placement._verdict == PlacementController.Verdict.NO_SURFACE
+		placement.place_held()
+		_check(none and carry.held_body() == tableau and not storage.is_stored(tableau), "refus %s : aucune surface, tableau toujours en main" % refused["label"])
+	# Près de la porte (dans la marge) : le recouvrement de la porte est insuffisant, le tableau tombe, non rangé.
+	await _take_and_aim(player, carry, placement, tableau, Vector3(0.95, 1.45, 5.0), Vector3(0.0, 0.0, -1.0))
+	var near_door: bool = placement._verdict == PlacementController.Verdict.UNSTABLE
+	placement.place_held()
+	_check(near_door and not storage.is_stored(tableau) and tableau.support_surface != _wall_of(scene, "ZoneMuraleSouth1"),
+			"refus près de la porte (bord de la marge) : instable, non accroché, non rangé")
+
+	# Deux tableaux : le second, qui chevauche le premier, est refusé ; à côté, il s'accroche.
+	var second: TestItem = (load("res://props/tableau_phare.tscn") as PackedScene).instantiate() as TestItem
+	second.item_data = data
+	second.position = Vector3(-1.5, 0.015, 2.0)
+	scene.add_child(second)
+	await physics_frame
+	var north_wall: PlacementSurface = _wall_of(scene, "ZoneMuraleNorth0")
+	await _take_and_aim(player, carry, placement, tableau, Vector3(0.0, 1.45, -5.0), Vector3(0.0, 0.0, 1.0))
+	placement.place_held()
+	_check(tableau.support_surface == north_wall and storage.is_stored(tableau), "deux tableaux : le premier est accroché au mur nord")
+	await physics_frame
+	await _take_and_aim(player, carry, placement, second, Vector3(0.4, 1.45, -5.0), Vector3(0.0, 0.0, 1.0))
+	var blocked: bool = placement._surface == north_wall and placement._verdict == PlacementController.Verdict.BLOCKED
+	placement.place_held()
+	_check(blocked and carry.held_body() == second and second.support_surface == null, "deux tableaux : le second, qui chevauche le premier, est refusé (rouge), reste en main")
+	await _take_and_aim(player, carry, placement, second, Vector3(1.0, 1.45, -5.0), Vector3(0.0, 0.0, 1.0))
+	var free_beside: bool = placement._verdict == PlacementController.Verdict.OK
+	placement.place_held()
+	_check(free_beside and second.support_surface == north_wall and north_wall.zone.holds(second) and tableau.support_surface == north_wall
+			and storage.is_stored(tableau), "deux tableaux : côte à côte, les deux accrochés dans la zone")
+	scene.queue_free()
+	await process_frame
+
+
+## Prend l'objet en main (s'il ne l'est pas), place le joueur à 1,5 m du point d'ancrage, face au mur, et met à jour la visée.
+func _take_and_aim(player: Player, carry: CarryController, placement: PlacementController, item: TestItem, anchor: Vector3, normal: Vector3) -> void:
+	if carry.held_body() != item:
+		carry.pick_up(item.get_node("Interactable"))
+	var stand: Vector3 = anchor + normal * 1.5
+	stand.y = 0.05
+	_aim_at(player, stand, anchor)
+	await physics_frame
+	placement._update_target()
+
+
+func _list(values: Array) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	for value: Vector2 in values:
+		out.append(value)
+	return out
+
+
+func _same_pans(actual: Array[Vector2], expected: Array) -> bool:
+	if actual.size() != expected.size():
+		return false
+	for i: int in actual.size():
+		if not actual[i].is_equal_approx(expected[i]):
+			return false
+	return true
+
+
+## Distance entre deux intervalles (négative s'ils se recouvrent).
+func _gap(a_low: float, a_high: float, b_low: float, b_high: float) -> float:
+	return maxf(a_low - b_high, b_low - a_high)
+
+
+## Coin intérieur à ±5 m : l'étendue de la zone le long du mur ne le dépasse pas.
+func _corner_ok(zone: Node3D, width: float) -> bool:
+	var pos: Vector3 = zone.global_position
+	var s: float = pos.x if absf(zone.global_basis.x.x) > 0.5 else pos.z
+	return absf(s) + width * 0.5 <= 5.0 + 0.0001
+
+
+func _abs_basis(basis: Basis) -> Basis:
+	return Basis(basis.x.abs(), basis.y.abs(), basis.z.abs())
+
+
+func get_nodes_cleanable(scene: Node) -> Array[Node]:
+	var out: Array[Node] = []
+	for node: Node in scene.get_tree().get_nodes_in_group(CleanableFace.GROUP):
+		if scene.is_ancestor_of(node):
+			out.append(node)
+	return out
+
+
 ## Sauvegarde → rechargement du tableau, sur la vraie zone murale : accroché (même transform, toujours rangé, même
 ## nombre d'objets rangés) ou tombé à plat (rechargé à plat, non rangé). Champ « rotation » écrit dans l'entrée.
-func _tableau_persistence(hung: bool) -> void:
-	var tag: String = "accroché" if hung else "tombé à plat"
+func _tableau_persistence(hung: bool, zone_name: String, anchor: Vector3) -> void:
+	var tag: String = ("accroché %s" % zone_name) if hung else "tombé à plat"
 	var scene: Node3D = _open(false)
 	await _settle()
 	var tableau: TestItem = scene.get_node("TableauPhare")
-	var wall: PlacementSurface = _wall(scene)
-	var anchor: Vector3 = Vector3(0.0, 1.5, -5.0)
+	var wall: PlacementSurface = _wall_of(scene, zone_name)
+	var wall_normal: Vector3 = wall.wall_normal()
 	var floor_surface: PlacementSurface = tableau.support_surface
 	_hang(tableau, wall, anchor)
 	if not hung: # chute : posé au sol, à plat, au même endroit qu'après une chute
@@ -367,8 +640,12 @@ func _tableau_persistence(hung: bool) -> void:
 	var stored_after: int = (reloaded.get_node("RoomProgress") as RoomProgress).storing_counts().x
 	_check(storage_again.is_stored(again) == hung and stored_after == stored_before,
 			"persistance (%s) : rangé = %s, même nombre d'objets rangés (%d)" % [tag, str(hung), stored_before])
-	_check(again.global_basis.y.is_equal_approx(Vector3(0.0, 0.0, 1.0)) == hung and again.global_basis.y.is_equal_approx(Vector3.UP) == not hung,
-			"persistance (%s) : %s" % [tag, "face contre le mur (axe horizontal conservé)" if hung else "à plat"])
+	_check(again.global_basis.y.is_equal_approx(wall_normal) == hung and again.global_basis.y.is_equal_approx(Vector3.UP) == not hung,
+			"persistance (%s) : %s" % [tag, "face contre le mur (normale du mur conservée)" if hung else "à plat"])
+	if hung:
+		var wall_again: PlacementSurface = _wall_of(reloaded, zone_name)
+		_check(again.support_surface == wall_again and wall_again.zone.holds(again),
+				"persistance (%s) : surface porteuse = la zone murale rechargée, qui contient l'objet" % tag)
 	reloaded.queue_free()
 	await process_frame
 
